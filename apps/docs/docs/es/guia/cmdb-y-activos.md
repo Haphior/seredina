@@ -65,6 +65,44 @@ corre. `seredina-agent uninstall --purge` quita el agente. Para
 actualizarlo, ejecutá un comando de inscripción nuevo: el equipo conserva
 su registro.
 
+### Qué reporta el agente
+
+Cada hora el agente envía un inventario completo. En la página del activo
+se ve en pestañas, y **Descargar JSON** lo guarda entero:
+
+| Pestaña | Qué contiene |
+|---|---|
+| Resumen | Fabricante, modelo y número de serie; sistema operativo y compilación; CPU; memoria; último arranque; usuario con sesión; dominio; IPs. Avisos si hay un reinicio pendiente, el disco sin cifrar, ningún antivirus activo o actualizaciones de seguridad pendientes. |
+| Hardware | BIOS/UEFI; cada módulo de memoria (ranura, tamaño, tipo, velocidad, serie); gráficos; monitores con su número de serie; baterías con su salud y ciclos; impresoras. |
+| Almacenamiento | Discos físicos (SSD, HDD o NVMe, bus, serie, salud) y volúmenes (sistema de archivos, espacio libre, cifrado). |
+| Red | Cada adaptador con su MAC, IPs, puerta de enlace, DNS, DHCP y velocidad. |
+| Software | Cada programa instalado con su versión, fabricante y fecha de instalación, con buscador. |
+| Seguridad | Cifrado del disco, firewall, Secure Boot, TPM, UAC/SELinux/Gatekeeper, antivirus y su estado, agentes de seguridad en ejecución (EDR), administradores locales. |
+| Actualizaciones | Actualizaciones instaladas (KB de Windows, actualizaciones de macOS) y, en Linux, las pendientes. |
+| Servicios, Puertos | Para servidores: el estado y el tipo de inicio de cada servicio, y qué escucha en cada puerto. |
+| Roles y VMs | Roles de Windows Server y software de servidor reconocido (SQL Server, IIS, PostgreSQL, nginx, Docker...), y las VMs y contenedores que aloja el equipo (Hyper-V, Proxmox, libvirt, Docker). |
+
+El fabricante, el modelo, el número de serie y el sistema operativo
+también llenan los campos del activo, así que el buscador de **Activos**
+encuentra un equipo por su número de serie.
+
+### Servidores
+
+El agente funciona igual en servidores: Windows Server 2012 o posterior,
+y cualquier Linux con systemd (Ubuntu, Debian, RHEL, Rocky, Alma,
+SUSE...). Un servidor queda como **Servidor** por sí solo:
+
+- **Windows:** las ediciones Server.
+- **Linux:** los equipos sin sesión gráfica.
+
+Si cambiás el tipo de un activo a mano, tu elección se mantiene. Solo
+vuelve a cambiar si el rol del equipo cambia de verdad (por ejemplo, si se
+reinstala como estación de trabajo).
+
+Para ver el inventario sin enviarlo (de un equipo que estás revisando, o
+para adjuntarlo a un ticket), ejecutá `seredina-agent inventory` como
+administrador.
+
 ::: warning Solo inventario, por diseño permanente
 El agente **nunca ejecuta nada remotamente** — ni scripts, ni despliegue
 de software. No es una limitación temporal de esta versión: ejecución

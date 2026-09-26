@@ -16,7 +16,7 @@ generator client {
   provider        = "prisma-client-js"
   // Needed for the `extensions` datasource block and KbChunk's Unsupported
   // vector column below (Phase 3 RAG, see docs/adr/0032-rag-knowledge-base-search.md).
-  previewFeatures = ["postgresqlExtensions"]
+  previewFeatures = ["postgresqlExtensions", "omitApi"]
 }
 
 datasource db {
@@ -663,6 +663,15 @@ model Asset {
   diskEncrypted     Boolean? @map("disk_encrypted")
   antivirusStatus   String?  @map("antivirus_status")
   installedPackages Json?    @map("installed_packages")
+  // The agent's full inventory (docs/adr/0069-full-agent-inventory.md):
+  // hardware down to memory modules and disk serials, software with
+  // publishers, security posture, and for servers their services, ports,
+  // roles and guests. One JSON document, replaced on every check-in; the
+  // fields people search by (manufacturer, model, serialNumber,
+  // operatingSystem) are copied into their columns above. Left out of asset
+  // lists (see listAssets): it can be hundreds of kilobytes.
+  agentInventory    Json?     @map("agent_inventory")
+  agentInventoryAt  DateTime? @map("agent_inventory_at")
   lastSeenAt      DateTime?            @map("last_seen_at")
   createdAt       DateTime             @default(now()) @map("created_at")
   updatedAt       DateTime             @updatedAt @map("updated_at")
@@ -732,6 +741,9 @@ model Device {
   // instead of creating a duplicate (docs/adr/0055-agent-based-discovery.md).
   // Nullable: agents older than this send none.
   machineFingerprint String?   @map("machine_fingerprint")
+  // The role (server/workstation) the agent last reported. The asset's type
+  // follows it only when it changes, so a type an admin set by hand sticks.
+  reportedRole     String?   @map("reported_role")
   enrolledAt       DateTime  @default(now()) @map("enrolled_at")
   revokedAt        DateTime? @map("revoked_at")
 

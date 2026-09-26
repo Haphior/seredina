@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { requirePermission } from '../rbac/permissions';
 import { checkIn, createEnrollmentToken, enrollDevice, listDevices, revokeDevice } from './service';
 import { getAgentSetup } from './agentSetup';
+import { agentInventorySchema, describeInventoryError } from './inventorySchema';
 import { auditRequest, recordAudit, requestOrigin } from '../audit/service';
 
 // Format only -- neighbors.ts's normalizeMac() does the real validation
@@ -29,7 +30,14 @@ const checkInSchema = z.object({
   // IPv4 only: an agent's ARP table. Capped well above any real LAN segment's
   // neighbor count, so one device can't flood the CMDB.
   neighbors: z.array(z.object({ ip: z.string().ip({ version: 'v4' }), mac: macSchema })).max(512).optional(),
+  // Validated separately below: a bad detailed inventory shouldn't cost the
+  // device its whole check-in.
+  inventory: z.unknown().optional(),
 });
+
+// A server's full inventory (thousands of packages, services, ports) runs to
+// a few hundred kilobytes; the global limit is 1 MiB.
+const CHECKIN_BODY_LIMIT = 5 * 1024 * 1024;
 
 export default async function deviceRoutes(app: FastifyInstance) {
   // Same tier as creating a discovery job -- both mint a real credential over the CMDB.
@@ -93,12 +101,25 @@ export default async function deviceRoutes(app: FastifyInstance) {
     }
   });
 
-  app.post('/v1/devices/checkin', { preHandler: app.authenticateDevice }, async (request, reply) => {
+  app.post('/v1/devices/checkin', { preHandler: app.authenticateDevice, bodyLimit: CHECKIN_BODY_LIMIT }, async (request, reply) => {
     const parsed = checkInSchema.safeParse(request.body);
     if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
+    const { inventory: rawInventory, ...summary } = parsed.data;
+    const inventory = rawInventory === undefined ? undefined : agentInventorySchema.safeParse(rawInventory);
+    if (inventory && !inventory.success) {
+      request.log.warn({ issues: inventory.error.issues.slice(0, 5) }, 'agent inventory rejected; storing the summary only');
+    }
     try {
-      const neighbors = await checkIn(request.deviceHashedCredential!, parsed.data);
-      return reply.code(200).send({ neighbors });
+      const neighbors = await checkIn(request.deviceHashedCredential!, {
+        ...summary,
+        inventory: inventory?.success ? inventory.data : undefined,
+      });
+      return reply.code(200).send({
+        neighbors,
+        // What happened to the detailed inventory, for the agent's log.
+        inventory: inventory === undefined ? 'none' : inventory.success ? 'stored' : 'rejected',
+        ...(inventory && !inventory.success ? { inventoryError: describeInventoryError(inventory.error) } : {}),
+      });
     } catch (err) {
       return reply.code(403).send({ error: (err as Error).message });
     }

@@ -9,6 +9,23 @@ contain breaking changes).
 
 ### Added
 
+- **Full agent inventory, for workstations and servers**
+  (`docs/adr/0069-full-agent-inventory.md`, agent v0.2.0). The agent
+  collects about as much as GLPI-Agent or Lansweeper:
+  - Hardware down to memory modules, disk serials, monitors and batteries.
+  - Network adapters.
+  - Software with publisher and install date.
+  - Updates.
+  - Security: antivirus and EDR, firewall, encryption, Secure Boot, TPM,
+    local administrators.
+  - For servers: services, listening ports, roles, and hosted VMs and
+    containers.
+
+  An asset's page shows it in tabs, with a JSON download. Servers are filed
+  as servers on their own, and a type set by hand sticks. Serial number,
+  model, manufacturer and OS fill the asset's fields, and asset search now
+  matches serial numbers and models. Older agents keep working.
+
 - **New endpoint agent for Windows, macOS and Linux**
   (`docs/adr/0068-go-endpoint-agent.md`). The agent is now a single binary
   in its own repository,

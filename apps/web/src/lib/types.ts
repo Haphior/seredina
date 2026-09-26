@@ -177,6 +177,105 @@ export interface AssetInstalledPackage {
   version?: string;
 }
 
+/**
+ * The agent's full inventory, schema 2 (docs/adr/0069-full-agent-inventory.md;
+ * apps/api/src/modules/devices/inventorySchema.ts validates it). Every part
+ * is optional: an agent fills what its OS and permissions give it.
+ */
+export interface AgentInventory {
+  schema: number;
+  collectedAt?: string;
+  system?: {
+    manufacturer?: string;
+    model?: string;
+    serialNumber?: string;
+    uuid?: string;
+    formFactor?: 'laptop' | 'desktop' | 'server' | 'virtual' | 'tablet' | 'other';
+    role?: 'server' | 'workstation';
+    virtual?: boolean;
+    hypervisor?: string;
+    biosVendor?: string;
+    biosVersion?: string;
+    biosDate?: string;
+    domain?: string;
+    timezone?: string;
+  };
+  os?: {
+    name?: string;
+    version?: string;
+    build?: string;
+    arch?: string;
+    kernel?: string;
+    installDate?: string;
+    lastBoot?: string;
+    pendingReboot?: boolean;
+  };
+  cpu?: { model?: string; vendor?: string; sockets?: number; cores?: number; threads?: number; speedMhz?: number };
+  memory?: {
+    totalMb?: number;
+    slots?: number;
+    modules?: {
+      slot?: string;
+      sizeMb?: number;
+      type?: string;
+      speedMhz?: number;
+      manufacturer?: string;
+      serialNumber?: string;
+      partNumber?: string;
+    }[];
+  };
+  disks?: { name?: string; model?: string; serialNumber?: string; sizeGb?: number; type?: string; interface?: string; health?: string }[];
+  volumes?: { mount: string; label?: string; fileSystem?: string; totalGb?: number; freeGb?: number; encrypted?: boolean }[];
+  network?: {
+    name?: string;
+    description?: string;
+    mac?: string;
+    ipv4?: string[];
+    ipv6?: string[];
+    gateway?: string;
+    dns?: string[];
+    dhcp?: boolean;
+    speedMbps?: number;
+    up?: boolean;
+    virtual?: boolean;
+  }[];
+  gpus?: { name?: string; vendor?: string; driverVersion?: string; memoryMb?: number }[];
+  monitors?: { manufacturer?: string; model?: string; serialNumber?: string; year?: number }[];
+  batteries?: {
+    name?: string;
+    manufacturer?: string;
+    chemistry?: string;
+    designCapacityMwh?: number;
+    fullCapacityMwh?: number;
+    healthPercent?: number;
+    cycleCount?: number;
+  }[];
+  printers?: { name: string; driver?: string; port?: string; shared?: boolean; network?: boolean; default?: boolean }[];
+  users?: { loggedOn?: string[]; lastLogon?: string; localAdmins?: string[]; localUsers?: string[] };
+  security?: {
+    antivirus?: { name: string; enabled?: boolean; upToDate?: boolean; version?: string }[];
+    firewallEnabled?: boolean;
+    systemDiskEncrypted?: boolean;
+    encryptionMethod?: string;
+    secureBoot?: boolean;
+    tpmPresent?: boolean;
+    tpmVersion?: string;
+    features?: Record<string, string>;
+    agents?: string[];
+  };
+  software?: { name: string; version?: string; publisher?: string; installDate?: string; arch?: string; source?: string }[];
+  updates?: {
+    installed?: { id: string; description?: string; installedOn?: string }[];
+    pending?: number;
+    pendingSecurity?: number;
+    lastInstalled?: string;
+  };
+  services?: { name: string; displayName?: string; state?: string; startMode?: string }[];
+  ports?: { protocol: 'tcp' | 'udp'; address?: string; port: number; process?: string }[];
+  serverRoles?: string[];
+  virtualMachines?: { name: string; type?: string; state?: string; image?: string }[];
+}
+
 export interface Asset {
   id: string;
   name: string;
@@ -199,6 +298,9 @@ export interface Asset {
   diskEncrypted: boolean | null;
   antivirusStatus: string | null;
   installedPackages: AssetInstalledPackage[] | null;
+  // Only on the asset's own page (GET /assets/:id); lists leave it out.
+  agentInventory?: AgentInventory | null;
+  agentInventoryAt?: string | null;
   lastSeenAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -237,7 +339,15 @@ export interface DeviceListItem {
   agentVersion: string | null;
   enrolledAt: string;
   revokedAt: string | null;
-  asset: { id: string; name: string; hostname: string | null; lastSeenAt: string | null; osVersion: string | null };
+  asset: {
+    id: string;
+    name: string;
+    hostname: string | null;
+    lastSeenAt: string | null;
+    osVersion: string | null;
+    operatingSystem: string | null;
+    assetType: AssetType;
+  };
 }
 
 export type DiscoveryJobStatus = 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED';
