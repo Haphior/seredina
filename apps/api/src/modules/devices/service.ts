@@ -2,6 +2,7 @@ import { randomBytes } from 'node:crypto';
 import { prisma, withTenantTx, type Prisma } from '@seredina/db';
 import { sha256Hex } from '@seredina/shared';
 import { ingestNeighbors, normalizeMac, type NeighborIngestResult, type NeighborReport } from './neighbors';
+import type { AgentInventory } from './inventorySchema';
 
 const TOKEN_PREFIX = 'ent_';
 const CREDENTIAL_PREFIX = 'dev_';
@@ -152,7 +153,15 @@ export interface DeviceListItem {
   agentVersion: string | null;
   enrolledAt: Date;
   revokedAt: Date | null;
-  asset: { id: string; name: string; hostname: string | null; lastSeenAt: Date | null; osVersion: string | null };
+  asset: {
+    id: string;
+    name: string;
+    hostname: string | null;
+    lastSeenAt: Date | null;
+    osVersion: string | null;
+    operatingSystem: string | null;
+    assetType: string;
+  };
 }
 
 export async function listDevices(tenantId: string): Promise<DeviceListItem[]> {
@@ -165,7 +174,9 @@ export async function listDevices(tenantId: string): Promise<DeviceListItem[]> {
         agentVersion: true,
         enrolledAt: true,
         revokedAt: true,
-        asset: { select: { id: true, name: true, hostname: true, lastSeenAt: true, osVersion: true } },
+        asset: {
+          select: { id: true, name: true, hostname: true, lastSeenAt: true, osVersion: true, operatingSystem: true, assetType: true },
+        },
       },
     }),
   );
@@ -191,6 +202,21 @@ export interface CheckInInput {
   macAddress?: string;
   /** The device's ARP/neighbor table -- passive discovery, see ./neighbors.ts. */
   neighbors?: NeighborReport[];
+  /** The full inventory (schema 2), already validated -- see ./inventorySchema.ts. */
+  inventory?: AgentInventory;
+}
+
+/** Where the text columns people search by come from, when the agent sent them. */
+function promotedFields(inventory: AgentInventory) {
+  const fields: Prisma.AssetUpdateInput = {};
+  const set = (key: 'manufacturer' | 'model' | 'serialNumber' | 'operatingSystem', value: string | undefined) => {
+    if (value && value.trim()) fields[key] = value.trim();
+  };
+  set('manufacturer', inventory.system?.manufacturer);
+  set('model', inventory.system?.model);
+  set('serialNumber', inventory.system?.serialNumber);
+  set('operatingSystem', inventory.os?.name);
+  return fields;
 }
 
 /**
@@ -212,9 +238,30 @@ export async function checkIn(hashedCredential: string, input: CheckInInput): Pr
     if (!device) throw new Error('unauthorized');
     if (device.revokedAt) throw new Error('device revoked');
 
+    // The asset's type follows the role the agent reports (server or
+    // workstation) only when that role changes, so a type an admin set by
+    // hand sticks. The first report only moves the enrollment default.
+    const role = input.inventory?.system?.role;
+    let assetType: 'SERVER' | 'WORKSTATION' | undefined;
+    if (role && role !== device.reportedRole) {
+      const current = await tx.asset.findUnique({ where: { id: device.assetId }, select: { assetType: true } });
+      if (device.reportedRole !== null || current?.assetType === 'WORKSTATION') {
+        assetType = role === 'server' ? 'SERVER' : 'WORKSTATION';
+      }
+      await tx.device.update({ where: { id: device.id }, data: { reportedRole: role } });
+    }
+
     await tx.asset.update({
       where: { id: device.assetId },
       data: {
+        ...(input.inventory
+          ? {
+              ...promotedFields(input.inventory),
+              agentInventory: input.inventory as Prisma.InputJsonValue,
+              agentInventoryAt: new Date(),
+            }
+          : {}),
+        ...(assetType ? { assetType } : {}),
         cpuModel: input.cpuModel,
         memoryTotalMb: input.memoryTotalMb,
         diskSummary: input.diskSummary as Prisma.InputJsonValue | undefined,

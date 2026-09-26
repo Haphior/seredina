@@ -137,6 +137,11 @@ sistema operativo y ejecutá el comando como administrador. El comando lleva
 la CA del servidor, así que el agente confía en tu certificado sin instalar
 nada en el equipo.
 
+Instalalo también en tus **servidores**: Windows Server y los servidores
+Linux reportan sus servicios, puertos en escucha, roles y VMs alojadas, y
+quedan como servidores por sí solos. Ver
+[Qué reporta el agente](/es/guia/cmdb-y-activos#que-reporta-el-agente).
+
 - **Para muchos equipos:** cada token vale 15 minutos, para un solo equipo.
   Generá uno por equipo, o distribuí el comando desde tu herramienta de
   gestión (Intune, un script de inicio por GPO, Jamf, Ansible) en tandas

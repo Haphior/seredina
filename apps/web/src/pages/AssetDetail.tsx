@@ -7,6 +7,7 @@ import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { AssetFormModal, type AssetFormValues } from '../components/AssetFormModal';
+import { AgentInventory } from '../components/AgentInventory';
 import { BackArrowIcon } from '../components/icons';
 import { formatDateTime } from '../lib/format';
 import { ContractStatusBadge } from './Contracts';
@@ -107,7 +108,12 @@ export function AssetDetail() {
             )}
           </Card>
 
-          {asset.discoverySource === 'AGENT' && (
+          {asset.agentInventory && (
+            <AgentInventory inventory={asset.agentInventory} collectedAt={asset.agentInventoryAt ?? null} assetName={asset.name} />
+          )}
+
+          {/* Agents older than the full inventory send only this summary. */}
+          {asset.discoverySource === 'AGENT' && !asset.agentInventory && (
             <Card>
               <h2 className="mb-3 text-[13px] font-bold uppercase tracking-wide text-slate-400">{t('assetDetail.agentInventory')}</h2>
               <dl className="grid grid-cols-2 gap-3 text-[13px]">

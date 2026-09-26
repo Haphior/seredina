@@ -136,6 +136,11 @@ system, and run the command as administrator. The command carries the
 server's CA, so the agent trusts your certificate without anything being
 installed on the computer.
 
+Install it on your **servers** too: Windows Server and Linux servers
+report their services, listening ports, roles and hosted VMs, and are
+filed as servers on their own. See
+[What the agent reports](/guide/cmdb-and-assets#what-the-agent-reports).
+
 - **For many computers:** each token is valid for 15 minutes, for one
   computer. Generate one per computer, or distribute the command from your
   management tool (Intune, GPO startup script, Jamf, Ansible) in small

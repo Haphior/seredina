@@ -46,8 +46,11 @@ real endpoint agent for hardware/software inventory). On top of that:
   reminders; **AI triage** of new tickets (suggest or auto-set priority/team).
 - **Endpoint agent** for Windows, macOS and Linux
   ([Haphior/seredina-agent](https://github.com/Haphior/seredina-agent)): one
-  binary that runs as a service and reports inventory to the CMDB, installed
-  with a command copied from the Devices page.
+  binary that runs as a service, installed with a command copied from the
+  Devices page. It reports a full inventory to the CMDB, on workstations and
+  servers alike: hardware down to serial numbers and memory modules,
+  software, updates, security posture (antivirus/EDR, encryption, firewall),
+  and a server's services, ports, roles and VMs.
 - The console in **English and Spanish**.
 
 See [docs/ROADMAP.md](docs/ROADMAP.md) for the full breakdown of what's shipped,

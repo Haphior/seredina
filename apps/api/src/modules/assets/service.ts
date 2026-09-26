@@ -64,6 +64,8 @@ export async function listAssets(tenantId: string, filter: ListAssetsFilter = {}
           { name: { contains: filter.q, mode: 'insensitive' } },
           { ipAddress: { contains: filter.q, mode: 'insensitive' } },
           { hostname: { contains: filter.q, mode: 'insensitive' } },
+          { serialNumber: { contains: filter.q, mode: 'insensitive' } },
+          { model: { contains: filter.q, mode: 'insensitive' } },
         ]
       : undefined,
   };
@@ -73,6 +75,9 @@ export async function listAssets(tenantId: string, filter: ListAssetsFilter = {}
       tx.asset.findMany({
         where,
         orderBy: { name: 'asc' },
+        // The agent's inventory documents are for the asset's own page; a
+        // list of fifty servers would otherwise carry megabytes of them.
+        omit: { agentInventory: true, installedPackages: true },
         include: { catalogModel: { include: { manufacturer: true } } },
         take: limit,
         skip: offset,

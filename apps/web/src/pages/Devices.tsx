@@ -218,6 +218,7 @@ export function Devices() {
             <thead className="bg-slate-50 text-[11.5px] font-bold uppercase tracking-wide text-slate-400">
               <tr>
                 <th className="px-5 py-2.5">{t('devices.hostname')}</th>
+                <th className="px-5 py-2.5">{t('devices.type')}</th>
                 <th className="px-5 py-2.5">{t('devices.platform')}</th>
                 <th className="px-5 py-2.5">{t('devices.lastCheckIn')}</th>
                 <th className="px-5 py-2.5">{t('devices.status')}</th>
@@ -232,7 +233,10 @@ export function Devices() {
                       {d.asset.name}
                     </Link>
                   </td>
-                  <td className="px-5 py-3 text-slate-600">{d.platform}</td>
+                  <td className="px-5 py-3">
+                    <Badge tone={d.asset.assetType === 'SERVER' ? 'indigo' : 'slate'}>{t(`assetType.${d.asset.assetType}`)}</Badge>
+                  </td>
+                  <td className="px-5 py-3 text-slate-600">{d.asset.operatingSystem ?? d.asset.osVersion ?? d.platform}</td>
                   <td className="px-5 py-3 text-slate-400">
                     {d.asset.lastSeenAt ? formatDateTime(d.asset.lastSeenAt) : t('devices.never')}
                   </td>

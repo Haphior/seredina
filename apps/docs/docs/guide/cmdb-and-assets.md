@@ -65,6 +65,43 @@ service is running. `seredina-agent uninstall --purge` removes the agent.
 To update the agent, run a new enrollment command: the device keeps its
 record.
 
+### What the agent reports
+
+Every hour the agent sends a full inventory. On the asset's page it's
+split into tabs, and **Download JSON** saves all of it:
+
+| Tab | What's in it |
+|---|---|
+| Overview | Manufacturer, model and serial number; OS and build; CPU; memory; last boot; logged-on user; domain; IPs. Warnings for a pending reboot, an unencrypted disk, no active antivirus, or pending security updates. |
+| Hardware | BIOS/UEFI; each memory module (slot, size, type, speed, serial); graphics; monitors with their serial; batteries with their health and cycles; printers. |
+| Storage | Physical disks (SSD, HDD or NVMe, bus, serial, health) and volumes (filesystem, free space, encryption). |
+| Network | Each adapter with its MAC, IPs, gateway, DNS, DHCP and speed. |
+| Software | Every installed program with its version, publisher and install date, with a search box. |
+| Security | Disk encryption, firewall, Secure Boot, TPM, UAC/SELinux/Gatekeeper, antivirus products and their state, security agents running (EDR), local administrators. |
+| Updates | Installed updates (Windows KBs, macOS updates) and, on Linux, pending ones. |
+| Services, Ports | For servers: each service's state and start mode, and what listens on which port. |
+| Roles and VMs | Windows Server roles and recognized server software (SQL Server, IIS, PostgreSQL, nginx, Docker...), and the VMs and containers the machine hosts (Hyper-V, Proxmox, libvirt, Docker). |
+
+The manufacturer, model, serial number and operating system also fill the
+asset's own fields, so **Assets** search finds a machine by its serial.
+
+### Servers
+
+The agent works the same on servers: Windows Server 2012 or later, and
+any Linux with systemd (Ubuntu, Debian, RHEL, Rocky, Alma, SUSE...).
+A server is filed as **Server** on its own:
+
+- **Windows:** the Server editions.
+- **Linux:** machines without a graphical session.
+
+If you change an asset's type by hand, your choice sticks. It only
+changes again if the machine's role really does change (for example,
+it's reinstalled as a workstation).
+
+To see the inventory without sending it (for a machine you're checking,
+or to attach to a ticket), run `seredina-agent inventory` as
+administrator.
+
 ::: warning Inventory-only, by permanent design
 The agent **never executes anything remotely** — no scripts, no software
 deployment. This isn't a temporary limitation of this version: remote
