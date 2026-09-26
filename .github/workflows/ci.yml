@@ -55,9 +55,9 @@ jobs:
           --health-retries 10
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '20'
 
@@ -73,7 +73,7 @@ jobs:
       # first doesn't re-download it. Default cache location per the
       # library's own docs: `.cache` relative to its installed path.
       - name: Cache the local embedding model
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: node_modules/@huggingface/transformers/.cache
           key: huggingface-minilm-l6-v2
@@ -115,7 +115,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Build and smoke-test the compose stack
         run: bash scripts/compose-smoke.sh
