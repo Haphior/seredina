@@ -119,7 +119,8 @@
       "contracts": "Contratos",
       "customerPortal": "Portal de clientes",
       "contacts": "Contactos",
-      "customerEmails": "Correos al cliente"
+      "customerEmails": "Correos al cliente",
+      "teams": "Equipos"
     }
   },
   "layout": {
@@ -2060,5 +2061,32 @@
     "removeImage": "Quitar",
     "orPasteUrl": "o pega la URL de una imagen publicada",
     "uploadFailed": "No se pudo subir la imagen"
+  },
+  "teams": {
+    "title": "Equipos",
+    "new": "Nuevo equipo",
+    "intro": "Agrupa a los agentes según lo que atienden. Un ticket se puede enviar a un equipo, y sus miembros reciben un aviso cuando llega uno sin responsable.",
+    "empty": "Todavía no hay equipos. Crea uno por cada grupo que atiende tickets, como Soporte N1 o Redes.",
+    "loadFailed": "No se pudieron cargar los equipos.",
+    "saveFailed": "No se pudo guardar el equipo.",
+    "deleteFailed": "No se pudo eliminar el equipo.",
+    "confirmDelete": "¿Eliminar el equipo «{{name}}»?",
+    "confirmDeleteWithTickets_one": "¿Eliminar el equipo «{{name}}»? Su {{count}} ticket se mantiene, sin equipo.",
+    "confirmDeleteWithTickets_other": "¿Eliminar el equipo «{{name}}»? Sus {{count}} tickets se mantienen, sin equipo.",
+    "memberCount_one": "{{count}} miembro",
+    "memberCount_other": "{{count}} miembros",
+    "ticketCount_one": "{{count}} ticket",
+    "ticketCount_other": "{{count}} tickets",
+    "edit": "editar",
+    "delete": "eliminar",
+    "editTitle": "Editar {{name}}",
+    "name": "Nombre",
+    "namePlaceholder": "p. ej. Soporte N1",
+    "members": "Miembros",
+    "selected_one": "{{count}} seleccionado",
+    "selected_other": "{{count}} seleccionados",
+    "searchPeople": "Buscar personas…",
+    "noPeople": "Nadie coincide.",
+    "membersHint": "Los miembros reciben el aviso «ticket en mi equipo»."
   }
 }

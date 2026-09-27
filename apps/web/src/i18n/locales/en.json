@@ -119,7 +119,8 @@
       "contracts": "Contracts",
       "customerPortal": "Customer Portal",
       "contacts": "Contacts",
-      "customerEmails": "Customer Emails"
+      "customerEmails": "Customer Emails",
+      "teams": "Teams"
     }
   },
   "layout": {
@@ -2060,5 +2061,32 @@
     "removeImage": "Remove",
     "orPasteUrl": "or paste the URL of a published image",
     "uploadFailed": "Could not upload the image"
+  },
+  "teams": {
+    "title": "Teams",
+    "new": "New team",
+    "intro": "Group agents by what they handle. A ticket can be sent to a team, and its members are notified when one lands there with nobody assigned.",
+    "empty": "No teams yet. Create one for each group that takes tickets, like Level 1 support or Networks.",
+    "loadFailed": "Couldn't load teams.",
+    "saveFailed": "Couldn't save the team.",
+    "deleteFailed": "Couldn't delete the team.",
+    "confirmDelete": "Delete the team \"{{name}}\"?",
+    "confirmDeleteWithTickets_one": "Delete the team \"{{name}}\"? Its {{count}} ticket stays, without a team.",
+    "confirmDeleteWithTickets_other": "Delete the team \"{{name}}\"? Its {{count}} tickets stay, without a team.",
+    "memberCount_one": "{{count}} member",
+    "memberCount_other": "{{count}} members",
+    "ticketCount_one": "{{count}} ticket",
+    "ticketCount_other": "{{count}} tickets",
+    "edit": "edit",
+    "delete": "delete",
+    "editTitle": "Edit {{name}}",
+    "name": "Name",
+    "namePlaceholder": "e.g. Level 1 support",
+    "members": "Members",
+    "selected_one": "{{count}} selected",
+    "selected_other": "{{count}} selected",
+    "searchPeople": "Search people…",
+    "noPeople": "Nobody matches.",
+    "membersHint": "Members get the \"ticket in my team\" notification."
   }
 }

@@ -109,6 +109,7 @@ const navGroups: {
     labelKey: 'administration',
     items: [
       { to: '/users', itemKey: 'users', icon: UsersIcon, permission: 'users:manage' },
+      { to: '/teams', itemKey: 'teams', icon: UsersIcon, permission: 'tickets:manage_all' },
       { to: '/roles', itemKey: 'roles', icon: ShieldIcon, permission: 'roles:manage' },
       { to: '/sso', itemKey: 'sso', icon: KeyIcon, permission: 'users:manage' },
       { to: '/audit-log', itemKey: 'auditLog', icon: ChecklistIcon, permission: 'audit:read' },

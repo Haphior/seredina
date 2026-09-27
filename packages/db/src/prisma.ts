@@ -28,6 +28,7 @@ const TENANT_SCOPE_FIELD: Record<string, string> = {
   RolePermission: 'tenantId',
   User: 'tenantId',
   Team: 'tenantId',
+  TeamMember: 'tenantId',
   Contact: 'tenantId',
   TicketStatus: 'tenantId',
   Ticket: 'tenantId',

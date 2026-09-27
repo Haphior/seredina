@@ -9,6 +9,11 @@ contain breaking changes).
 
 ### Added
 
+- **Teams you can manage** (`docs/adr/0071-teams-and-notification-events.md`).
+  Administration → Teams creates, renames and deletes teams and sets their
+  members; a person can be in several teams. Until now a new workspace had
+  only the "General" team and no way to add another. Deleting a team keeps
+  its tickets, without a team.
 - **Branded customer emails in your company's language**
   (`docs/adr/0070-customer-email-templates.md`).
   - Every email to a customer uses your logo, an optional banner and your

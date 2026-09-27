@@ -104,6 +104,7 @@ model Tenant {
   aiTriageMode String @default("off") @map("ai_triage_mode")
   contracts      Contract[]
   contractAssets ContractAsset[]
+  teamMembers    TeamMember[]
 
   // Customer portal (docs/adr/0065-customer-portal.md): contacts sign in with
   // an emailed link to follow and reply to their own tickets. Off by default.
@@ -216,6 +217,7 @@ model User {
   notificationPreferences NotificationPreference[]
   ownedProblems        Problem[]             @relation("ProblemOwner")
   reviewedAiAgentRuns  AiAgentRun[]
+  teamMemberships      TeamMember[]
 
   @@unique([tenantId, email])
   @@map("users")
@@ -233,9 +235,28 @@ model Team {
 
   tickets      Ticket[]
   processSteps ProcessStepTemplate[]
+  members      TeamMember[]
 
   @@unique([tenantId, name])
   @@map("teams")
+}
+
+// Who belongs to a team -- a plain join table, so a user can be in several
+// teams. Drives "a ticket landed in my team" notifications
+// (docs/adr/0071-teams-and-notification-events.md).
+model TeamMember {
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  teamId    String   @map("team_id") @db.Uuid
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId    String   @map("user_id") @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([teamId, userId])
+  @@index([userId])
+  @@map("team_members")
 }
 
 // The requester on a ticket -- deliberately separate from User (agents/admins), see

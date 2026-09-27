@@ -31,6 +31,17 @@ Permissions are granular (`tickets:read`, `tickets:write`,
 `users:manage`, `roles:manage`, `audit:read`, `contacts:manage`) — a custom role can combine them however
 you need, you're not tied to the three factory-default roles.
 
+## Teams
+
+**Administration → Teams** groups agents by what they handle, such as
+Level 1 support or Networks. Each team has a name and members; a person
+can belong to several teams. A ticket can be sent to a team from its
+Details panel, from a macro or from a process step.
+
+When a ticket lands in a team with nobody assigned, the team's members
+get a notification (see [Notifications](/guide/tickets#notifications)).
+Deleting a team keeps its tickets; they just no longer have a team.
+
 ## Single sign-on (SSO)
 
 **Administration → Single Sign-On** lets people sign in with their

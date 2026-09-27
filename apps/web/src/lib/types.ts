@@ -25,6 +25,9 @@ export interface TicketStatus {
 export interface Team {
   id: string;
   name: string;
+  /** Present on GET /teams; absent where a team is embedded in another resource. */
+  memberIds?: string[];
+  ticketCount?: number;
 }
 
 export interface Contact {

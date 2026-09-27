@@ -33,6 +33,17 @@ Los permisos son granulares (`tickets:read`, `tickets:write`,
 `users:manage`, `roles:manage`, `audit:read`, `contacts:manage`) — un rol personalizado puede combinarlos
 como necesites, no estás atado a los tres roles de fábrica.
 
+## Equipos
+
+**Administración → Equipos** agrupa a los agentes según lo que atienden,
+como Soporte N1 o Redes. Cada equipo tiene un nombre y miembros; una
+persona puede estar en varios equipos. Un ticket se envía a un equipo
+desde su panel de Detalles, desde una macro o desde un paso de proceso.
+
+Cuando un ticket llega a un equipo sin responsable, los miembros del equipo
+reciben un aviso (ver [Notificaciones](/es/guia/tickets#notificaciones)).
+Al eliminar un equipo sus tickets se mantienen, solo que sin equipo.
+
 ## Inicio de sesión único (SSO)
 
 **Administración → Inicio de sesión único** permite entrar con la cuenta de
