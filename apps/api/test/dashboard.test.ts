@@ -9,6 +9,7 @@ import { getDashboardPrefs, getOnboardingChecklist, upsertDashboardPref, WIDGET_
 // unasked-for on every dashboard. Keep this list in sync with
 // dashboard/service.ts's own DEFAULT_VISIBLE map.
 const DEFAULT_HIDDEN_WIDGETS = ['channel_breakdown', 'my_open_tickets', 'unassigned_open_tickets', 'quick_links'];
+import { createEmailChannel } from '../src/modules/emailchannels/service';
 import { createMacro } from '../src/modules/macros/service';
 import { upsertSlaPolicy } from '../src/modules/sla/service';
 import { createTicketStatus, seedDefaultTicketStatuses } from '../src/modules/tickets/service';
@@ -82,6 +83,7 @@ describe.skipIf(!hasDb)('dashboard widget prefs', () => {
 
 describe.skipIf(!hasDb)('onboarding checklist', () => {
   let tenantId: string;
+  let checklistAfterMailbox: { key: string; done: boolean }[];
 
   beforeAll(async () => {
     tenantId = randomUUID();
@@ -99,6 +101,24 @@ describe.skipIf(!hasDb)('onboarding checklist', () => {
   });
 
   it('each item flips to done independently as the tenant actually does the thing', async () => {
+    await createEmailChannel(tenantId, {
+      name: 'Support',
+      fromAddress: 'support@example.com',
+      imapHost: 'imap.example.com',
+      imapPort: 993,
+      imapSecure: true,
+      imapUsername: 'support',
+      imapPassword: 'x',
+      smtpHost: 'smtp.example.com',
+      smtpPort: 465,
+      smtpSecure: true,
+      smtpUsername: 'support',
+      smtpPassword: 'x',
+    });
+    ({ items: checklistAfterMailbox } = await getOnboardingChecklist(tenantId));
+    expect(checklistAfterMailbox.find((i) => i.key === 'connect_email')?.done).toBe(true);
+    expect(checklistAfterMailbox.find((i) => i.key === 'customize_status')?.done).toBe(false);
+
     await createTicketStatus(tenantId, { key: 'waiting_on_vendor', label: 'Waiting on Vendor', category: 'PENDING' });
     let { items } = await getOnboardingChecklist(tenantId);
     expect(items.find((i) => i.key === 'customize_status')?.done).toBe(true);
