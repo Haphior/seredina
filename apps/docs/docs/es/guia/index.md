@@ -1,13 +1,13 @@
 # Primeros pasos
 
 Esta guía cubre la consola de agentes: cómo usar cada funcionalidad desde
-adentro, una vez que ya tenés una instancia corriendo. Si todavía no
-instalaste Seredina, empezá por
+adentro, una vez que ya tienes una instancia corriendo. Si todavía no
+instalaste Seredina, empieza por
 [Instalación con Docker](/es/despliegue/).
 
 ## Crear tu organización
 
-Visitá `/register` en tu instancia y completá el formulario — slug de
+Visita `/register` en tu instancia y completa el formulario — slug de
 organización, tu nombre, email y contraseña. Ese primer registro te
 convierte automáticamente en administrador; no hay un paso de bootstrap
 por línea de comandos separado.
@@ -15,7 +15,7 @@ por línea de comandos separado.
 ::: tip Un solo registro en modo autoalojado
 Si tu instancia corre en `SEREDINA_MODE=self_hosted` (el modo por
 defecto), solo se puede registrar una organización — es intencional, ver
-[Modo cloud](/es/despliegue/modo-cloud) si necesitás más de una.
+[Modo cloud](/es/despliegue/modo-cloud) si necesitas más de una.
 :::
 
 ## El checklist de primeros pasos
@@ -29,9 +29,9 @@ del widget.
 
 ## Invitar a tu equipo
 
-Desde **Administración → Usuarios**, invitá a cada persona por correo para
+Desde **Administración → Usuarios**, invita a cada persona por correo para
 que elija su propia contraseña (necesita un canal de correo conectado), o
-creá la cuenta con una contraseña inicial y compartila vos. Ver
+crea la cuenta con una contraseña inicial y compártela tú. Ver
 [Usuarios y roles](/es/guia/administracion#usuarios-y-roles).
 
 Con el [inicio de sesión único](/es/guia/administracion#inicio-de-sesion-unico-sso)

@@ -29,7 +29,7 @@ una ruta de backend separada.
 - **Ticket en blanco** — para un caso que llegó por teléfono o en
   persona: asunto, descripción, datos del solicitante, prioridad.
 - **Desde catálogo** — si tu tenant tiene ítems configurados en el
-  [Catálogo de servicios](/es/guia/catalogo-de-servicios), elegís uno y el
+  [Catálogo de servicios](/es/guia/catalogo-de-servicios), eliges uno y el
   formulario se arma solo con sus campos personalizados asociados.
 
 Si no hay ítems de catálogo configurados, el modal arranca directo en modo

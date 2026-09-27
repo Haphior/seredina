@@ -366,11 +366,11 @@ export function TicketDetail() {
               {ticket.status.label}
             </Badge>
             <Badge tone={PRIORITY_TONE[ticket.priority]} dot>
-              {t('ticketDetail.priorityLabel', { priority: ticket.priority })}
+              {t('ticketDetail.priorityLabel', { priority: t(`priority.${ticket.priority}`) })}
             </Badge>
             <span className="flex items-center gap-1.5">
               {theme !== 'refined' && <ChannelGlyph channel={ticket.channel} />}
-              <Badge tone={ticket.channel === 'alert' ? 'rose' : 'slate'}>{ticket.channel}</Badge>
+              <Badge tone={ticket.channel === 'alert' ? 'rose' : 'slate'}>{t(`channel.short.${ticket.channel}`, { defaultValue: ticket.channel })}</Badge>
             </span>
             {ticket.externalId && <span className="text-xs text-slate-400">{t('ticketDetail.ref', { id: ticket.externalId })}</span>}
             {isFirstResponseOverdue(ticket) && (

@@ -44,6 +44,29 @@ contain breaking changes).
 
 ### Changed
 
+- **Spanish that reads as Spanish everywhere.**
+  - A workspace registered in Spanish starts with Spanish status names
+    (Abierto, Pendiente, Resuelto, Cerrado) and Spanish customer emails.
+  - Priorities, the ticket's channel and the built-in role names show in the
+    console's language instead of LOW/URGENT, "agent" or "admin".
+  - Dates follow the console's language and the browser's region
+    (27/9/26, 18:40 rather than 9/27/2026, 5:57:07 PM).
+  - The console and the Spanish documentation use "tú" throughout; a few
+    screens and most of the docs used "vos".
+- **Sign-in on a self-hosted server no longer asks for the organization**:
+  there is only one, so the page fills it in. The "create an organization"
+  link is gone there too, and `/register` explains that the server already
+  has its organization instead of failing with a technical error.
+- **New ticket** can set the team and the assignee right away, and they
+  are notified as if assigned afterward.
+- **SLA policies** take minutes, hours or days, save every edited priority
+  with one button, and can be filled in with suggested targets.
+- **The dashboard** no longer shows hidden widgets as empty cards (they're
+  under "Add widget"), and the first-steps checklist starts with connecting
+  a mailbox.
+- The ticket queue explains where tickets come from when there are none
+  yet, with buttons to log one or connect a mailbox; the assignee filter
+  says "Any assignee" instead of just "Any".
 - A customer reply to a **resolved** ticket now reopens it, as a reply to a
   closed ticket already did. Its first resolution time is kept.
 - Assigning a ticket to yourself no longer sends you a notification.

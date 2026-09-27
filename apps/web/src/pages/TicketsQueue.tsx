@@ -7,6 +7,7 @@ import type {
   CustomFieldDefinition,
   SavedView,
   ServiceCatalogItem,
+  Team,
   Ticket,
   TicketPriority,
   TicketStatus,
@@ -292,7 +293,7 @@ export function TicketsQueue() {
             <option value="">{t('tickets.filters.anyPriority')}</option>
             {PRIORITIES.map((p) => (
               <option key={p} value={p}>
-                {p}
+                {t(`priority.${p}`)}
               </option>
             ))}
           </select>
@@ -348,7 +349,7 @@ export function TicketsQueue() {
               </option>
               {(['LOW', 'NORMAL', 'HIGH', 'URGENT'] as const).map((p) => (
                 <option key={p} value={p}>
-                  {p}
+                  {t(`priority.${p}`)}
                 </option>
               ))}
             </select>
@@ -363,7 +364,24 @@ export function TicketsQueue() {
       <div className="flex-1 overflow-y-auto px-8 pb-7">
         {error && <p className="text-sm text-rose-600">{error}</p>}
         {tickets === null && !error && <p className="text-sm text-slate-500">{t('common.loading')}</p>}
-        {tickets?.length === 0 && <p className="text-sm text-slate-500">{t('tickets.empty')}</p>}
+        {tickets?.length === 0 &&
+          (tab === 'ALL' && !assigneeFilter && !priorityFilter && !q.trim() ? (
+            // Nothing at all yet: say how tickets get here, not just that there are none.
+            <div className="flex max-w-lg flex-col items-start gap-3 rounded-xl border border-dashed border-slate-300 bg-white/60 px-6 py-6">
+              <p className="text-[15px] font-semibold text-slate-800">{t('tickets.emptyFirst.title')}</p>
+              <p className="text-[13.5px] text-slate-500">{t('tickets.emptyFirst.body')}</p>
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" onClick={() => setShowRequest(true)}>
+                  {t('tickets.emptyFirst.create')}
+                </Button>
+                <Link to="/email-channels" className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[13px] font-semibold text-slate-700 hover:bg-slate-50">
+                  {t('tickets.emptyFirst.connectEmail')}
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-slate-500">{t('tickets.empty')}</p>
+          ))}
 
         {tickets && tickets.length > 0 && (
           <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -607,15 +625,34 @@ function BlankTicketForm({ onClose, onCreated }: { onClose: () => void; onCreate
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [priority, setPriority] = useState<TicketPriority>('NORMAL');
+  const [teamId, setTeamId] = useState('');
+  const [assigneeId, setAssigneeId] = useState('');
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [agents, setAgents] = useState<UserSummary[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Who takes it, right from the start -- optional, and just empty if these
+  // can't be listed (an agent without access to the user list).
+  useEffect(() => {
+    apiGet<{ teams: Team[] }>('/teams').then((r) => setTeams(r.teams)).catch(() => {});
+    apiGet<{ users: UserSummary[] }>('/users').then((r) => setAgents(r.users.filter((u) => u.isActive))).catch(() => {});
+  }, []);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
     setSubmitting(true);
     try {
-      const ticket = await apiPost<{ id: string }>('/tickets', { subject, body, contactName, contactEmail, priority });
+      const ticket = await apiPost<{ id: string }>('/tickets', {
+        subject,
+        body,
+        contactName,
+        contactEmail,
+        priority,
+        teamId: teamId || undefined,
+        assigneeId: assigneeId || undefined,
+      });
       onClose();
       onCreated(ticket.id);
     } catch (err) {
@@ -679,11 +716,40 @@ function BlankTicketForm({ onClose, onCreated }: { onClose: () => void; onCreate
         >
           {PRIORITIES.map((p) => (
             <option key={p} value={p}>
-              {p}
+              {t(`priority.${p}`)}
             </option>
           ))}
         </select>
       </label>
+
+      <div className="flex gap-2">
+        {teams.length > 0 && (
+          <label className="block flex-1 text-sm">
+            <span className="mb-1 block font-medium text-slate-700">{t('tickets.form.team')}</span>
+            <select value={teamId} onChange={(e) => setTeamId(e.target.value)} className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm">
+              <option value="">{t('common.unassigned')}</option>
+              {teams.map((team) => (
+                <option key={team.id} value={team.id}>
+                  {team.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+        {agents.length > 0 && (
+          <label className="block flex-1 text-sm">
+            <span className="mb-1 block font-medium text-slate-700">{t('tickets.form.assignee')}</span>
+            <select value={assigneeId} onChange={(e) => setAssigneeId(e.target.value)} className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm">
+              <option value="">{t('common.unassigned')}</option>
+              {agents.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+      </div>
 
       {error && <p className="text-sm text-rose-600">{error}</p>}
 

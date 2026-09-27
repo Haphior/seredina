@@ -1,7 +1,7 @@
 # Contactos y datos personales
 
 **Contactos** (en la barra lateral, debajo de Tickets) lista a las personas
-que escriben, por cualquier canal. Buscá por nombre o correo y abrí uno para
+que escriben, por cualquier canal. Busca por nombre o correo y abre uno para
 ver sus tickets. El nombre del contacto en un ticket también lleva ahí.
 
 Las leyes de protección de datos, como la Ley 21.719 de Chile, el GDPR o la

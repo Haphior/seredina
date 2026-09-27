@@ -13,21 +13,21 @@ despliegue y agrega lo que cambia en una red interna:
 
 - **Sistema operativo.** Cualquier Linux con Docker Engine y el plugin
   `docker compose`. Los ejemplos usan Ubuntu Server 24.04 LTS.
-- **Tamaño.** Para un equipo chico o mediano, empezá con 2 vCPU, 4 GB de
-  RAM y 40 GB de disco. Sumá más si tenés mucho historial de tickets o
-  muchos adjuntos. Con la opción de IA local (Ollama), sumá la memoria que
+- **Tamaño.** Para un equipo chico o mediano, empieza con 2 vCPU, 4 GB de
+  RAM y 40 GB de disco. Suma más si tienes mucho historial de tickets o
+  muchos adjuntos. Con la opción de IA local (Ollama), suma la memoria que
   necesite tu modelo.
 - **Dirección.** Dale al servidor una IP fija, o una reserva en el DHCP.
 - **Acceso de administración.** Solo quienes lo administran deberían
-  tener acceso por SSH. Mantené el sistema al día con actualizaciones de
+  tener acceso por SSH. Mantén el sistema al día con actualizaciones de
   seguridad automáticas (`unattended-upgrades` en Ubuntu).
 
 ## 2. Un nombre para el servidor
 
-Elegí la dirección que la gente va a escribir y creala en tu DNS interno
+Elige la dirección que la gente va a escribir y créala en tu DNS interno
 (el DNS de Active Directory, tu router, etc.) apuntando al servidor.
 
-**Usá un nombre bajo el dominio real de tu empresa**, aunque solo se
+**Usa un nombre bajo el dominio real de tu empresa**, aunque solo se
 resuelva dentro de la red, por ejemplo `helpdesk.tuempresa.cl`, en vez de
 `helpdesk.local` o una IP. Google solo acepta direcciones de redirección
 OAuth bajo un dominio de nivel superior público. Con un nombre `.local`, o
@@ -44,19 +44,19 @@ cd /opt/seredina
 ./scripts/setup.sh
 ```
 
-`setup.sh` escribe el `.env` con secretos aleatorios. **Copiá el `.env` a un
+`setup.sh` escribe el `.env` con secretos aleatorios. **Copia el `.env` a un
 lugar seguro, fuera de este servidor, ahora mismo** (un gestor de
 contraseñas o una bóveda). Sin su `ENCRYPTION_KEY`, un backup no se puede
 restaurar con los buzones, el SSO y la verificación en dos pasos de los
 usuarios intactos. Ver
-[lo que también necesitás respaldar](/es/despliegue/actualizaciones-y-backups#lo-que-tambien-necesitas-respaldar).
+[lo que también necesitas respaldar](/es/despliegue/actualizaciones-y-backups#lo-que-tambien-necesitas-respaldar).
 
 ## 4. Certificado y dirección
 
-Elegí una opción:
+Elige una opción:
 
 - **Tu empresa tiene su propia CA** (por ejemplo, Active Directory
-  Certificate Services). Emití un certificado para el nombre y usalo:
+  Certificate Services). Emite un certificado para el nombre y usalo:
 
   ```bash
   ./scripts/configure-address.sh --address helpdesk.tuempresa.cl --tls custom \
@@ -71,14 +71,14 @@ Elegí una opción:
   ./scripts/configure-address.sh --address helpdesk.tuempresa.cl --tls internal
   ```
 
-  Después instalá el certificado raíz generado en los equipos de tu
+  Después instala el certificado raíz generado en los equipos de tu
   equipo, a mano o por directiva de grupo. Ver
   [Tu dirección y HTTPS](/es/despliegue/#tu-direccion-y-https).
 
 Let's Encrypt (`acme`) no sirve para un servidor al que internet no llega,
 porque necesita llegar a los puertos 80 y 443 desde afuera.
 
-Después levantá todo:
+Después levanta todo:
 
 ```bash
 docker compose -f infra/docker-compose.yml up -d --build
@@ -89,7 +89,7 @@ docker compose -f infra/docker-compose.yml ps
 `https://<nombre>` y `https://<nombre>/api`. Todos los enlaces que se
 envían por correo, y todas las redirecciones de OAuth y SSO, salen de ahí.
 
-Abrí `https://<nombre>`, registrá tu organización y activá la verificación
+Abre `https://<nombre>`, registra tu organización y activa la verificación
 en dos pasos de las cuentas de administración (**Seguridad de la cuenta**).
 
 ## 5. Firewall
@@ -107,7 +107,7 @@ sudo ufw enable
 Docker publica los puertos con sus propias reglas, no con las de ufw.
 Seredina deja Postgres, Redis y (con el proxy activo) los puertos de la web
 y la API escuchando en `127.0.0.1`, así que hacia la red solo quedan el 80 y
-el 443. Verificalo con `sudo ss -ltnp`.
+el 443. Verifícalo con `sudo ss -ltnp`.
 
 Hacia afuera, el servidor necesita:
 
@@ -131,34 +131,34 @@ Hacia afuera, el servidor necesita:
 
 ## 7. Agentes en tus equipos
 
-Instalá el [agente](/es/guia/cmdb-y-activos#dispositivos) en los equipos de
-la empresa. Usá **Dispositivos → Generar comando de inscripción**, elegí el
-sistema operativo y ejecutá el comando como administrador. El comando lleva
+Instala el [agente](/es/guia/cmdb-y-activos#dispositivos) en los equipos de
+la empresa. Usa **Dispositivos → Generar comando de inscripción**, elige el
+sistema operativo y ejecuta el comando como administrador. El comando lleva
 la CA del servidor, así que el agente confía en tu certificado sin instalar
 nada en el equipo.
 
-Instalalo también en tus **servidores**: Windows Server y los servidores
+Instálalo también en tus **servidores**: Windows Server y los servidores
 Linux reportan sus servicios, puertos en escucha, roles y VMs alojadas, y
 quedan como servidores por sí solos. Ver
 [Qué reporta el agente](/es/guia/cmdb-y-activos#que-reporta-el-agente).
 
 - **Para muchos equipos:** cada token vale 15 minutos, para un solo equipo.
-  Generá uno por equipo, o distribuí el comando desde tu herramienta de
+  Genera uno por equipo, o distribuye el comando desde tu herramienta de
   gestión (Intune, un script de inicio por GPO, Jamf, Ansible) en tandas
   chicas.
-- **Equipos sin acceso a GitHub:** copiá los archivos de una
+- **Equipos sin acceso a GitHub:** copia los archivos de una
   [versión](https://github.com/Haphior/seredina-agent/releases) a un
-  servidor web interno y configurá `AGENT_DOWNLOAD_URL`. Ver
+  servidor web interno y configura `AGENT_DOWNLOAD_URL`. Ver
   [Variables de entorno](/es/despliegue/variables-de-entorno).
 - **Notebooks fuera de la oficina:** reportan cuando vuelven a la red o se
   conectan a la VPN. El agente reintenta cada hora.
 
 ## 8. Backups
 
-Programá con cron el volcado nocturno de
+Programa con cron el volcado nocturno de
 [Actualizaciones y backups](/es/despliegue/actualizaciones-y-backups#backups)
-y copiá los volcados **a otra máquina** (un NAS, un servidor de archivos,
-almacenamiento de objetos). Si usás `internal`, respaldá también el volumen
+y copia los volcados **a otra máquina** (un NAS, un servidor de archivos,
+almacenamiento de objetos). Si usas `internal`, respalda también el volumen
 `caddy_data`:
 
 ```bash
@@ -167,41 +167,41 @@ docker run --rm -v infra_caddy_data:/data -v /var/backups/seredina:/out alpine \
 ```
 
 El nombre es `infra_caddy_data`, salvo que hayas definido un nombre de
-proyecto de compose: verificalo con `docker volume ls`. Si lo perdés, se
+proyecto de compose: verifícalo con `docker volume ls`. Si lo pierdes, se
 genera una CA nueva, y cada agente y cada navegador tiene que recibir la
 nueva.
 
-Antes de salir a producción, **restaurá un backup en una máquina de prueba**
-e iniciá sesión en ella.
+Antes de salir a producción, **restaura un backup en una máquina de prueba**
+e inicia sesión en ella.
 
 ## 9. Actualizaciones
 
-Instalá y actualizá por versión (tag), nunca desde `main`: cada versión
+Instala y actualiza por versión (tag), nunca desde `main`: cada versión
 lista sus cambios en la
 [página de versiones](https://github.com/Haphior/helpdesk-seredina/releases).
-Seguí [Actualizar tu instancia](/es/despliegue/actualizaciones-y-backups#actualizar-tu-instancia):
+Sigue [Actualizar tu instancia](/es/despliegue/actualizaciones-y-backups#actualizar-tu-instancia):
 
-1. Leé las notas.
-2. Hacé un backup.
-3. Corré `git checkout <versión nueva>` y `docker compose ... up -d --build`.
-4. Verificá que `/api/health` muestre la versión nueva.
+1. Lee las notas.
+2. Haz un backup.
+3. Corre `git checkout <versión nueva>` y `docker compose ... up -d --build`.
+4. Verifica que `/api/health` muestre la versión nueva.
 
-Actualizá fuera del horario de trabajo. La misma página explica cómo
+Actualiza fuera del horario de trabajo. La misma página explica cómo
 volver atrás.
 
-Los agentes se actualizan aparte, sin tokens de inscripción: corré
+Los agentes se actualizan aparte, sin tokens de inscripción: corre
 `seredina-agent update` en cada equipo, desde tu herramienta de gestión
-si tenés muchos. Ver
+si tienes muchos. Ver
 [Actualizar los agentes](/es/despliegue/actualizaciones-y-backups#actualizar-los-agentes).
 
 ## Lista de salida a producción
 
 - [ ] El nombre resuelve al servidor desde los equipos de los usuarios, y el sitio carga sin aviso de certificado.
 - [ ] El `.env` está copiado en un lugar seguro, fuera del servidor.
-- [ ] Las cuentas de administración tienen verificación en dos pasos; el SSO funciona si lo usás.
+- [ ] Las cuentas de administración tienen verificación en dos pasos; el SSO funciona si lo usas.
 - [ ] Un correo a cada buzón de soporte se convierte en ticket, y la respuesta le llega a quien escribió.
 - [ ] Llega el correo de "olvidé mi contraseña", y su enlace abre.
 - [ ] Hay un equipo Windows, uno macOS y uno Linux inscritos, y aparecen en **Activos**.
-- [ ] El firewall solo expone 80/443 (y SSH para administración): verificalo con `ss -ltnp` y con un escaneo de puertos desde otra máquina.
+- [ ] El firewall solo expone 80/443 (y SSH para administración): verifícalo con `ss -ltnp` y con un escaneo de puertos desde otra máquina.
 - [ ] El backup nocturno corre, se copia fuera del servidor, y se probó una restauración.
 - [ ] Alguien recibe las alertas de espacio en disco y de fallas del backup.

@@ -113,16 +113,20 @@ export interface OnboardingChecklistItem {
  * near-universal SaaS-onboarding step it didn't mention: inviting a teammate.
  */
 export async function getOnboardingChecklist(tenantId: string): Promise<{ items: OnboardingChecklistItem[]; allDone: boolean }> {
-  const [statuses, slaPolicyCount, macroCount, userCount] = await withTenantTx(prisma, tenantId, (tx) =>
+  const [statuses, slaPolicyCount, macroCount, userCount, emailChannelCount] = await withTenantTx(prisma, tenantId, (tx) =>
     Promise.all([
       tx.ticketStatus.findMany({ select: { key: true } }),
       tx.slaPolicy.count(),
       tx.macro.count(),
       tx.user.count(),
+      tx.emailChannel.count(),
     ]),
   );
 
   const items: OnboardingChecklistItem[] = [
+    // First: without a mailbox no request arrives by email, no reply reaches
+    // a customer, and no notification goes out by email.
+    { key: 'connect_email', label: 'Connect a mailbox', done: emailChannelCount > 0, href: '/email-channels' },
     {
       key: 'customize_status',
       label: 'Customize your ticket statuses',

@@ -3,10 +3,10 @@
 Seredina tiene dos mecanismos de autenticación completamente separados,
 para dos audiencias distintas — no los confundas entre sí.
 
-## API Keys — para integraciones (lo que necesitás vos)
+## API Keys — para integraciones (lo que necesitas)
 
 Si estás integrando algo externo (un formulario de contacto, tu propio
-monitoreo, un script), **esto es lo que querés**. Las claves de API
+monitoreo, un script), **esto es lo que quieres**. Las claves de API
 autentican contra los endpoints públicos del canal API y de ingesta de
 alertas (`/v1/tickets`, `/v1/alerts`, `/v1/alerts/grafana`) — nunca contra
 la consola de agentes.
@@ -16,7 +16,7 @@ la consola de agentes.
 Desde la consola: **Administración → Claves de API → Nueva clave**. El
 valor completo (con prefijo `sk_`) se muestra **una sola vez** al crearla
 — Seredina solo guarda su hash, nunca el valor en texto plano, así que si
-lo perdés hay que generar una clave nueva.
+lo pierdes hay que generar una clave nueva.
 
 ### Usarla
 
@@ -57,7 +57,7 @@ permisos).
 - [API REST](/es/api/rest-api) — los endpoints públicos que una API Key puede
   llamar, en detalle.
 - [Webhooks salientes](/es/api/webhooks) — la dirección contraria: Seredina
-  notificándote a vos cuando algo pasa.
+  notificándote a ti cuando algo pasa.
 - [Servidor MCP](/es/api/mcp-server) — para conectar tu propio agente de IA
   (Claude Desktop, un flujo de n8n, un script) contra el mismo catálogo de
   herramientas que usa el copiloto.

@@ -1,7 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { prisma, withTenantTx } from '@seredina/db';
-import { registerTenant } from '../src/modules/auth/service';
+import { registerTenant, registrationInfo } from '../src/modules/auth/service';
+import { parseEmailSettings } from '@seredina/shared';
 
 /**
  * SEREDINA_MODE=self_hosted's single-tenant enforcement (Phase 4) -- see
@@ -76,5 +77,30 @@ describe.skipIf(!hasDb)('registerTenant + SEREDINA_MODE', () => {
         password: 'SuperSecret123!',
       }),
     ).rejects.toThrow('this self-hosted instance already has a tenant');
+  });
+
+  it('a workspace registered in Spanish starts with Spanish statuses and Spanish customer emails', async () => {
+    const rand = Math.random().toString(36).slice(2, 8);
+    const { tenantId } = await registerTenant({
+      tenantSlug: `es-${rand}`,
+      tenantName: 'Empresa',
+      adminEmail: `es-${rand}@example.com`,
+      adminName: 'Admin',
+      password: 'SuperSecret123!',
+      language: 'es',
+    });
+    const [statuses, tenant] = await withTenantTx(prisma, tenantId, (tx) =>
+      Promise.all([tx.ticketStatus.findMany({ orderBy: { sortOrder: 'asc' } }), tx.tenant.findUniqueOrThrow({ where: { id: tenantId } })]),
+    );
+    expect(statuses.map((s) => s.label)).toEqual(['Abierto', 'Pendiente', 'Resuelto', 'Cerrado']);
+    expect(statuses.map((s) => s.key)).toEqual(['open', 'pending', 'resolved', 'closed']);
+    expect(parseEmailSettings(tenant.emailSettings).language).toBe('es');
+  });
+
+  it('registration is open in cloud mode and closed on a self-hosted instance that has its tenant', async () => {
+    expect(await registrationInfo()).toEqual({ open: true, tenantSlug: null });
+    process.env.SEREDINA_MODE = 'self_hosted';
+    // The shared test database holds many tenants, so there's no single slug to offer.
+    expect(await registrationInfo()).toEqual({ open: false, tenantSlug: null });
   });
 });

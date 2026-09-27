@@ -9,7 +9,7 @@ negocio ni saltarte los controles de autorización.
 
 ## Dos transportes
 
-Elegís con `MCP_TRANSPORT` (por defecto `stdio`):
+Eliges con `MCP_TRANSPORT` (por defecto `stdio`):
 
 ### `stdio`
 
@@ -20,12 +20,12 @@ servidor MCP local. El tenant se resuelve una sola vez al arrancar, a
 partir de `SEREDINA_API_KEY`.
 
 ```bash
-# 1. Creá una API Key desde Administración → Claves de API en la consola.
+# 1. Crea una API Key desde Administración → Claves de API en la consola.
 
 # 2. Construí la imagen:
 docker build -f infra/docker/Dockerfile.mcp-server -t seredina-mcp-server .
 
-# 3. Apuntá tu cliente MCP a:
+# 3. Apunta tu cliente MCP a:
 docker run -i --rm \
   -e SEREDINA_API_KEY=<tu clave> \
   -e DATABASE_URL=... \

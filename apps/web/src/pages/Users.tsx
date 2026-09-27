@@ -9,6 +9,7 @@ import { Input } from '../components/Input';
 import { Select } from '../components/Select';
 import { Card } from '../components/Card';
 import { useAuth } from '../auth/AuthContext';
+import { roleDisplayName } from '../lib/format';
 
 export function Users() {
   const { t } = useTranslation();
@@ -147,7 +148,7 @@ export function Users() {
                 >
                   {roles.map((r) => (
                     <option key={r.id} value={r.key}>
-                      {r.name}
+                      {roleDisplayName(r, t)}
                     </option>
                   ))}
                 </Select>
@@ -273,7 +274,7 @@ function CreateUserModal({
         <Select label={t('users.col.role')} value={roleKey} onChange={(e) => setRoleKey(e.target.value)}>
           {roles.map((r) => (
             <option key={r.id} value={r.key}>
-              {r.name}
+              {roleDisplayName(r, t)}
             </option>
           ))}
         </Select>

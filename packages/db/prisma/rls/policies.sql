@@ -167,6 +167,22 @@ $$;
 REVOKE ALL ON FUNCTION public.count_tenants() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.count_tenants() TO app_tenant;
 
+-- Same pattern, for the sign-in page of a self-hosted instance: with exactly
+-- one tenant, the organization field is noise, so the page asks for the slug
+-- instead of the user. Returns NULL unless there is exactly one tenant, and
+-- only its slug -- already public, it's in every portal and KB URL.
+CREATE OR REPLACE FUNCTION public.single_tenant_slug()
+RETURNS text
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT CASE WHEN count(*) = 1 THEN min(slug) END FROM tenants;
+$$;
+
+REVOKE ALL ON FUNCTION public.single_tenant_slug() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.single_tenant_slug() TO app_tenant;
+
 -- Same escape-hatch pattern as resolve_tenant_id_by_api_key_hash: an incoming
 -- Telegram webhook POST (docs/adr/0044-telegram-channel.md) carries only the
 -- opaque webhook_id in its URL path, no tenant context yet. Exposes only

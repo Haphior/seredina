@@ -28,7 +28,9 @@
       "submitting": "Creando…",
       "haveAccount": "¿Ya tienes una cuenta?",
       "signIn": "Iniciar sesión",
-      "failed": "Error al registrarse"
+      "failed": "Error al registrarse",
+      "closedTitle": "Este servidor ya tiene su organización",
+      "closedBody": "Un Seredina instalado en tu servidor funciona con una sola organización. Para tener una cuenta, pídele a un administrador que te invite."
     },
     "fields": {
       "orgSlug": "Identificador de la organización",
@@ -133,7 +135,7 @@
   },
   "dashboard": {
     "title": "Panel",
-    "subtitle": "Oculta, redimensiona, reordena o agregá widgets — se guarda por persona, no por tenant.",
+    "subtitle": "Oculta, redimensiona, reordena o agrega widgets. Se guarda por persona, no para toda la organización.",
     "loading": "Cargando…",
     "loadFailed": "No se pudo cargar el panel",
     "hidden": "Oculto",
@@ -174,14 +176,15 @@
         "customize_status": "Personaliza tus estados de tickets",
         "set_sla_policy": "Define una política de SLA",
         "create_macro": "Crea una macro",
-        "invite_teammate": "Invita a un compañero de equipo"
+        "invite_teammate": "Invita a un compañero de equipo",
+        "connect_email": "Conecta un buzón de correo"
       }
     },
     "recentActivity": {
       "empty": "Aún no hay tickets."
     },
     "myOpenTickets": {
-      "empty": "No tenés tickets abiertos asignados."
+      "empty": "No tienes tickets abiertos asignados."
     },
     "unassignedTickets": {
       "empty": "No hay tickets sin asignar — buen trabajo."
@@ -231,7 +234,7 @@
       "closed": "Cerrados"
     },
     "filters": {
-      "anyone": "Cualquiera",
+      "anyone": "Cualquier responsable",
       "assignedToMe": "Asignados a mí",
       "anyPriority": "Cualquier prioridad",
       "saveThisView": "+ Guardar esta vista"
@@ -255,7 +258,7 @@
       "slaOverdue": "SLA vencido",
       "sla": "SLA"
     },
-    "empty": "No hay tickets aquí.",
+    "empty": "Ningún ticket coincide con estos filtros.",
     "loadFailed": "No se pudieron cargar los tickets",
     "loadMore": "Cargar más ({{count}} restantes)",
     "removeSavedViewFailed": "No se pudo quitar la vista guardada",
@@ -279,7 +282,9 @@
       "subjectOptional": "Asunto (opcional)",
       "request": "Solicitud",
       "createTicket": "Crear ticket",
-      "createFailed": "No se pudo crear el ticket"
+      "createFailed": "No se pudo crear el ticket",
+      "team": "Equipo",
+      "assignee": "Responsable"
     },
     "live": {
       "live": "En vivo",
@@ -288,11 +293,17 @@
       "connectingHint": "Conectando con las actualizaciones en vivo",
       "offline": "Reconectando…",
       "offlineHint": "Las actualizaciones en vivo están en pausa; recarga para ver lo último"
+    },
+    "emptyFirst": {
+      "title": "Todavía no hay tickets",
+      "body": "Los tickets llegan desde un buzón de correo conectado, el portal de clientes, la API o una alerta de monitoreo. También puedes registrar uno a mano, por una llamada o una visita.",
+      "create": "Registrar un ticket",
+      "connectEmail": "Conectar un buzón"
     }
   },
   "ticketDetail": {
     "backToTickets": "Tickets",
-    "priorityLabel": "prioridad {{priority}}",
+    "priorityLabel": "Prioridad {{priority}}",
     "ref": "ref: {{id}}",
     "firstResponseOverdue": "Primera respuesta vencida",
     "resolutionOverdue": "Resolución vencida",
@@ -392,19 +403,19 @@
     "steps": {
       "welcome": {
         "title": "¡Bienvenido a Seredina!",
-        "body": "Un vistazo rápido a dónde está todo. Podés saltar este tour cuando quieras."
+        "body": "Un vistazo rápido a dónde está todo. Puedes saltar este tour cuando quieras."
       },
       "dashboard": {
         "title": "Tu panel",
-        "body": "Acá aterrizás cada vez que entrás — widgets de volumen de tickets, SLA y más, que podés ocultar o reordenar."
+        "body": "Aquí llegas cada vez que entras: widgets de volumen de tickets, SLA y más, que puedes ocultar o reordenar."
       },
       "checklist": {
         "title": "Primeros pasos",
-        "body": "Esta lista te guía para configurar tu organización: personalizar estados de tickets, una política de SLA, una macro, e invitar a tu equipo."
+        "body": "Esta lista te guía para configurar tu organización: conectar un buzón de correo, personalizar los estados de tickets, definir un SLA, crear una macro e invitar a tu equipo."
       },
       "tickets": {
         "title": "Tickets",
-        "body": "Todo lo que llega — por correo, la API, o una alerta de monitoreo — termina siendo un ticket acá."
+        "body": "Todo lo que llega, por correo, la API o una alerta de monitoreo, termina siendo un ticket aquí."
       },
       "processes": {
         "title": "Procesos",
@@ -412,15 +423,15 @@
       },
       "knowledgeBase": {
         "title": "Base de conocimiento",
-        "body": "Artículos que usa tu equipo — publicá uno y tus clientes también van a poder leerlo."
+        "body": "Artículos que usa tu equipo. Publica uno y tus clientes también podrán leerlo."
       },
       "language": {
         "title": "Idioma",
-        "body": "Cambiá el idioma de la consola cuando quieras — es tu propia preferencia, no la de todo el equipo."
+        "body": "Cambia el idioma de la consola cuando quieras. Es tu propia preferencia, no la de todo el equipo."
       },
       "done": {
         "title": "¡Listo!",
-        "body": "Podés volver a ver este tour cuando quieras con el ícono de ayuda, justo abajo."
+        "body": "Puedes volver a ver este tour cuando quieras con el ícono de ayuda, justo abajo."
       }
     }
   },
@@ -1060,6 +1071,11 @@
       "roles:manage": "Gestionar roles",
       "audit:read": "Ver el registro de auditoría",
       "contacts:manage": "Gestionar los datos personales de los contactos"
+    },
+    "builtin": {
+      "admin": "Administrador",
+      "team_lead": "Líder de equipo",
+      "agent": "Agente"
     }
   },
   "equipment": {
@@ -1099,22 +1115,30 @@
     "removeFailed": "No se pudo quitar la política de SLA",
     "confirmRemove": "¿Quitar la política de SLA de prioridad {{priority}}? Los tickets con esa prioridad dejarán de tener fechas de vencimiento.",
     "title": "Políticas de SLA",
-    "intro": "Objetivos de primera respuesta y resolución por prioridad. Una prioridad sin política no tiene vencimientos — el seguimiento de SLA es opcional. Los objetivos \"solo horario laboral\" usan el horario de la página Horario laboral.",
+    "intro": "Plazos de primera respuesta y resolución por prioridad. Una prioridad sin plazo no tiene vencimientos; el seguimiento de SLA es opcional. Los plazos «solo horario laboral» cuentan solo las horas definidas en Horario laboral.",
     "firstResponse": "Primera respuesta",
-    "firstResponseAria": "Minutos de primera respuesta para prioridad {{priority}}",
+    "firstResponseAria": "Plazo de primera respuesta para prioridad {{priority}}",
     "resolution": "Resolución",
-    "resolutionAria": "Minutos de resolución para prioridad {{priority}}",
-    "placeholder": "p. ej. 30",
-    "min": "min",
+    "resolutionAria": "Plazo de resolución para prioridad {{priority}}",
     "businessHoursOnly": "Solo horario laboral",
     "remove": "quitar",
-    "update": "Actualizar",
     "left": "Quedan {{time}}",
     "overdueBy": "Vencido hace {{time}}",
     "firstResponseDue": "Primera respuesta vence {{time}}",
     "resolutionDue": "Resolución vence {{time}}",
     "firstResponseShort": "Respuesta",
-    "resolutionShort": "Resolución"
+    "resolutionShort": "Resolución",
+    "useSuggested": "Completar con plazos sugeridos",
+    "saveChanges": "Guardar cambios",
+    "saved": "Guardado.",
+    "bothNeeded": "Cada prioridad necesita un plazo de primera respuesta y uno de resolución.",
+    "noTarget": "Sin plazo",
+    "unit": "unidad",
+    "units": {
+      "min": "min",
+      "h": "horas",
+      "d": "días"
+    }
   },
   "assetStatus": {
     "ACTIVE": "Activo",
@@ -1172,7 +1196,17 @@
       "agent": "Registrado por un agente",
       "portal": "Por portal de clientes"
     },
-    "viaOther": "Por {{channel}}"
+    "viaOther": "Por {{channel}}",
+    "short": {
+      "email": "Correo",
+      "api": "API",
+      "catalog": "Catálogo",
+      "widget": "Widget",
+      "telegram": "Telegram",
+      "alert": "Alerta",
+      "agent": "Agente",
+      "portal": "Portal"
+    }
   },
   "catalog": {
     "loadFailed": "No se pudo cargar el catálogo de servicios",

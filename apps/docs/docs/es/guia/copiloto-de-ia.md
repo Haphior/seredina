@@ -41,7 +41,7 @@ en la transparencia de costos de IA como `triage`.
 
 ## Modo autónomo ("Dejar que la IA lo intente")
 
-Acá el copiloto puede investigar el ticket y, si tiene confianza,
+Aquí el copiloto puede investigar el ticket y, si tiene confianza,
 **actuar** sobre él — no solo redactar texto. La diferencia clave con los
 dos modos anteriores es que sí puede ejecutar herramientas reales
 (consultar datos, cambiar el estado, asignar, aplicar una macro, agregar
@@ -69,7 +69,7 @@ control para integraciones externas).
 
 **Operaciones → Uso de IA** muestra el costo real en dólares de cada
 llamada al copiloto, agregado por tenant. Como la clave del proveedor de
-IA puede ser la propia del tenant (traé tu propia clave, desde
+IA puede ser la propia del tenant (trae tu propia clave, desde
 **Configuración → IA**), Seredina nunca le agrega margen — el costo
 mostrado es exactamente lo que cobra el proveedor.
 

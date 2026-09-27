@@ -25,8 +25,8 @@ resto tiene un valor por defecto razonable o es opcional.
 | `ENCRYPTION_KEY` | Sí (secreto generado) | Cifra en reposo (AES-256-GCM) las contraseñas IMAP/SMTP de los canales de correo, y otros secretos por tenant. **Debe tener exactamente 64 caracteres hexadecimales** (`openssl rand -hex 32`). |
 
 ::: warning Perder este `ENCRYPTION_KEY` es irreversible
-Si lo perdés o lo rotás sin migrar los datos existentes, **toda** contraseña
-de canal de correo ya guardada queda indescifrable — hacele backup con la
+Si lo pierdes o lo rotas sin migrar los datos existentes, **toda** contraseña
+de canal de correo ya guardada queda indescifrable — hazle backup con la
 misma seriedad que a una contraseña de base de datos.
 :::
 
@@ -62,7 +62,7 @@ del despliegue.
 | `WEB_PORT` | No | Puerto de la consola web (`8080` por defecto). |
 | `WEB_ORIGIN` | Sí | Debe ser como el navegador llega a la consola (nunca el hostname interno de compose). `api` también arma con ella todos los enlaces públicos: los de encuestas CSAT, los de acceso al portal de clientes, y la dirección a la que Microsoft 365 / Gmail y tu proveedor de SSO devuelven el navegador (`<WEB_ORIGIN>/api/email-channels/oauth/callback` y `<WEB_ORIGIN>/api/auth/sso/callback`, salvo que `API_PUBLIC_URL` esté definida). El `worker` recibe el mismo valor, para el enlace al portal en los correos. Sin definir, esas funciones no andan. |
 | `VITE_API_URL` | No | Déjala vacía: la consola llega a la API en `/api` de su propia dirección. Defínela solo para apuntar la consola a una API en otro origen (queda fija al compilar). |
-| `API_PUBLIC_URL` | Solo si usás Telegram | URL HTTPS real, accesible desde internet, de tu API — Telegram la llama directamente para entregar mensajes, así que nunca puede ser `localhost` ni un hostname interno de compose. También es la dirección que la página Dispositivos pone en los comandos de enrolamiento de agentes y, si está definida, la base de las URI de redirección de OAuth y SSO (`<API_PUBLIC_URL>/email-channels/oauth/callback`, `<API_PUBLIC_URL>/auth/sso/callback`). `configure-address.sh` la define como `https://<dirección>/api`. |
+| `API_PUBLIC_URL` | Solo si usas Telegram | URL HTTPS real, accesible desde internet, de tu API — Telegram la llama directamente para entregar mensajes, así que nunca puede ser `localhost` ni un hostname interno de compose. También es la dirección que la página Dispositivos pone en los comandos de enrolamiento de agentes y, si está definida, la base de las URI de redirección de OAuth y SSO (`<API_PUBLIC_URL>/email-channels/oauth/callback`, `<API_PUBLIC_URL>/auth/sso/callback`). `configure-address.sh` la define como `https://<dirección>/api`. |
 | `SEREDINA_SITE` | Con el perfil `proxy` | La dirección que sirve el proxy HTTPS: un dominio o IP (`http://…` si `TLS_MODE=off`). La define `scripts/configure-address.sh`. |
 | `TLS_MODE` | Con el perfil `proxy` | `acme` (Let's Encrypt), `custom` (`certs/cert.pem` + `certs/key.pem`), `internal` (CA generada) u `off`. |
 | `ACME_EMAIL` | Con `TLS_MODE=acme` | Recibe avisos de vencimiento si la renovación llegara a fallar. |

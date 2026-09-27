@@ -28,7 +28,9 @@
       "submitting": "Creating…",
       "haveAccount": "Already have an account?",
       "signIn": "Sign in",
-      "failed": "Registration failed"
+      "failed": "Registration failed",
+      "closedTitle": "This server already has its organization",
+      "closedBody": "A self-hosted Seredina runs one organization. To get an account, ask an administrator to invite you."
     },
     "fields": {
       "orgSlug": "Organization slug",
@@ -174,7 +176,8 @@
         "customize_status": "Customize your ticket statuses",
         "set_sla_policy": "Set an SLA policy",
         "create_macro": "Create a macro",
-        "invite_teammate": "Invite a teammate"
+        "invite_teammate": "Invite a teammate",
+        "connect_email": "Connect a mailbox"
       }
     },
     "recentActivity": {
@@ -231,7 +234,7 @@
       "closed": "Closed"
     },
     "filters": {
-      "anyone": "Anyone",
+      "anyone": "Any assignee",
       "assignedToMe": "Assigned to me",
       "anyPriority": "Any priority",
       "saveThisView": "+ Save this view"
@@ -255,7 +258,7 @@
       "slaOverdue": "SLA overdue",
       "sla": "SLA"
     },
-    "empty": "No tickets here.",
+    "empty": "No tickets match these filters.",
     "loadFailed": "Failed to load tickets",
     "loadMore": "Load more ({{count}} remaining)",
     "removeSavedViewFailed": "Failed to remove saved view",
@@ -279,7 +282,9 @@
       "subjectOptional": "Subject (optional)",
       "request": "Request",
       "createTicket": "Create ticket",
-      "createFailed": "Failed to create ticket"
+      "createFailed": "Failed to create ticket",
+      "team": "Team",
+      "assignee": "Assignee"
     },
     "live": {
       "live": "Live",
@@ -288,6 +293,12 @@
       "connectingHint": "Connecting to live updates",
       "offline": "Reconnecting…",
       "offlineHint": "Live updates are paused; reload to see the latest"
+    },
+    "emptyFirst": {
+      "title": "No tickets yet",
+      "body": "Tickets arrive from a connected mailbox, the customer portal, the API or a monitoring alert. You can also log one by hand, for a call or a walk-in.",
+      "create": "Log a ticket",
+      "connectEmail": "Connect a mailbox"
     }
   },
   "ticketDetail": {
@@ -400,7 +411,7 @@
       },
       "checklist": {
         "title": "Get started",
-        "body": "This checklist walks you through setting up your organization: customizing ticket statuses, an SLA policy, a macro, and inviting your team."
+        "body": "This list walks you through setting up your organization: connect a mailbox, customize ticket statuses, set an SLA, create a macro and invite your team."
       },
       "tickets": {
         "title": "Tickets",
@@ -1060,6 +1071,11 @@
       "roles:manage": "Manage roles",
       "audit:read": "See the audit log",
       "contacts:manage": "Manage contacts’ personal data"
+    },
+    "builtin": {
+      "admin": "Administrator",
+      "team_lead": "Team lead",
+      "agent": "Agent"
     }
   },
   "equipment": {
@@ -1099,22 +1115,30 @@
     "removeFailed": "Failed to remove SLA policy",
     "confirmRemove": "Remove the SLA policy for {{priority}} priority? Tickets at this priority will no longer get due dates.",
     "title": "SLA Policies",
-    "intro": "First response and resolution targets, per priority. A priority with no policy here gets no due dates at all — SLA tracking is opt-in. Business-hours-only targets use the schedule set on the Business Hours page.",
+    "intro": "First-response and resolution targets per priority. A priority without a target has no due dates; SLA tracking is optional. \"Business hours only\" targets count only the hours set under Business Hours.",
     "firstResponse": "First response",
-    "firstResponseAria": "First response minutes for {{priority}} priority",
+    "firstResponseAria": "First response target for {{priority}} priority",
     "resolution": "Resolution",
-    "resolutionAria": "Resolution minutes for {{priority}} priority",
-    "placeholder": "e.g. 30",
-    "min": "min",
+    "resolutionAria": "Resolution target for {{priority}} priority",
     "businessHoursOnly": "Business hours only",
     "remove": "remove",
-    "update": "Update",
     "left": "{{time}} left",
     "overdueBy": "{{time}} overdue",
     "firstResponseDue": "First response due {{time}}",
     "resolutionDue": "Resolution due {{time}}",
     "firstResponseShort": "Response",
-    "resolutionShort": "Resolution"
+    "resolutionShort": "Resolution",
+    "useSuggested": "Fill in suggested targets",
+    "saveChanges": "Save changes",
+    "saved": "Saved.",
+    "bothNeeded": "Each priority needs both a first-response and a resolution target.",
+    "noTarget": "No target",
+    "unit": "unit",
+    "units": {
+      "min": "min",
+      "h": "hours",
+      "d": "days"
+    }
   },
   "assetStatus": {
     "ACTIVE": "Active",
@@ -1172,7 +1196,17 @@
       "agent": "Logged by an agent",
       "portal": "Via customer portal"
     },
-    "viaOther": "Via {{channel}}"
+    "viaOther": "Via {{channel}}",
+    "short": {
+      "email": "Email",
+      "api": "API",
+      "catalog": "Catalog",
+      "widget": "Widget",
+      "telegram": "Telegram",
+      "alert": "Alert",
+      "agent": "Agent",
+      "portal": "Portal"
+    }
   },
   "catalog": {
     "loadFailed": "Failed to load the service catalog",

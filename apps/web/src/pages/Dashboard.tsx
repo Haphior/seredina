@@ -30,6 +30,7 @@ import {
   ShrinkIcon,
 } from '../components/icons';
 import { PRIORITY_TONE, STATUS_CATEGORY_TONE } from '../lib/format';
+import { uiLocale } from '../i18n';
 
 interface DashboardData {
   onboarding: OnboardingChecklist;
@@ -110,7 +111,9 @@ export function Dashboard() {
   async function move(widgetType: WidgetType, direction: -1 | 1) {
     if (!prefs) return;
     const i = prefs.findIndex((p) => p.widgetType === widgetType);
-    const j = i + direction;
+    // Swap with the next *visible* widget: hidden ones aren't on the grid.
+    let j = i + direction;
+    while (j >= 0 && j < prefs.length && !prefs[j].visible) j += direction;
     if (i < 0 || j < 0 || j >= prefs.length) return;
 
     const a = prefs[i];
@@ -159,6 +162,8 @@ export function Dashboard() {
   }
 
   const hiddenPrefs = prefs?.filter((p) => !p.visible) ?? [];
+  // Hidden widgets live in "Add widget", not as empty cards on the grid.
+  const visiblePrefs = prefs?.filter((p) => p.visible) ?? [];
 
   return (
     <div className="px-8 py-7">
@@ -180,12 +185,12 @@ export function Dashboard() {
 
       {prefs && data && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {prefs.map((pref, i) => (
+          {visiblePrefs.map((pref, i) => (
             <WidgetCard
               key={pref.widgetType}
               pref={pref}
               canMoveUp={i > 0}
-              canMoveDown={i < prefs.length - 1}
+              canMoveDown={i < visiblePrefs.length - 1}
               isDragging={dragging === pref.widgetType}
               onToggle={() => setVisible(pref.widgetType, !pref.visible)}
               onMoveUp={() => move(pref.widgetType, -1)}
@@ -194,7 +199,7 @@ export function Dashboard() {
               onDragStart={() => setDragging(pref.widgetType)}
               onDragEnd={() => setDragging(null)}
               onDropOn={() => {
-                if (dragging && dragging !== pref.widgetType) reorderTo(dragging, i);
+                if (dragging && dragging !== pref.widgetType) reorderTo(dragging, prefs.findIndex((p) => p.widgetType === pref.widgetType));
                 setDragging(null);
               }}
             >
@@ -409,7 +414,7 @@ function TicketVolumeWidget({ points }: { points: TicketVolumePoint[] }) {
 
 function formatShortDate(iso?: string) {
   if (!iso) return '';
-  return new Date(iso + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  return new Date(iso + 'T00:00:00').toLocaleDateString(uiLocale(), { month: 'short', day: 'numeric' });
 }
 
 // The one-segment gauge shared by PriorityBreakdownWidget and
@@ -429,6 +434,7 @@ function ProgressBar({ value, max, colorClassName }: { value: number; max: numbe
 const PRIORITY_ORDER = ['LOW', 'NORMAL', 'HIGH', 'URGENT'] as const;
 
 function PriorityBreakdownWidget({ counts }: { counts: Record<string, number> }) {
+  const { t } = useTranslation();
   const max = Math.max(1, ...PRIORITY_ORDER.map((p) => counts[p] ?? 0));
   return (
     <div className="flex flex-col gap-2">
@@ -437,7 +443,7 @@ function PriorityBreakdownWidget({ counts }: { counts: Record<string, number> })
         return (
           <div key={p} className="flex items-center gap-2.5">
             <Badge tone={PRIORITY_TONE[p]} dot>
-              {p}
+              {t(`priority.${p}`)}
             </Badge>
             <ProgressBar value={count} max={max} colorClassName="bg-indigo-400" />
             <span className="w-6 text-right text-[12.5px] font-medium text-slate-600">{count}</span>

@@ -9,7 +9,7 @@
   persona recibe un enlace, válido por 7 días, para elegir su propia
   contraseña. Mientras no lo use, la lista de usuarios muestra
   **Invitación pendiente**, con la acción **reenviar invitación**.
-- O definir una **contraseña inicial** y compartírsela vos.
+- O definir una **contraseña inicial** y compartírsela tú.
 
 Cada persona cambia su propia contraseña desde **Seguridad de la cuenta**
 (el ícono del escudo abajo en la barra lateral), y quien la olvidó puede
@@ -111,12 +111,12 @@ actualizar).
 ## Claves de API
 
 **Administración → Claves de API** — para integraciones externas, no
-para agentes humanos. Ver [Autenticación](/es/api/#api-keys-para-integraciones-lo-que-necesitás-vos)
+para agentes humanos. Ver [Autenticación](/es/api/#api-keys-para-integraciones-lo-que-necesitas)
 para el detalle completo.
 
 ## Campos personalizados
 
-**Configuración → Campos Personalizados** — definí campos extra que
+**Configuración → Campos Personalizados** — define campos extra que
 aparecen en el panel de propiedades de cada ticket. Cinco tipos
 disponibles: texto, número, sí/no, fecha, y lista de opciones. Un campo
 personalizado también puede asociarse a un

@@ -34,14 +34,14 @@ Eso es todo. `scripts/setup.sh` genera cada secreto (`JWT_SECRET`,
 valores fijos. El servicio `migrate` aplica el esquema y las políticas de
 Row-Level Security y termina; después arrancan `api`, `worker` y `web`.
 
-Abrí `http://localhost:8080` (o el puerto que hayas puesto en `WEB_PORT`) y
-registrá tu organización en `/register`. No hay un paso de bootstrap por
+Abre `http://localhost:8080` (o el puerto que hayas puesto en `WEB_PORT`) y
+registra tu organización en `/register`. No hay un paso de bootstrap por
 CLI aparte — el mismo flujo de registro funciona igual en modo autoalojado
 y en modo cloud.
 
 ::: tip Regenerar secretos
-`scripts/setup.sh` no toca un `.env` que ya existe. Si querés secretos
-nuevos desde cero, borrá `.env` primero — pero tené en cuenta que esto
+`scripts/setup.sh` no toca un `.env` que ya existe. Si quieres secretos
+nuevos desde cero, borra `.env` primero — pero ten en cuenta que esto
 invalida cualquier contraseña de canal de correo ya guardada, cifrada con
 el `ENCRYPTION_KEY` anterior.
 :::
@@ -143,7 +143,7 @@ npm run dev:api
 # en una segunda terminal
 npm run dev --workspace=apps/web   # http://localhost:5173
 
-# en una tercera, solo si necesitás descubrimiento/correo funcionando
+# en una tercera, solo si necesitas descubrimiento/correo funcionando
 npm run dev --workspace=apps/worker
 ```
 

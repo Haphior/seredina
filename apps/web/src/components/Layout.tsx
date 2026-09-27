@@ -40,6 +40,7 @@ import {
   WebhookIcon,
 } from './icons';
 import { Logo } from './Logo';
+import { roleDisplayName } from '../lib/format';
 
 interface Me {
   name: string;
@@ -218,7 +219,7 @@ export function Layout() {
           <Avatar name={me?.name ?? '?'} size={28} />
           <div className="min-w-0 flex-1">
             <div className="truncate text-[13px] font-semibold text-slate-800">{me?.name ?? '…'}</div>
-            <div className="truncate text-[11.5px] capitalize text-slate-400">{me?.role?.key ?? ''}</div>
+            <div className="truncate text-[11.5px] text-slate-400">{me?.role ? roleDisplayName({ key: me.role.key, name: me.role.key }, t) : ''}</div>
           </div>
           <button
             onClick={() => navigate('/account/security')}

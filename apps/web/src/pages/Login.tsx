@@ -1,10 +1,11 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../auth/AuthContext';
 import { AuthLayout, Field } from '../components/AuthLayout';
 import { CodeInput, MfaEnroll, RecoveryCodes, type MfaSetupData } from '../components/MfaSetup';
 import { API_URL, apiPost, ApiError } from '../lib/api';
+import { useRegistrationInfo } from '../lib/registration';
 
 type Step =
   | { kind: 'password' }
@@ -26,6 +27,12 @@ export function Login() {
   // Set by the API when a single sign-on attempt comes back with a problem.
   const [error, setError] = useState<string | null>(params.get('sso_error'));
   const [submitting, setSubmitting] = useState(false);
+  // A self-hosted instance with one organization answers the org field itself.
+  const registration = useRegistrationInfo();
+  const knownOrg = registration?.tenantSlug ?? null;
+  useEffect(() => {
+    if (knownOrg) setTenantSlug(knownOrg);
+  }, [knownOrg]);
 
   function signInWithSso() {
     if (!tenantSlug.trim()) {
@@ -165,7 +172,7 @@ export function Login() {
         </div>
 
         <div className="flex flex-col gap-3.5">
-          <Field label={t('auth.fields.orgSlug')} value={tenantSlug} onChange={setTenantSlug} placeholder="acme" />
+          {!knownOrg && <Field label={t('auth.fields.orgSlug')} value={tenantSlug} onChange={setTenantSlug} placeholder="acme" />}
           <Field label={t('auth.fields.email')} type="email" value={email} onChange={setEmail} placeholder="you@company.com" />
           <Field label={t('auth.fields.password')} type="password" value={password} onChange={setPassword} />
           <Link to="/forgot-password" className="-mt-1.5 self-end text-[12.5px] font-medium text-indigo-600 hover:underline">
@@ -192,12 +199,14 @@ export function Login() {
           {t('auth.sso.button')}
         </button>
 
-        <p className="text-center text-[13px] text-slate-400">
-          {t('auth.login.noOrg')}{' '}
-          <Link to="/register" className="font-semibold text-indigo-600 hover:underline">
-            {t('auth.login.createOne')}
-          </Link>
-        </p>
+        {registration?.open !== false && (
+          <p className="text-center text-[13px] text-slate-400">
+            {t('auth.login.noOrg')}{' '}
+            <Link to="/register" className="font-semibold text-indigo-600 hover:underline">
+              {t('auth.login.createOne')}
+            </Link>
+          </p>
+        )}
       </form>
     </AuthLayout>
   );

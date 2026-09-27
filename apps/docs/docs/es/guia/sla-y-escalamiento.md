@@ -3,10 +3,14 @@
 ## Políticas de SLA
 
 Desde **Configuración → Políticas de SLA** se define, por prioridad
-(Baja/Normal/Alta/Urgente), en cuántos minutos debe llegar la primera
-respuesta y en cuántos debe resolverse el ticket. Cada prioridad tiene su
-propia política — un ticket urgente típicamente tiene plazos mucho más
-cortos que uno de baja prioridad.
+(Baja/Normal/Alta/Urgente), cuánto puede tardar la primera respuesta y
+cuánto la resolución del ticket, en minutos, horas o días. Cada prioridad
+tiene su propia política — un ticket urgente típicamente tiene plazos
+mucho más cortos que uno de baja prioridad. **Completar con plazos
+sugeridos** propone un punto de partida habitual para las prioridades que
+no has definido (Urgente: 15 min / 4 h, Alta: 1 h / 8 h, Normal: 4 h / 2
+días, Baja: 8 h / 5 días); **Guardar cambios** guarda de una vez todas las
+prioridades que editaste.
 
 Cada política tiene un interruptor **solo horario laboral**: si está
 activado, el conteo de tiempo se pausa fuera del horario configurado en

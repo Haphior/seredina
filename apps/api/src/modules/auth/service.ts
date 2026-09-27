@@ -1,8 +1,8 @@
 import { randomBytes, randomUUID } from 'node:crypto';
 import bcrypt from 'bcryptjs';
-import { DEFAULT_ROLES, PERMISSIONS, type Permission } from '@seredina/shared';
+import { DEFAULT_ROLES, PERMISSIONS, type EmailLanguage, type Permission } from '@seredina/shared';
 import { prisma, withTenantTx } from '@seredina/db';
-import { countTenants, resolveTenantIdBySlug } from '../tenants/service';
+import { countTenants, resolveTenantIdBySlug, singleTenantSlug } from '../tenants/service';
 import { seedDefaultTicketStatuses } from '../tickets/service';
 import { seedDefaultTeam } from '../teams/service';
 import { recordAudit } from '../audit/service';
@@ -19,6 +19,12 @@ export interface RegisterTenantInput {
   adminEmail: string;
   adminName: string;
   password: string;
+  /**
+   * The language the workspace starts in: default status names and the
+   * customer-email language. Left out (older API clients), statuses are in
+   * English and emails keep their own default.
+   */
+  language?: EmailLanguage;
 }
 
 export interface AuthResult {
@@ -32,6 +38,19 @@ export interface AuthResult {
    * session token may be issued while this is set.
    */
   mfa?: 'verify' | 'setup';
+}
+
+/**
+ * What the sign-in and sign-up pages need before anyone is signed in. A
+ * self-hosted instance takes one registration, so after that the sign-up
+ * page is closed; and with its one tenant, sign-in doesn't need to ask for
+ * the organization.
+ */
+export async function registrationInfo(): Promise<{ open: boolean; tenantSlug: string | null }> {
+  const selfHosted = process.env.SEREDINA_MODE === 'self_hosted';
+  if (!selfHosted) return { open: true, tenantSlug: null };
+  const [count, slug] = await Promise.all([countTenants(), singleTenantSlug()]);
+  return { open: count === 0, tenantSlug: slug };
 }
 
 export async function registerTenant(input: RegisterTenantInput): Promise<AuthResult> {
@@ -61,7 +80,13 @@ export async function registerTenant(input: RegisterTenantInput): Promise<AuthRe
 
   return withTenantTx(prisma, tenantId, async (tx) => {
     await tx.tenant.create({
-      data: { id: tenantId, slug: input.tenantSlug, name: input.tenantName, mode },
+      data: {
+        id: tenantId,
+        slug: input.tenantSlug,
+        name: input.tenantName,
+        mode,
+        emailSettings: input.language ? { language: input.language } : undefined,
+      },
     });
 
     const allPermissions = await tx.permission.findMany();
@@ -83,7 +108,7 @@ export async function registerTenant(input: RegisterTenantInput): Promise<AuthRe
       data: { tenantId, email: input.adminEmail, name: input.adminName, passwordHash, roleId: adminRoleId },
     });
 
-    await seedDefaultTicketStatuses(tx, tenantId);
+    await seedDefaultTicketStatuses(tx, tenantId, input.language);
     await seedDefaultTeam(tx, tenantId);
 
     return { tenantId, userId: adminUser.id, permissions: DEFAULT_ROLES.admin };

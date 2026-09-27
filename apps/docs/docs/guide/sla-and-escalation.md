@@ -3,9 +3,13 @@
 ## SLA policies
 
 From **Configuration → SLA Policies**, you define, per priority
-(Low/Normal/High/Urgent), how many minutes the first response and the
-resolution are due in. Each priority has its own policy — an urgent
-ticket typically has much tighter deadlines than a low-priority one.
+(Low/Normal/High/Urgent), how long the first response and the
+resolution may take, in minutes, hours or days. Each priority has its own
+policy — an urgent ticket typically has much tighter deadlines than a
+low-priority one. **Fill in suggested targets** proposes a common starting
+point for the priorities you haven't set (Urgent: 15 min / 4 h, High: 1 h /
+8 h, Normal: 4 h / 2 days, Low: 8 h / 5 days); **Save changes** saves every
+priority you edited at once.
 
 Each policy has a **business hours only** toggle: when on, the time
 count pauses outside the schedule configured in **Operations → Business

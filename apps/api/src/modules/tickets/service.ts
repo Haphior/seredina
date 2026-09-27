@@ -7,20 +7,25 @@ import { getActiveEscalationForTicket } from '../oncall/service';
 import { notifyUser, notifyUsers } from '../notifications/service';
 import { createCsatSurveyLink } from '../csat/service';
 import { loadEmailContext, templateFor, tenantLanguage } from '../emailtemplates/service';
-import { emailString, parseEmailSettings, renderTemplate, surveyButton, type EmailMeta } from '@seredina/shared';
+import { emailString, parseEmailSettings, renderTemplate, surveyButton, type EmailLanguage, type EmailMeta } from '@seredina/shared';
 
-const DEFAULT_TICKET_STATUSES: { key: string; label: string; category: TicketStatusCategory; sortOrder: number }[] = [
-  { key: 'open', label: 'Open', category: 'OPEN', sortOrder: 0 },
-  { key: 'pending', label: 'Pending', category: 'PENDING', sortOrder: 1 },
-  { key: 'resolved', label: 'Resolved', category: 'RESOLVED', sortOrder: 2 },
-  { key: 'closed', label: 'Closed', category: 'CLOSED', sortOrder: 3 },
+const DEFAULT_TICKET_STATUSES: { key: string; label: Record<EmailLanguage, string>; category: TicketStatusCategory; sortOrder: number }[] = [
+  { key: 'open', label: { en: 'Open', es: 'Abierto' }, category: 'OPEN', sortOrder: 0 },
+  { key: 'pending', label: { en: 'Pending', es: 'Pendiente' }, category: 'PENDING', sortOrder: 1 },
+  { key: 'resolved', label: { en: 'Resolved', es: 'Resuelto' }, category: 'RESOLVED', sortOrder: 2 },
+  { key: 'closed', label: { en: 'Closed', es: 'Cerrado' }, category: 'CLOSED', sortOrder: 3 },
 ];
 
-/** Called from auth/service.ts's registerTenant, inside its own tenant transaction -- not a standalone entry point. */
-export async function seedDefaultTicketStatuses(tx: Prisma.TransactionClient, tenantId: string) {
+/**
+ * Called from auth/service.ts's registerTenant, inside its own tenant
+ * transaction -- not a standalone entry point. The labels are tenant data
+ * from then on (renamable), so they're written in the language the
+ * workspace was created in.
+ */
+export async function seedDefaultTicketStatuses(tx: Prisma.TransactionClient, tenantId: string, language: EmailLanguage = 'en') {
   const statuses = [];
-  for (const status of DEFAULT_TICKET_STATUSES) {
-    statuses.push(await tx.ticketStatus.create({ data: { tenantId, ...status } }));
+  for (const { label, ...status } of DEFAULT_TICKET_STATUSES) {
+    statuses.push(await tx.ticketStatus.create({ data: { tenantId, ...status, label: label[language] } }));
   }
   return statuses;
 }

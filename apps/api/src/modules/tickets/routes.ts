@@ -45,6 +45,11 @@ const createFromApiSchema = z.object({
   priority: PRIORITY.optional(),
 });
 
+const createByAgentSchema = createFromApiSchema.extend({
+  assigneeId: z.string().uuid().optional(),
+  teamId: z.string().uuid().optional(),
+});
+
 const addMessageSchema = z.object({
   body: z.string().min(1),
   isPrivateNote: z.boolean().default(false),
@@ -177,12 +182,24 @@ export default async function ticketRoutes(app: FastifyInstance) {
   // other channel already goes through (see docs/adr/0016-service-catalog.md
   // for the precedent of reusing it under a different channel value), just
   // authenticated as a logged-in agent (tickets:write) instead of an ApiKey.
+  //
+  // Who takes it can be set right away: applied through updateTicket, so the
+  // assignee or the team hear about it exactly as if it were set afterward.
   app.post('/tickets', { preHandler: [app.authenticate, requirePermission('tickets:write')] }, async (request, reply) => {
-    const parsed = createFromApiSchema.safeParse(request.body);
+    const parsed = createByAgentSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.code(400).send({ error: parsed.error.flatten() });
     }
-    const ticket = await createTicketFromApi(request.user.tenantId, { ...parsed.data, channel: 'agent' });
+    const { assigneeId, teamId, ...input } = parsed.data;
+    const ticket = await createTicketFromApi(request.user.tenantId, { ...input, channel: 'agent' });
+    if (assigneeId || teamId) {
+      try {
+        return reply.code(201).send(await updateTicket(request.user.tenantId, ticket.id, { assigneeId, teamId }, request.user.sub));
+      } catch {
+        // An unknown assignee or team leaves the ticket unassigned rather than losing it.
+        return reply.code(201).send(ticket);
+      }
+    }
     return reply.code(201).send(ticket);
   });
 

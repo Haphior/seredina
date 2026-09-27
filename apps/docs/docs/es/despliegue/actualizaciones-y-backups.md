@@ -2,7 +2,7 @@
 
 ## Actualizar tu instancia
 
-Seredina no se actualiza sola: vos elegís cuándo. Cada versión es un tag
+Seredina no se actualiza sola: tú eliges cuándo. Cada versión es un tag
 de git (`v0.2.0`, `v0.3.0`...), con sus notas en la
 [página de versiones](https://github.com/Haphior/helpdesk-seredina/releases).
 Un servidor en producción debería correr una versión, no lo que tenga
@@ -17,9 +17,9 @@ git -C /opt/seredina describe --tags            # v0.2.0
 
 ### Actualizar a una versión nueva
 
-1. **Leé las notas de la versión.** Dicen qué cambió y si hay algo que
-   hacer a mano. Leé también las de cada versión que te saltes.
-2. **Hacé un backup** de la base de datos, y tené a mano tu copia del
+1. **Lee las notas de la versión.** Dicen qué cambió y si hay algo que
+   hacer a mano. Lee también las de cada versión que te saltes.
+2. **Haz un backup** de la base de datos, y ten a mano tu copia del
    `.env` (ver [Backups](#backups)):
 
    ```bash
@@ -27,7 +27,7 @@ git -C /opt/seredina describe --tags            # v0.2.0
      pg_dump -U app_migrator -Fc seredina > antes-de-v0.3.0.dump
    ```
 
-3. **Cambiá a la versión y reconstruí:**
+3. **Cambia a la versión y reconstruye:**
 
    ```bash
    git fetch --tags
@@ -37,13 +37,13 @@ git -C /opt/seredina describe --tags            # v0.2.0
 
    El servicio `migrate` corre primero y aplica las migraciones nuevas
    antes de que `api` reciba tráfico. No hay un paso de migración aparte.
-   Contá con uno o dos minutos sin servicio mientras se reinician los
-   contenedores: hacelo fuera del horario de trabajo.
-4. **Verificá:** `/api/health` muestra la versión nueva, y podés iniciar
+   Cuenta con uno o dos minutos sin servicio mientras se reinician los
+   contenedores: hazlo fuera del horario de trabajo.
+4. **Verifica:** `/api/health` muestra la versión nueva, y puedes iniciar
    sesión.
 
 Si instalaste desde `main` antes de que existieran las versiones,
-`git checkout v0.2.0` te pasa a la primera. Desde ahí, seguí los pasos
+`git checkout v0.2.0` te pasa a la primera. Desde ahí, sigue los pasos
 de arriba.
 
 ### Volver atrás
@@ -80,25 +80,25 @@ En Windows el agente está en `C:\Program Files\Seredina Agent\seredina-agent.ex
 
 `update` conserva la inscripción del equipo y su intervalo de reporte.
 Verifica el SHA-256 de la descarga, y no hace nada si el agente ya está
-al día. Así que podés correrlo en todos tus equipos desde Intune, un
+al día. Así que puedes correrlo en todos tus equipos desde Intune, un
 script de inicio por GPO, Jamf o Ansible.
 
 ## Backups
 
 Seredina no trae backups automatizados — es un Postgres estándar corriendo
 en un contenedor, y las herramientas estándar de Postgres son las que
-usás.
+usas.
 
 ```bash
-# Backup completo, en el formato comprimido propio de Postgres. Correlo
+# Backup completo, en el formato comprimido propio de Postgres. Córrelo
 # desde la raíz del repositorio. El -T importa: sin él docker asigna una
 # terminal y puede corromper la salida binaria.
 docker compose -f infra/docker-compose.yml exec -T postgres \
   pg_dump -U app_migrator -Fc seredina > seredina-$(date +%Y%m%d-%H%M).dump
 ```
 
-Programalo con cron (o con el mecanismo de backup de tu proveedor) y
-copiá el archivo **fuera de la máquina** — un backup en el mismo disco que
+Prográmalo con cron (o con el mecanismo de backup de tu proveedor) y
+copia el archivo **fuera de la máquina** — un backup en el mismo disco que
 la base de datos no sobrevive a ese disco. Por ejemplo, todas las noches a
 las 02:30 guardando 14 días:
 
@@ -106,18 +106,18 @@ las 02:30 guardando 14 días:
 30 2 * * * cd /opt/seredina && docker compose -f infra/docker-compose.yml exec -T postgres pg_dump -U app_migrator -Fc seredina > /var/backups/seredina/seredina-$(date +\%Y\%m\%d).dump && find /var/backups/seredina -name '*.dump' -mtime +14 -delete
 ```
 
-Si Postgres no corre en este compose (una base administrada), usá los
-snapshots de tu proveedor o apuntá el mismo `pg_dump` a esa base.
+Si Postgres no corre en este compose (una base administrada), usa los
+snapshots de tu proveedor o apunta el mismo `pg_dump` a esa base.
 
 ### Restaurar
 
-Restaurá sobre una base de datos **vacía** y dejá que `migrate` termine el
+Restaura sobre una base de datos **vacía** y deja que `migrate` termine el
 trabajo: recrea el rol `app_tenant` con la contraseña de tu `.env` y vuelve
 a aplicar las políticas de seguridad por fila y los permisos, que no
 forman parte de un volcado de tablas.
 
 ```bash
-# 1. Detené todo, vaciá solo el volumen de la base de datos, levantá solo Postgres.
+# 1. Detené todo, vacía solo el volumen de la base de datos, levanta solo Postgres.
 docker compose -f infra/docker-compose.yml down
 docker volume rm infra_postgres_data        # el nombre que muestra `docker volume ls`
 docker compose -f infra/docker-compose.yml up -d postgres
@@ -126,42 +126,42 @@ docker compose -f infra/docker-compose.yml up -d postgres
 docker compose -f infra/docker-compose.yml exec -T postgres \
   pg_restore -U app_migrator -d seredina --no-owner --no-privileges < seredina-20260101-0230.dump
 
-# 3. Levantá el resto; migrate corre primero, como en cada arranque.
+# 3. Levanta el resto; migrate corre primero, como en cada arranque.
 docker compose -f infra/docker-compose.yml up -d
 ```
 
-`docker volume rm` borra la base de datos actual. Correlo solo cuando de
+`docker volume rm` borra la base de datos actual. Córrelo solo cuando de
 verdad quieras reemplazar esos datos. No uses `down -v` en su lugar:
 también borra `caddy_data`, y con el modo TLS `internal` se generaría una
 CA nueva, así que los navegadores y todos los agentes dejarían de confiar
-en el servidor. Probá restaurar en una
+en el servidor. Prueba restaurar en una
 máquina de prueba de vez en cuando: un backup que nunca restauraste es una
 suposición, no un backup.
 
 Los backups también conservan los datos personales que después se
 [anonimizaron](/es/guia/contactos-y-datos-personales) en la base en uso,
-hasta que se rotan. Guardalos solo el tiempo que los necesites.
+hasta que se rotan. Guárdalos solo el tiempo que los necesites.
 
-### Lo que también necesitás respaldar
+### Lo que también necesitas respaldar
 
-Un volcado de la base de datos **no alcanza por sí solo**. Guardá una copia
+Un volcado de la base de datos **no alcanza por sí solo**. Guarda una copia
 de tu `.env` en un lugar seguro y separado de los volcados — en especial:
 
 - **`ENCRYPTION_KEY`**: cifra (AES-256-GCM) todos los secretos guardados:
   contraseñas de canales de correo y tokens OAuth de Gmail/Microsoft 365,
   secretos de cliente de SSO, secretos de MFA de los usuarios, claves de
   proveedores de IA, secretos de firma de webhooks y tokens de bots de
-  Telegram. Si restaurás la base con otra clave, todo eso queda ilegible
+  Telegram. Si restauras la base con otra clave, todo eso queda ilegible
   para siempre: hay que reconectar los buzones, reconfigurar el SSO y
   **un administrador tiene que restablecer el MFA de cada usuario**.
-  Guardala como la contraseña de la base de datos misma — y nunca en el
+  Guárdala como la contraseña de la base de datos misma — y nunca en el
   mismo lugar que los volcados, o con un solo backup robado alcanza para
   leer todos los secretos.
-- **`JWT_SECRET`**: si lo perdés, no perdés datos, pero cada sesión activa
+- **`JWT_SECRET`**: si lo pierdes, no pierdes datos, pero cada sesión activa
   queda inválida — no es catastrófico, solo molesto.
 - **`APP_TENANT_DB_PASSWORD`** y **`POSTGRES_PASSWORD`**: no hacen falta
   para leer el volcado, pero restaurar con el mismo `.env` evita sorpresas.
-- Si usás el perfil `proxy` con tu propio certificado, los archivos de
+- Si usas el perfil `proxy` con tu propio certificado, los archivos de
   `certs/`. Los certificados de Let's Encrypt se vuelven a emitir solos.
 
 ### Exportación de datos por tenant
