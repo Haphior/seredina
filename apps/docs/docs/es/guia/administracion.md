@@ -2,7 +2,7 @@
 
 ## Usuarios y roles
 
-**Administración → Usuarios** crea cuentas de dos maneras:
+**Ajustes → Usuarios** crea cuentas de dos maneras:
 
 - **Enviarle una invitación por correo** (necesita un
   [canal de correo](/es/guia/canales#correo-electronico) conectado): la
@@ -20,7 +20,7 @@ por la vía que sea, cierra las demás sesiones de esa persona, así una
 sesión robada no sobrevive a la contraseña.
 
 Tres roles vienen predefinidos, y cada uno se puede editar o se pueden
-crear roles completamente nuevos desde **Administración → Roles**:
+crear roles completamente nuevos desde **Ajustes → Roles**:
 
 | Rol | Permisos por defecto |
 |---|---|
@@ -35,7 +35,7 @@ como necesites, no estás atado a los tres roles de fábrica.
 
 ## Equipos
 
-**Administración → Equipos** agrupa a los agentes según lo que atienden,
+**Ajustes → Equipos** agrupa a los agentes según lo que atienden,
 como Soporte N1 o Redes. Cada equipo tiene un nombre y miembros; una
 persona puede estar en varios equipos. Un ticket se envía a un equipo
 desde su panel de Detalles, desde una macro o desde un paso de proceso.
@@ -46,7 +46,7 @@ Al eliminar un equipo sus tickets se mantienen, solo que sin equipo.
 
 ## Inicio de sesión único (SSO)
 
-**Administración → Inicio de sesión único** permite entrar con la cuenta de
+**Ajustes → Inicio de sesión único** permite entrar con la cuenta de
 Microsoft 365 (Entra ID), Google Workspace o cualquier cuenta OpenID Connect
 (Okta, Auth0, Keycloak, Authentik…) en vez de una contraseña aparte.
 Registras una aplicación en tu proveedor de identidad (la página muestra los
@@ -79,7 +79,7 @@ entonces, al iniciar sesión se pide un código después de la contraseña. Se
 muestran una sola vez diez **códigos de recuperación**: guárdalos en un lugar
 seguro, cada uno sirve para entrar una vez si pierdes el teléfono.
 
-En **Administración → Usuarios**, un administrador puede:
+En **Ajustes → Usuarios**, un administrador puede:
 
 - **Exigir la verificación en dos pasos a todos.** A quien no la tenga se le
   guía para configurarla en su próximo inicio de sesión, y no puede
@@ -92,7 +92,7 @@ contraseñas incorrectas.
 
 ## Registro de auditoría
 
-**Administración → Registro de auditoría** muestra la actividad relevante
+**Ajustes → Registro de auditoría** muestra la actividad relevante
 para la seguridad: inicios de sesión (exitosos y fallidos, con dirección IP
 y navegador), bloqueos de cuenta, usuarios creados, desactivados o con un
 rol nuevo, cambios de roles, claves de API, webhooks, canales de correo,
@@ -110,13 +110,13 @@ actualizar).
 
 ## Claves de API
 
-**Administración → Claves de API** — para integraciones externas, no
+**Ajustes → Claves de API** — para integraciones externas, no
 para agentes humanos. Ver [Autenticación](/es/api/#api-keys-para-integraciones-lo-que-necesitas)
 para el detalle completo.
 
 ## Campos personalizados
 
-**Configuración → Campos Personalizados** — define campos extra que
+**Ajustes → Campos Personalizados** — define campos extra que
 aparecen en el panel de propiedades de cada ticket. Cinco tipos
 disponibles: texto, número, sí/no, fecha, y lista de opciones. Un campo
 personalizado también puede asociarse a un
@@ -125,7 +125,7 @@ así distintos tipos de solicitud piden datos distintos.
 
 ## Apariencia
 
-**Administración → Apariencia** — dos temas visuales para toda la
+**Ajustes → Apariencia** — dos temas visuales para toda la
 consola, con efecto inmediato para cualquiera que la tenga abierta:
 
 - **Meet in the Middle** (por defecto) — paleta piedra cálida, con un
@@ -137,7 +137,7 @@ misma organización ven el mismo tema.
 
 ## Marca blanca
 
-**Administración → Marca** — logo y color de acento propios, visibles en
+**Ajustes → Marca** — logo y color de acento propios, visibles en
 el [portal de autoservicio y la página de estado pública](/es/guia/portal-publico)
 que ven tus clientes. La consola interna de agentes mantiene la identidad
 de Seredina — el white-label es para las superficies que da la cara al

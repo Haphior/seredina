@@ -2,7 +2,7 @@
 
 ## Políticas de SLA
 
-Desde **Configuración → Políticas de SLA** se define, por prioridad
+Desde **Ajustes → Políticas de SLA** se define, por prioridad
 (Baja/Normal/Alta/Urgente), cuánto puede tardar la primera respuesta y
 cuánto la resolución del ticket, en minutos, horas o días. Cada prioridad
 tiene su propia política — un ticket urgente típicamente tiene plazos
@@ -14,7 +14,7 @@ prioridades que editaste.
 
 Cada política tiene un interruptor **solo horario laboral**: si está
 activado, el conteo de tiempo se pausa fuera del horario configurado en
-**Operaciones → Horario Laboral** (zona horaria y ventanas por día de la
+**Ajustes → Horario Laboral** (zona horaria y ventanas por día de la
 semana) — un ticket urgente abierto un viernes a la noche no empieza a
 "vencer" hasta que vuelva a abrir la oficina.
 
@@ -30,7 +30,7 @@ necesidad de abrir cada uno.
 ## Escalamiento
 
 El escalamiento es una cadena de niveles ("tiers"), cada uno con un
-tiempo de espera propio (**Operaciones → Guardia y Escalamiento**). Un
+tiempo de espera propio (**Ajustes → Guardia y Escalamiento**). Un
 nivel puede apuntar a una persona específica o a un
 [calendario de guardia](#guardia-on-call) — si nadie reconoce la alerta
 dentro del tiempo del nivel actual, pasa automáticamente al siguiente.

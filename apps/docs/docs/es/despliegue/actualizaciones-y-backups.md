@@ -167,7 +167,7 @@ de tu `.env` en un lugar seguro y separado de los volcados — en especial:
 ### Exportación de datos por tenant
 
 Aparte del backup de infraestructura, cada tenant tiene su propia
-exportación completa en un formato abierto: **Configuración → Exportar
+exportación completa en un formato abierto: **Ajustes → Exportar
 Datos** en la consola (o `GET /export` directamente) devuelve un único
 JSON con las ~35 tablas propias de ese tenant. Es la respuesta honesta al
 "portabilidad de datos": migrar *fuera* de Seredina es un clic, no un

@@ -203,7 +203,7 @@ export function TicketsQueue() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex flex-col gap-4 px-8 pb-5 pt-7">
+      <div className="flex flex-col gap-4 px-4 pb-4 pt-5 md:px-8 md:pb-5 md:pt-7">
         <div className="flex items-baseline justify-between gap-2.5">
           <div className="flex items-baseline gap-2.5">
             <h1 className="text-[22px] font-extrabold tracking-tight text-slate-900">{t('tickets.title')}</h1>
@@ -361,7 +361,7 @@ export function TicketsQueue() {
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto px-8 pb-7">
+      <div className="flex-1 overflow-y-auto px-4 pb-5 md:px-8 md:pb-7">
         {error && <p className="text-sm text-rose-600">{error}</p>}
         {tickets === null && !error && <p className="text-sm text-slate-500">{t('common.loading')}</p>}
         {tickets?.length === 0 &&
@@ -384,7 +384,40 @@ export function TicketsQueue() {
           ))}
 
         {tickets && tickets.length > 0 && (
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          // Phones: one compact card per ticket instead of a nine-column grid.
+          <div className="flex flex-col gap-2 md:hidden">
+            {tickets.map((ticket) => (
+              <Link
+                key={ticket.id}
+                to={`/tickets/${ticket.id}`}
+                className={`rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm ${flashIds.has(ticket.id) ? 'live-flash' : ''}`}
+              >
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="min-w-0 truncate text-[14px] font-semibold text-slate-800">
+                    <span className="mr-1.5 font-medium text-slate-400">#{ticket.number}</span>
+                    {ticket.subject}
+                  </span>
+                  {isTicketOverdue(ticket) && <ClockIcon width={13} height={13} className="flex-shrink-0 text-rose-500" />}
+                </div>
+                <div className="mb-2 truncate text-[12.5px] text-slate-400">
+                  {ticket.contact.name} · {ticket.assignee?.name ?? t('common.unassigned')}
+                </div>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <Badge tone={STATUS_CATEGORY_TONE[ticket.status.category]} dot>
+                    {ticket.status.label}
+                  </Badge>
+                  <Badge tone={PRIORITY_TONE[ticket.priority]} dot>
+                    {t(`priority.${ticket.priority}`)}
+                  </Badge>
+                  <span className="ml-auto text-[11.5px] text-slate-400">{formatDateTime(ticket.updatedAt)}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {tickets && tickets.length > 0 && (
+          <div className="hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm md:block">
             <div
               className="grid items-center gap-3 border-b border-slate-200 bg-slate-50 px-5 py-2.5 text-[11.5px] font-bold uppercase tracking-wide text-slate-400"
               style={{ gridTemplateColumns: ROW_COLUMNS }}
@@ -460,7 +493,7 @@ export function TicketsQueue() {
                     )}
                     <span className="flex w-fit items-center gap-1.5">
                       {theme !== 'refined' && <ChannelGlyph channel={ticket.channel} />}
-                      <Badge tone={CHANNEL_TONE[ticket.channel] ?? 'slate'}>{ticket.channel}</Badge>
+                      <Badge tone={CHANNEL_TONE[ticket.channel] ?? 'slate'}>{t(`channel.short.${ticket.channel}`, { defaultValue: ticket.channel })}</Badge>
                     </span>
                     <span className="text-right text-[12px] text-slate-400">{formatDateTime(ticket.updatedAt)}</span>
                   </Link>

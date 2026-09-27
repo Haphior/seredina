@@ -24,6 +24,7 @@ const STEPS: TourStep[] = [
   { target: 'nav-tickets', titleKey: 'tour.steps.tickets.title', bodyKey: 'tour.steps.tickets.body' },
   { target: 'nav-processes', titleKey: 'tour.steps.processes.title', bodyKey: 'tour.steps.processes.body' },
   { target: 'nav-knowledgeBase', titleKey: 'tour.steps.knowledgeBase.title', bodyKey: 'tour.steps.knowledgeBase.body' },
+  { target: 'nav-settings', titleKey: 'tour.steps.settings.title', bodyKey: 'tour.steps.settings.body' },
   { target: 'language-switcher', titleKey: 'tour.steps.language.title', bodyKey: 'tour.steps.language.body' },
   { titleKey: 'tour.steps.done.title', bodyKey: 'tour.steps.done.body' },
 ];

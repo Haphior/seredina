@@ -82,7 +82,12 @@
       "cmdb": "CMDB",
       "configuration": "Configuración",
       "operations": "Operaciones",
-      "administration": "Administración"
+      "administration": "Administración",
+      "channels": "Canales",
+      "service": "Tickets y servicio",
+      "people": "Personas y acceso",
+      "ai": "IA",
+      "organization": "Organización"
     },
     "items": {
       "dashboard": "Panel",
@@ -122,12 +127,17 @@
       "customerPortal": "Portal de clientes",
       "contacts": "Contactos",
       "customerEmails": "Correos al cliente",
-      "teams": "Equipos"
+      "teams": "Equipos",
+      "settings": "Ajustes",
+      "notificationSettings": "Notificaciones"
     }
   },
   "layout": {
     "logOut": "Cerrar sesión",
-    "accountSecurity": "Seguridad de la cuenta"
+    "accountSecurity": "Seguridad de la cuenta",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "menu": "Menú"
   },
   "language": {
     "english": "English",
@@ -432,6 +442,10 @@
       "done": {
         "title": "¡Listo!",
         "body": "Puedes volver a ver este tour cuando quieras con el ícono de ayuda, justo abajo."
+      },
+      "settings": {
+        "title": "Ajustes",
+        "body": "Todo lo que configura tu organización: buzones, SLA, usuarios, equipos, IA y más, agrupado y con buscador."
       }
     }
   },
@@ -1054,7 +1068,7 @@
     "title": "Roles",
     "new": "Nuevo rol",
     "edit": "Editar rol",
-    "intro": "Cada rol de aquí está disponible de inmediato al asignarle uno a un usuario (Administración → Usuarios) — sin reiniciar, sin una lista fija.",
+    "intro": "Cada rol de aquí está disponible de inmediato al asignárselo a un usuario (Ajustes → Usuarios), sin reiniciar y sin una lista fija.",
     "delete": "eliminar",
     "key": "Clave",
     "keyHint": "Minúsculas, letras, números y guiones bajos. No se puede cambiar después.",
@@ -2138,5 +2152,40 @@
     "searchPeople": "Buscar personas…",
     "noPeople": "Nadie coincide.",
     "membersHint": "Los miembros reciben el aviso «ticket en mi equipo»."
+  },
+  "settings": {
+    "title": "Ajustes",
+    "intro": "Todo lo que define cómo funciona tu organización.",
+    "search": "Buscar en ajustes…",
+    "noMatch": "Ningún ajuste coincide.",
+    "descriptions": {
+      "emailChannels": "Buzones que convierten correos en tickets y envían tus respuestas.",
+      "customerEmails": "Idioma, logo, firma y textos de lo que reciben los clientes.",
+      "customerPortal": "Una página donde los clientes siguen y responden sus solicitudes.",
+      "telegram": "Recibe solicitudes por un bot de Telegram.",
+      "monitoringIntegrations": "Convierte alertas de Zabbix, Grafana y otros en tickets.",
+      "webhooks": "Avisa a otros sistemas, Slack o Teams cuando algo pasa.",
+      "apiKeys": "Claves para scripts e integraciones que crean tickets.",
+      "ticketStatuses": "Las etapas de un ticket, con tus propios nombres.",
+      "slaPolicies": "Qué tan rápido responder y resolver, por prioridad.",
+      "businessHours": "Tu horario laboral, para SLA que se pausan fuera de él.",
+      "macros": "Respuestas y acciones guardadas, aplicadas con un clic.",
+      "customFields": "Campos extra en los tickets, como sede o centro de costo.",
+      "serviceCatalog": "Servicios que se pueden solicitar, con su propio formulario.",
+      "processTemplates": "Checklists reutilizables: ingresos, cambios, despliegues.",
+      "onCall": "Quién está de guardia y cómo escala un ticket sin respuesta.",
+      "users": "Cuentas, invitaciones y roles de quienes atienden tickets.",
+      "teams": "Grupos de agentes; un ticket se puede enviar a un equipo.",
+      "roles": "Qué puede hacer cada rol.",
+      "notificationSettings": "De qué te avisamos, y los valores de la organización.",
+      "sso": "Inicia sesión con el proveedor de identidad de tu empresa.",
+      "auditLog": "Quién cambió qué, y cuándo.",
+      "aiSettings": "El modelo de IA, tu clave y lo que la IA puede hacer.",
+      "aiUsage": "Llamadas a la IA y su costo.",
+      "aiAgentActivity": "Lo que hizo el agente de IA por su cuenta, para revisar.",
+      "appearance": "El aspecto de la consola.",
+      "branding": "Tu nombre, logo y colores en las páginas públicas.",
+      "dataExport": "Descarga los datos de tu organización."
+    }
   }
 }

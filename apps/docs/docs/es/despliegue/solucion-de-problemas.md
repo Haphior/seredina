@@ -30,7 +30,7 @@ un error de instalación. Revisa `AI_PROVIDER` y la clave correspondiente
 (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, o que `OLLAMA_BASE_URL` apunte a
 una instancia de Ollama corriendo de verdad) en
 [Variables de entorno](/es/despliegue/variables-de-entorno). También revisa
-que el tenant no tenga su propia clave configurada en Configuración → IA
+que el tenant no tenga su propia clave configurada en Ajustes → IA
 que esté mal — si el tenant tiene una clave propia, se usa *en vez de* la
 del despliegue, nunca como respaldo.
 
@@ -71,7 +71,7 @@ Puede entrar con uno de sus **códigos de recuperación** en lugar del
 código de 6 dígitos. Cada uno sirve una sola vez.
 
 Si ya no le quedan códigos, otro administrador le restablece la
-verificación en dos pasos desde **Administración → Usuarios** (restablecer 2FA). La vuelve a
+verificación en dos pasos desde **Ajustes → Usuarios** (restablecer 2FA). La vuelve a
 configurar en su próximo inicio de sesión si el espacio de trabajo la
 exige.
 
@@ -95,7 +95,7 @@ segundo administrador para no tener que volver a hacerlo.
 
 - **El proveedor muestra un error antes de volver**: la URI de redirección
   registrada en el proveedor tiene que coincidir exactamente con la que
-  muestra **Administración → Inicio de sesión único**.
+  muestra **Ajustes → Inicio de sesión único**.
 - **"Accounts from example.com can't sign in to this workspace"** (los
   errores del SSO llegan en inglés): ese dominio no está en la lista de
   dominios permitidos. Agrégalo o vacía la lista.

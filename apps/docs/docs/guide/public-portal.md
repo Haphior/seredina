@@ -7,7 +7,7 @@ portal uses a link sent by email.
 ## Customer portal
 
 `/portal/your-organization` — where the people you support follow their
-own requests. Turn it on under **Administration → Customer Portal** (it's
+own requests. Turn it on under **Settings → Customer Portal** (it's
 off by default, and needs a connected [email channel](/guide/channels#email)
 because sign-in links go out by email).
 

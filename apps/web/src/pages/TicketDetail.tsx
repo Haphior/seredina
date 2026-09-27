@@ -351,8 +351,8 @@ export function TicketDetail() {
   if (!ticket) return <div className="p-6 text-sm text-slate-500">{t('common.loading')}</div>;
 
   return (
-    <div className="flex h-full">
-      <div className="flex-1 overflow-y-auto px-9 py-7">
+    <div className="flex flex-col md:h-full md:flex-row">
+      <div className="min-w-0 px-4 py-5 md:flex-1 md:overflow-y-auto md:px-9 md:py-7">
         <Link to="/tickets" className="mb-3.5 flex items-center gap-1.5 text-[13px] font-medium text-slate-400 hover:text-slate-600">
           <BackArrowIcon width={15} height={15} />
           {t('ticketDetail.backToTickets')}
@@ -361,7 +361,7 @@ export function TicketDetail() {
         <div className="mb-5">
           <span className="text-[13px] font-medium text-slate-400">#{ticket.number}</span>
           <h1 className="mb-2.5 mt-0.5 text-[22px] font-extrabold tracking-tight text-slate-900">{ticket.subject}</h1>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Badge tone={STATUS_CATEGORY_TONE[ticket.status.category]} dot>
               {ticket.status.label}
             </Badge>
@@ -386,7 +386,7 @@ export function TicketDetail() {
               </Badge>
             )}
 
-            <div className="ml-auto flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 md:ml-auto">
               {presenceUserIds.length > 0 && (
                 <div className="flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
                   <EyeIcon width={12} height={12} />
@@ -668,8 +668,8 @@ export function TicketDetail() {
               ))}
             </div>
           )}
-          <div className="flex items-center justify-between px-1.5">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2 px-1.5">
+            <div className="flex flex-wrap items-center gap-2">
               <label className="flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[12.5px] font-medium text-slate-500">
                 <input
                   type="checkbox"
@@ -705,7 +705,7 @@ export function TicketDetail() {
         </div>
       </div>
 
-      <aside className="w-[280px] flex-shrink-0 overflow-y-auto border-l border-slate-200 bg-white px-5 py-[22px]">
+      <aside className="w-full flex-shrink-0 border-t border-slate-200 bg-white px-5 py-[22px] md:w-[280px] md:overflow-y-auto md:border-l md:border-t-0">
         <h2 className="mb-4 text-[13px] font-bold uppercase tracking-wide text-slate-400">{t('ticketDetail.detailsHeading')}</h2>
 
         <div className="flex flex-col gap-3.5">

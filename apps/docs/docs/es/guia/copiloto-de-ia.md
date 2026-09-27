@@ -22,7 +22,7 @@ listado como "Basado en:" debajo del cuadro.
 
 ## Clasificación de tickets nuevos
 
-**Operaciones → Configuración de IA → Clasificación de tickets nuevos con
+**Ajustes → Configuración de IA → Clasificación de tickets nuevos con
 IA** hace que la IA lea el asunto y el primer mensaje de cada ticket nuevo
 (o la descripción de una alerta) y elija una prioridad y uno de tus equipos:
 
@@ -49,7 +49,7 @@ una respuesta), sujeto siempre a la Política de Autonomía del tenant.
 
 ### Política de Autonomía
 
-Desde **Operaciones → Actividad del Agente de IA** se configura:
+Desde **Ajustes → Actividad del Agente de IA** se configura:
 
 - **Lista de herramientas de auto-ejecución** — solo las herramientas
   explícitamente permitidas ahí se ejecutan de inmediato. Cualquier otra
@@ -67,10 +67,10 @@ control para integraciones externas).
 
 ## Transparencia de costos de IA
 
-**Operaciones → Uso de IA** muestra el costo real en dólares de cada
+**Ajustes → Uso de IA** muestra el costo real en dólares de cada
 llamada al copiloto, agregado por tenant. Como la clave del proveedor de
 IA puede ser la propia del tenant (trae tu propia clave, desde
-**Configuración → IA**), Seredina nunca le agrega margen — el costo
+**Ajustes → IA**), Seredina nunca le agrega margen — el costo
 mostrado es exactamente lo que cobra el proveedor.
 
 ## Sin proveedor de IA configurado

@@ -8,7 +8,7 @@ para notificaciones *salientes* (Slack, Teams, tu propio webhook), ver
 
 ## Correo electrónico
 
-**Administración → Canales de correo → Nuevo canal** ofrece tres tipos de
+**Ajustes → Canales de correo → Nuevo canal** ofrece tres tipos de
 buzón:
 
 - **Microsoft 365 / Outlook** y **Gmail / Google Workspace** — inicio de
@@ -90,7 +90,7 @@ aviso de solicitud resuelta con su encuesta de satisfacción y los enlaces de
 acceso al portal. Va escrito en el idioma de tu empresa, con una línea chica
 "Powered by Seredina" debajo del mensaje.
 
-Configúralo en **Administración → Correos al cliente**:
+Configúralo en **Ajustes → Correos al cliente**:
 
 - **Idioma de los correos**: español (por defecto) o inglés. Todo lo que
   Seredina escribe por ti sale en ese idioma: los textos predeterminados,
@@ -152,7 +152,7 @@ cuenta ni credencial de por medio. Ver
 
 ## Telegram
 
-**Administración → Telegram** — conecta tu propio bot (creado con
+**Ajustes → Telegram** — conecta tu propio bot (creado con
 [@BotFather](https://t.me/BotFather)) pegando su token. Un mensaje directo
 al bot crea un ticket; el agente responde desde la consola como cualquier
 otro canal, y la respuesta llega al usuario por Telegram.
@@ -166,7 +166,7 @@ desde internet. `localhost` no funciona para este canal en particular. Ver
 
 ## Alertas de monitoreo (NOC/SOC)
 
-**Administración → Integraciones de Monitoreo** trae instrucciones
+**Ajustes → Integraciones de Monitoreo** trae instrucciones
 listas para copiar y pegar para conectar:
 
 - **Grafana Alerting** — un "contact point" tipo webhook apuntando a

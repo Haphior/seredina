@@ -50,7 +50,7 @@ requisito de instalación.
 | `OLLAMA_BASE_URL` / `OLLAMA_MODEL` | No | Sin costo por llamada, corre contra una instalación local de [Ollama](https://ollama.com). `OLLAMA_BASE_URL` por defecto `http://localhost:11434/v1`. |
 
 Además de esta configuración a nivel de despliegue, cada tenant puede traer
-su propia clave (BYOK) desde Configuración → IA en la consola — si la
+su propia clave (BYOK) desde Ajustes → IA en la consola — si la
 tiene, se usa *exclusivamente*, nunca como respaldo la configuración global
 del despliegue.
 

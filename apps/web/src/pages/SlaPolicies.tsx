@@ -139,7 +139,7 @@ export function SlaPolicies() {
   const anyEmpty = PRIORITIES.some((p) => !rows[p].firstResponse.value && !rows[p].resolution.value);
 
   return (
-    <div className="px-8 py-7">
+    <div className="px-4 py-5 md:px-8 md:py-7">
       <div className="mb-1 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-[22px] font-extrabold tracking-tight text-slate-900">{t('sla.title')}</h1>
         {policies !== null && anyEmpty && (

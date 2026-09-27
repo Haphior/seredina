@@ -82,7 +82,12 @@
       "cmdb": "CMDB",
       "configuration": "Configuration",
       "operations": "Operations",
-      "administration": "Administration"
+      "administration": "Administration",
+      "channels": "Channels",
+      "service": "Tickets and service",
+      "people": "People and access",
+      "ai": "AI",
+      "organization": "Organization"
     },
     "items": {
       "dashboard": "Dashboard",
@@ -122,12 +127,17 @@
       "customerPortal": "Customer Portal",
       "contacts": "Contacts",
       "customerEmails": "Customer Emails",
-      "teams": "Teams"
+      "teams": "Teams",
+      "settings": "Settings",
+      "notificationSettings": "Notifications"
     }
   },
   "layout": {
     "logOut": "Log out",
-    "accountSecurity": "Account security"
+    "accountSecurity": "Account security",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "menu": "Menu"
   },
   "language": {
     "english": "English",
@@ -432,6 +442,10 @@
       "done": {
         "title": "You're all set!",
         "body": "You can watch this tour again anytime with the help icon right below."
+      },
+      "settings": {
+        "title": "Settings",
+        "body": "Everything that configures your workspace: mailboxes, SLAs, users, teams, AI and more, grouped and searchable."
       }
     }
   },
@@ -1054,7 +1068,7 @@
     "title": "Roles",
     "new": "New role",
     "edit": "Edit role",
-    "intro": "Every role here is available immediately when assigning a user (Administration → Users) — no restart, no fixed list.",
+    "intro": "Every role here is available immediately when assigning a user (Settings → Users), with no restart and no fixed list.",
     "delete": "delete",
     "key": "Key",
     "keyHint": "Lowercase, alphanumeric and underscores. Can't be changed later.",
@@ -2138,5 +2152,40 @@
     "searchPeople": "Search people…",
     "noPeople": "Nobody matches.",
     "membersHint": "Members get the \"ticket in my team\" notification."
+  },
+  "settings": {
+    "title": "Settings",
+    "intro": "Everything that sets up how your workspace works.",
+    "search": "Search settings…",
+    "noMatch": "No setting matches.",
+    "descriptions": {
+      "emailChannels": "Mailboxes that turn email into tickets and send your replies.",
+      "customerEmails": "Language, logo, signature and wording of what customers receive.",
+      "customerPortal": "A page where customers follow and reply to their own requests.",
+      "telegram": "Take requests through a Telegram bot.",
+      "monitoringIntegrations": "Turn alerts from Zabbix, Grafana and others into tickets.",
+      "webhooks": "Tell other systems, Slack or Teams when something happens.",
+      "apiKeys": "Keys for scripts and integrations that create tickets.",
+      "ticketStatuses": "The steps a ticket goes through, with your own names.",
+      "slaPolicies": "How fast to answer and resolve, per priority.",
+      "businessHours": "Your working hours, for SLAs that pause outside them.",
+      "macros": "Saved replies and actions, applied in one click.",
+      "customFields": "Extra fields on tickets, like location or cost center.",
+      "serviceCatalog": "Requestable services with their own form.",
+      "processTemplates": "Reusable checklists: onboarding, changes, releases.",
+      "onCall": "Who's on call, and how an unanswered ticket escalates.",
+      "users": "Accounts, invitations and roles of the people who work tickets.",
+      "teams": "Groups of agents; a ticket can go to a team.",
+      "roles": "What each role is allowed to do.",
+      "notificationSettings": "What you're told about, and the workspace defaults.",
+      "sso": "Sign in with your company's identity provider.",
+      "auditLog": "Who changed what, and when.",
+      "aiSettings": "The AI model, your key and what the AI may do.",
+      "aiUsage": "AI calls and their cost.",
+      "aiAgentActivity": "What the AI agent did on its own, for review.",
+      "appearance": "The console's look.",
+      "branding": "Your name, logo and colors on public pages.",
+      "dataExport": "Download your workspace's data."
+    }
   }
 }

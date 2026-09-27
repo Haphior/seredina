@@ -51,7 +51,7 @@ knowing it.
   the same problem generated two separate tickets.
 - **Run macro…** (if macros are configured) — applies a predefined set of
   changes at once (change status, assign, add a reply) from
-  **Configuration → Macros**.
+  **Settings → Macros**.
 - **Summarize** / **Let AI try** — see [AI Copilot](/guide/ai-copilot).
 
 ### Messages and replies

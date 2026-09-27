@@ -166,7 +166,7 @@ export function Dashboard() {
   const visiblePrefs = prefs?.filter((p) => p.visible) ?? [];
 
   return (
-    <div className="px-8 py-7">
+    <div className="px-4 py-5 md:px-8 md:py-7">
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
           <h1 className="mb-1 text-[22px] font-extrabold tracking-tight text-slate-900">{t('dashboard.title')}</h1>

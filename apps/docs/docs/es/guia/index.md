@@ -29,7 +29,7 @@ del widget.
 
 ## Invitar a tu equipo
 
-Desde **Administración → Usuarios**, invita a cada persona por correo para
+Desde **Ajustes → Usuarios**, invita a cada persona por correo para
 que elija su propia contraseña (necesita un canal de correo conectado), o
 crea la cuenta con una contraseña inicial y compártela tú. Ver
 [Usuarios y roles](/es/guia/administracion#usuarios-y-roles).
@@ -41,8 +41,13 @@ el rol que elegiste.
 
 ## Cómo está organizada esta guía
 
-La navegación de la izquierda sigue los mismos grupos que la barra
-lateral de la propia consola:
+En la consola, la barra lateral tiene el trabajo del día a día (tickets,
+contactos, procesos, la base de conocimiento y el CMDB). Todo lo que
+configura la organización está en **Ajustes**, al final de la barra
+lateral, agrupado y con buscador. En el teléfono, la barra lateral se abre
+con el botón de menú de arriba.
+
+Los capítulos de esta guía:
 
 - **[Tickets](/es/guia/tickets)** — la cola, el detalle, macros, fusión, acciones en lote
 - **[SLA y escalamiento](/es/guia/sla-y-escalamiento)**

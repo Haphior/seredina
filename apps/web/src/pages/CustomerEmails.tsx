@@ -67,7 +67,7 @@ export function CustomerEmails() {
   useEffect(load, [load]);
 
   return (
-    <div className="max-w-5xl px-8 py-7">
+    <div className="max-w-5xl px-4 py-5 md:px-8 md:py-7">
       <h1 className="mb-1 text-[22px] font-extrabold tracking-tight text-slate-900">{t('customerEmails.title')}</h1>
       <p className="mb-5 max-w-3xl text-[13.5px] text-slate-500">{t('customerEmails.intro')}</p>
       {error && <p className="mb-4 text-sm text-rose-600">{error}</p>}

@@ -2,7 +2,7 @@
 
 La dirección contraria a la API REST: en vez de que tú llames a
 Seredina, Seredina te avisa a ti cuando algo pasa. Se configuran desde
-**Operaciones → Webhooks** en la consola.
+**Ajustes → Webhooks** en la consola.
 
 ## Tipos de webhook
 

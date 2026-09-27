@@ -69,7 +69,7 @@ They can sign in with one of their **recovery codes** instead of the
 6-digit code. Each works once.
 
 With no recovery codes left, another admin resets their two-factor
-sign-in from **Administration → Users** (reset 2FA). They set it up again
+sign-in from **Settings → Users** (reset 2FA). They set it up again
 at their next sign-in if the workspace requires it.
 
 If the person locked out is the **only admin**, nobody can reset them from
@@ -92,7 +92,7 @@ admin exists afterwards so this isn't needed again.
 
 - **The provider shows an error before coming back**: the redirect URI
   registered with the provider must match the one shown on
-  **Administration → Single sign-on** exactly.
+  **Settings → Single sign-on** exactly.
 - **"Accounts from example.com can't sign in to this workspace"**: that
   domain isn't in the allowed domains list. Add it, or clear the list.
 - **"There's no account for … in this workspace"**: automatic account

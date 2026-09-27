@@ -28,7 +28,7 @@ with the eye icon in the widget's corner.
 
 ## Inviting your team
 
-From **Administration → Users**, invite people by email so they choose
+From **Settings → Users**, invite people by email so they choose
 their own password (needs a connected email channel), or create the
 account with an initial password and share it yourself. See
 [Users and roles](/guide/administration#users-and-roles).
@@ -40,8 +40,12 @@ chose.
 
 ## How this guide is organized
 
-The left-hand navigation follows the same groups as the console's own
-sidebar:
+In the console, the sidebar holds the day-to-day work (tickets, contacts,
+processes, the knowledge base and the CMDB). Everything that configures the
+workspace is under **Settings**, at the bottom of the sidebar, grouped and
+searchable. On a phone, the sidebar opens from the menu button at the top.
+
+This guide's chapters:
 
 - **[Tickets](/guide/tickets)** — the queue, ticket detail, macros, merging, bulk actions
 - **[SLA & Escalation](/guide/sla-and-escalation)**

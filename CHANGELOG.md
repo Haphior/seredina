@@ -44,6 +44,15 @@ contain breaking changes).
 
 ### Changed
 
+- **Settings in one place**: the sidebar keeps the daily work (tickets,
+  contacts, processes, knowledge base, CMDB) and a **Settings** entry. The
+  Settings page groups the 27 configuration pages by what you're setting up
+  (channels, tickets and service, people and access, AI, organization), each
+  with a one-line description, and a search box. Configuration pages link
+  back to it.
+- **Works on a phone**: a top bar with a menu button opens the sidebar as a
+  drawer; the ticket queue shows one card per ticket; ticket detail stacks
+  its details under the conversation; pages use narrower margins.
 - **Spanish that reads as Spanish everywhere.**
   - A workspace registered in Spanish starts with Spanish status names
     (Abierto, Pendiente, Resuelto, Cerrado) and Spanish customer emails.

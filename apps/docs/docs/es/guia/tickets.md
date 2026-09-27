@@ -53,7 +53,7 @@ saberlo.
   problema generó dos tickets separados.
 - **Ejecutar macro…** (si hay macros configuradas) — aplica de una vez un
   conjunto de cambios predefinidos (cambiar estado, asignar, agregar una
-  respuesta) desde **Configuración → Macros**.
+  respuesta) desde **Ajustes → Macros**.
 - **Resumir** / **Dejar que la IA lo intente** — ver
   [Copiloto de IA](/es/guia/copiloto-de-ia).
 

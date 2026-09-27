@@ -8,7 +8,7 @@ de sesión; el portal de clientes usa un enlace enviado por correo.
 ## Portal de clientes
 
 `/portal/tu-organizacion` — donde las personas a las que das soporte siguen
-sus propias solicitudes. Actívalo en **Administración → Portal de clientes**
+sus propias solicitudes. Actívalo en **Ajustes → Portal de clientes**
 (viene desactivado y necesita un [canal de correo](/es/guia/canales#correo-electronico)
 conectado, porque los enlaces de acceso se envían por correo).
 

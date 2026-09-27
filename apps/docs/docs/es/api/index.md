@@ -13,7 +13,7 @@ la consola de agentes.
 
 ### Crear una clave
 
-Desde la consola: **Administración → Claves de API → Nueva clave**. El
+Desde la consola: **Ajustes → Claves de API → Nueva clave**. El
 valor completo (con prefijo `sk_`) se muestra **una sola vez** al crearla
 — Seredina solo guarda su hash, nunca el valor en texto plano, así que si
 lo pierdes hay que generar una clave nueva.
@@ -38,7 +38,7 @@ clave.
 
 ### Revocar una clave
 
-Desde el mismo lugar donde la creaste — **Administración → Claves de
+Desde el mismo lugar donde la creaste — **Ajustes → Claves de
 API**. Una clave revocada deja de funcionar de inmediato; cualquier
 integración que la use empieza a recibir `401`.
 
