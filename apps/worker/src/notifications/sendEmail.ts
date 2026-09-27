@@ -27,7 +27,7 @@ export async function sendNotificationEmail(payload: NotificationEmailJobPayload
   // Same layout and sender name as the tenant's customer email
   // (docs/adr/0070-customer-email-templates.md), minus the customer-only bits.
   const { brand, from } = emailContextFor(data.tenant, process.env.WEB_ORIGIN, data.channel.fromAddress);
-  const { html, text } = renderBrandedEmail({ ...brand, signature: '', portalLink: null }, { body: payload.body });
+  const { html, text } = renderBrandedEmail({ ...brand, signature: '', portalLink: null, bannerUrl: null }, { body: payload.body });
   const transport = await createTransportForChannel(data.channel);
   await transport.sendMail({
     from,

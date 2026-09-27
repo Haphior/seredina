@@ -1984,7 +1984,7 @@
   },
   "customerEmails": {
     "title": "Correos al cliente",
-    "intro": "Así se ven los correos que reciben tus clientes: con tu logo y color (de Marca), en el idioma de tu empresa y con tus propias palabras. Cada respuesta, acuse de recibo y cierre sale con este diseño.",
+    "intro": "Así se ven los correos que reciben tus clientes: con tu logo, tu banner y tu color, en el idioma de tu empresa y con tus propias palabras. Cada respuesta, acuse de recibo y cierre sale con este diseño.",
     "loadFailed": "No se pudieron cargar los correos al cliente",
     "needsEmail": "Conecta un buzón para que estos correos puedan salir:",
     "settingsTitle": "Ajustes generales",
@@ -2042,6 +2042,23 @@
       "agent_name": "Nombre del agente",
       "message": "Texto de la respuesta del agente",
       "portal_link": "Enlace al portal de clientes (si está activado)"
-    }
+    },
+    "logo": {
+      "label": "Logo",
+      "hint": "Arriba de cada correo. PNG, JPG o GIF de hasta 2 MB; se muestra a 48 px de alto. Si no subes uno, se usa el de Marca.",
+      "empty": "Sin logo: se muestra el nombre de tu empresa",
+      "urlLabel": "URL del logo"
+    },
+    "banner": {
+      "label": "Banner",
+      "hint": "Imagen ancha bajo el logo. Recomendado 1200 × 400 px (se muestra a 600 px de ancho). PNG, JPG o GIF de hasta 2 MB.",
+      "empty": "Sin banner",
+      "urlLabel": "URL del banner"
+    },
+    "bannerLink": "Enlace del banner (opcional)",
+    "upload": "Subir imagen",
+    "removeImage": "Quitar",
+    "orPasteUrl": "o pega la URL de una imagen publicada",
+    "uploadFailed": "No se pudo subir la imagen"
   }
 }

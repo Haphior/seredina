@@ -22,6 +22,12 @@ export interface EmailSettings {
   quoteHistory: boolean;
   /** Add the satisfaction survey button to the "resolved" email. */
   surveyOnResolve: boolean;
+  /** The logo at the top of every email; empty = the one from Branding. */
+  logoUrl: string;
+  /** A wide image under the header (a campaign, the company's look); empty = none. */
+  bannerUrl: string;
+  /** Where clicking the banner goes; empty = not a link. */
+  bannerLink: string;
 }
 
 export const DEFAULT_EMAIL_SETTINGS: EmailSettings = {
@@ -30,7 +36,13 @@ export const DEFAULT_EMAIL_SETTINGS: EmailSettings = {
   signature: '',
   quoteHistory: true,
   surveyOnResolve: true,
+  logoUrl: '',
+  bannerUrl: '',
+  bannerLink: '',
 };
+
+/** Recommended banner size: shown 600 px wide, twice that for sharp screens. */
+export const EMAIL_BANNER_WIDTH = 600;
 
 export function parseEmailSettings(raw: unknown): EmailSettings {
   const r = (raw && typeof raw === 'object' ? raw : {}) as Partial<EmailSettings>;
@@ -40,6 +52,9 @@ export function parseEmailSettings(raw: unknown): EmailSettings {
     signature: typeof r.signature === 'string' ? r.signature : '',
     quoteHistory: typeof r.quoteHistory === 'boolean' ? r.quoteHistory : DEFAULT_EMAIL_SETTINGS.quoteHistory,
     surveyOnResolve: typeof r.surveyOnResolve === 'boolean' ? r.surveyOnResolve : DEFAULT_EMAIL_SETTINGS.surveyOnResolve,
+    logoUrl: typeof r.logoUrl === 'string' ? r.logoUrl : '',
+    bannerUrl: typeof r.bannerUrl === 'string' ? r.bannerUrl : '',
+    bannerLink: typeof r.bannerLink === 'string' ? r.bannerLink : '',
   };
 }
 
@@ -270,6 +285,9 @@ export interface EmailBrand {
   signature?: string;
   /** Link to the customer portal, shown in the footer when set. */
   portalLink?: string | null;
+  /** A wide image under the header, optionally a link. */
+  bannerUrl?: string | null;
+  bannerLink?: string | null;
 }
 
 export interface EmailContent {
@@ -336,8 +354,17 @@ export function renderBrandedEmail(brand: EmailBrand, content: EmailContent): { 
   const button = content.button && safeUrl(content.button.url) ? content.button : undefined;
 
   const header = logo
-    ? `<img src="${logo}" alt="${company}" height="40" style="display:block;height:40px;max-width:220px;border:0;outline:none;">`
+    ? `<img src="${logo}" alt="${company}" height="48" style="display:block;height:48px;width:auto;max-width:240px;border:0;outline:none;">`
     : `<span style="font-size:20px;font-weight:700;color:${accent};letter-spacing:-0.2px;">${company}</span>`;
+
+  const bannerSrc = safeUrl(brand.bannerUrl);
+  const bannerHref = safeUrl(brand.bannerLink);
+  const bannerImg = bannerSrc
+    ? `<img src="${bannerSrc}" alt="${company}" width="${EMAIL_BANNER_WIDTH}" style="display:block;width:100%;max-width:${EMAIL_BANNER_WIDTH}px;height:auto;border:0;outline:none;">`
+    : '';
+  const bannerHtml = bannerImg
+    ? `<tr><td style="padding:0 0 22px 0;font-size:0;line-height:0;">${bannerHref ? `<a href="${bannerHref}" style="display:block;">${bannerImg}</a>` : bannerImg}</td></tr>`
+    : '';
 
   const label =
     content.ticketNumber !== undefined
@@ -399,6 +426,7 @@ export function renderBrandedEmail(brand: EmailBrand, content: EmailContent): { 
     <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
       <tr><td style="height:5px;line-height:5px;font-size:0;background:${accent};">&nbsp;</td></tr>
       <tr><td style="padding:28px 40px 20px 40px;">${header}</td></tr>
+      ${bannerHtml}
       ${label}
       <tr><td style="padding:12px 40px 8px 40px;font-size:15px;line-height:24px;color:#1f2937;">${textToHtml(content.body, accent)}</td></tr>
       ${signatureHtml}
@@ -495,7 +523,9 @@ export function emailContextFor(tenant: EmailTenant, webOrigin: string | undefin
   const portalLink = portalHomeLink(webOrigin, tenant.slug, tenant.customerPortalEnabled);
   const brand: EmailBrand = {
     company: tenant.name,
-    logoUrl: branding.logoUrl ?? null,
+    logoUrl: settings.logoUrl || branding.logoUrl || null,
+    bannerUrl: settings.bannerUrl || null,
+    bannerLink: settings.bannerLink || null,
     accentColor: branding.accentColor ?? null,
     language: settings.language,
     signature: settings.signature,

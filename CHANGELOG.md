@@ -11,9 +11,10 @@ contain breaking changes).
 
 - **Branded customer emails in your company's language**
   (`docs/adr/0070-customer-email-templates.md`).
-  - Every email to a customer uses your logo and color, a signature, the
-    customer's last message quoted, and "Powered by Seredina" under the
-    message.
+  - Every email to a customer uses your logo, an optional banner and your
+    color, a signature, the customer's last message quoted, and "Powered by
+    Seredina" under the message. The logo and banner can be uploaded or
+    linked; the banner can link somewhere.
   - Administration → Customer Emails sets:
     - the language (Spanish by default, or English);
     - the sender name;

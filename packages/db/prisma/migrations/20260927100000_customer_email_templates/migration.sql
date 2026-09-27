@@ -21,3 +21,21 @@ CREATE UNIQUE INDEX "email_templates_tenant_id_event_key" ON "email_templates"("
 
 ALTER TABLE "email_templates" ADD CONSTRAINT "email_templates_tenant_id_fkey"
   FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- The uploaded logo and banner for customer emails.
+CREATE TABLE "email_images" (
+    "id" UUID NOT NULL,
+    "tenant_id" UUID NOT NULL,
+    "kind" TEXT NOT NULL,
+    "mime_type" TEXT NOT NULL,
+    "data" BYTEA NOT NULL,
+    "sha256" TEXT NOT NULL,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "email_images_pkey" PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX "email_images_tenant_id_kind_key" ON "email_images"("tenant_id", "kind");
+
+ALTER TABLE "email_images" ADD CONSTRAINT "email_images_tenant_id_fkey"
+  FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -89,6 +89,11 @@ Set it up in **Administration → Customer Emails**:
   footer, sign-in and password emails, and notifications to your agents.
 - **Sender name**: shown on the From line, for example
   *IT Support &lt;support@yourcompany.com&gt;*. Empty means your company name.
+- **Logo** and **banner**: upload a PNG, JPG or GIF (up to 2 MB), or paste
+  the address of an image hosted elsewhere. The logo goes at the top of
+  every email; without one, the Branding logo is used. The banner is a wide
+  image under it: 1200 × 400 px recommended, shown 600 px wide, and it can
+  link somewhere.
 - **Company signature**: goes under every email: team name, phone, hours.
 - **Quote the customer's last message** under each reply, and add the
   **satisfaction survey** to the "resolved" email.
@@ -111,6 +116,13 @@ changes.
 :::
 
 Each agent adds their own signature under **Account security**.
+
+::: tip Images need an address your customers can reach
+Mail clients load the logo and banner from your server's `WEB_ORIGIN`. If
+Seredina is only reachable inside your company network, customers outside
+it won't see uploaded images. Use a public address, or paste the URL of an
+image hosted on your website.
+:::
 
 Out-of-office replies, bounces and mailing lists still become tickets, but
 never get an acknowledgement, so two autoresponders can't answer each other

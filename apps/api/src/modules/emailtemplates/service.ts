@@ -21,7 +21,9 @@ import {
   type EmailTemplate,
 } from '@seredina/shared';
 import { contactEmailQueue } from '../../lib/queue';
-import { webOrigin } from '../../lib/publicUrl';
+import { createHash } from 'node:crypto';
+import { apiPublicBase, webOrigin } from '../../lib/publicUrl';
+import { resolveTenantIdBySlug } from '../tenants/service';
 
 /**
  * Customer email: the tenant's settings and per-event templates, previews
@@ -238,4 +240,62 @@ export async function brandedNotice(
     button: { label: emailString(language, keys.button, all), url },
   });
   return { subject: emailString(language, keys.subject, all), text, html, language };
+}
+
+// ---------------------------------------------------------------------------
+// Logo and banner uploads
+// ---------------------------------------------------------------------------
+
+export type EmailImageKind = 'logo' | 'banner';
+export const MAX_EMAIL_IMAGE_BYTES = 2 * 1024 * 1024;
+
+/**
+ * The formats every mail client shows. Checked by the file's first bytes,
+ * not its name or declared type. SVG is refused: Gmail and Outlook don't
+ * display it, and it can carry script.
+ */
+export function sniffEmailImage(data: Buffer): string | null {
+  if (data.length >= 8 && data.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return 'image/png';
+  if (data.length >= 3 && data[0] === 0xff && data[1] === 0xd8 && data[2] === 0xff) return 'image/jpeg';
+  if (data.length >= 6 && (data.subarray(0, 6).toString('ascii') === 'GIF87a' || data.subarray(0, 6).toString('ascii') === 'GIF89a')) return 'image/gif';
+  return null;
+}
+
+/**
+ * Stores an uploaded logo or banner and points the email settings at its
+ * public address. The address carries the image's hash, so a new upload is
+ * a new URL and no mail client or proxy keeps showing the old one.
+ */
+export async function saveEmailImage(tenantId: string, kind: EmailImageKind, data: Buffer): Promise<EmailSettings> {
+  const mimeType = sniffEmailImage(data);
+  if (!mimeType) throw new EmailTemplateError('Upload a PNG, JPG or GIF image.');
+  if (data.length > MAX_EMAIL_IMAGE_BYTES) throw new EmailTemplateError('The image is larger than 2 MB.');
+  const base = apiPublicBase();
+  if (!base) throw new EmailTemplateError('The server has no public address configured (WEB_ORIGIN), so email clients could not load the image.', 409);
+
+  const sha256 = createHash('sha256').update(data).digest('hex');
+  const slug = await withTenantTx(prisma, tenantId, async (tx) => {
+    await tx.emailImage.upsert({
+      where: { tenantId_kind: { tenantId, kind } },
+      create: { tenantId, kind, mimeType, data, sha256 },
+      update: { mimeType, data, sha256 },
+    });
+    return (await tx.tenant.findUniqueOrThrow({ where: { id: tenantId }, select: { slug: true } })).slug;
+  });
+  const url = `${base}/public/${encodeURIComponent(slug)}/email-images/${kind}?v=${sha256.slice(0, 12)}`;
+  return updateEmailSettings(tenantId, kind === 'logo' ? { logoUrl: url } : { bannerUrl: url });
+}
+
+export async function deleteEmailImage(tenantId: string, kind: EmailImageKind): Promise<EmailSettings> {
+  await withTenantTx(prisma, tenantId, (tx) => tx.emailImage.deleteMany({ where: { kind } }));
+  return updateEmailSettings(tenantId, kind === 'logo' ? { logoUrl: '' } : { bannerUrl: '', bannerLink: '' });
+}
+
+/** For the public route mail clients load images from. */
+export async function getPublicEmailImage(tenantSlug: string, kind: EmailImageKind) {
+  const tenantId = await resolveTenantIdBySlug(tenantSlug);
+  if (!tenantId) return null;
+  return withTenantTx(prisma, tenantId, (tx) =>
+    tx.emailImage.findUnique({ where: { tenantId_kind: { tenantId, kind } }, select: { mimeType: true, data: true, sha256: true } }),
+  );
 }

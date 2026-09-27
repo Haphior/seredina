@@ -27,7 +27,10 @@ shared by the API (ticket events, previews, simple notices) and the worker
 - **HTML**: tables and inline styles, which is what Outlook, Gmail and Apple
   Mail all render the same way.
 - **Header**: an accent bar in the tenant's color, then its logo, or its name
-  in that color. Both come from Branding.
+  in that color. The color comes from Branding. The logo is the one set for
+  emails, falling back to the Branding logo.
+- **Banner**: an optional wide image under the header, optionally a link.
+  It is shown 600 px wide; 1200 × 400 px is recommended.
 - **Card**:
   - a "Request #N · subject" label;
   - the message;
@@ -107,6 +110,27 @@ Seredina's own automatic emails carry `Auto-Submitted: auto-replied` (the
 acknowledgement) or `auto-generated`, so a well-behaved autoresponder on the
 other side stays quiet. The acknowledgement is sent at most once per ticket,
 even when its job is retried.
+
+### Logo and banner
+
+The logo and banner can be uploaded in the console or given as the address
+of an image hosted elsewhere.
+
+- **Uploads** go to `email_images`, one row per tenant and kind. They must
+  be PNG, JPG or GIF (checked by the file's first bytes, not its name) and
+  2 MB at most. SVG is refused: Gmail and Outlook don't show it, and it can
+  carry script.
+- **Serving**: `GET /public/:tenantSlug/email-images/:kind` serves the image
+  with no session, since mail clients and Gmail's image proxy have none.
+  Only these two images are reachable there.
+- **URL**: the email settings store the image's absolute URL, built from
+  `API_PUBLIC_URL`, or `WEB_ORIGIN` + `/api`. The URL carries a hash of the
+  image, so a new upload gets a new URL that no cache has seen.
+- **Reachability**: the recipient's mail client has to reach that address. A
+  server only reachable inside the company network shows the images to
+  internal recipients only. External customers need a public address, or an
+  image hosted elsewhere.
+- **Agent notifications** keep the logo but not the banner.
 
 ### Sender and signatures
 

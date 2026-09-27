@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { apiDelete, apiGet, apiPost, apiPut, ApiError } from '../lib/api';
+import { apiDelete, apiGet, apiPost, apiPut, apiUpload, ApiError } from '../lib/api';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { Input } from '../components/Input';
@@ -18,6 +18,9 @@ interface EmailSettings {
   signature: string;
   quoteHistory: boolean;
   surveyOnResolve: boolean;
+  logoUrl: string;
+  bannerUrl: string;
+  bannerLink: string;
 }
 
 interface TemplateView {
@@ -147,6 +150,28 @@ function SettingsCard({ settings, onSaved }: { settings: EmailSettings; onSaved:
         placeholder={t('customerEmails.companySignaturePlaceholder')}
         onChange={(e) => set('signature', e.target.value)}
       />
+      <div className="grid gap-4 border-t border-slate-100 pt-4 sm:grid-cols-2">
+        <ImageField
+          kind="logo"
+          url={form.logoUrl}
+          onUrl={(v) => set('logoUrl', v)}
+          onUploaded={(next) => setForm((f) => ({ ...f, logoUrl: next.logoUrl }))}
+        />
+        <ImageField
+          kind="banner"
+          url={form.bannerUrl}
+          onUrl={(v) => set('bannerUrl', v)}
+          onUploaded={(next) => setForm((f) => ({ ...f, bannerUrl: next.bannerUrl, bannerLink: next.bannerLink }))}
+        />
+      </div>
+      {form.bannerUrl && (
+        <Input
+          label={t('customerEmails.bannerLink')}
+          value={form.bannerLink}
+          placeholder="https://"
+          onChange={(e) => set('bannerLink', e.target.value.trim())}
+        />
+      )}
       <Check label={t('customerEmails.quoteHistory')} hint={t('customerEmails.quoteHistoryHint')} checked={form.quoteHistory} onChange={(v) => set('quoteHistory', v)} />
       <Check label={t('customerEmails.survey')} hint={t('customerEmails.surveyHint')} checked={form.surveyOnResolve} onChange={(v) => set('surveyOnResolve', v)} />
       <div className="flex items-center gap-3">
@@ -329,5 +354,96 @@ function Check({ label, hint, checked, onChange }: { label: string; hint: string
         <span className="block text-[12.5px] text-slate-500">{hint}</span>
       </span>
     </label>
+  );
+}
+
+/**
+ * The email logo or banner: upload an image (stored by Seredina and served
+ * to mail clients) or paste the address of one hosted elsewhere.
+ */
+function ImageField({
+  kind,
+  url,
+  onUrl,
+  onUploaded,
+}: {
+  kind: 'logo' | 'banner';
+  url: string;
+  onUrl: (v: string) => void;
+  onUploaded: (settings: EmailSettings) => void;
+}) {
+  const { t } = useTranslation();
+  const input = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function upload(file: File) {
+    setBusy(true);
+    setError(null);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      onUploaded(await apiUpload<EmailSettings>(`/email-templates/images/${kind}`, form));
+    } catch (err) {
+      setError(errorText(err, t('customerEmails.uploadFailed')));
+    } finally {
+      setBusy(false);
+      if (input.current) input.current.value = '';
+    }
+  }
+
+  async function remove() {
+    setBusy(true);
+    setError(null);
+    try {
+      onUploaded(await apiDelete<EmailSettings>(`/email-templates/images/${kind}`));
+    } catch (err) {
+      setError(errorText(err, t('customerEmails.uploadFailed')));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div>
+      <p className="mb-1 text-[12.5px] font-semibold text-slate-700">{t(`customerEmails.${kind}.label`)}</p>
+      <p className="mb-2 text-[12px] text-slate-500">{t(`customerEmails.${kind}.hint`)}</p>
+      <div
+        className={`mb-2 flex items-center justify-center overflow-hidden rounded-lg border border-dashed border-slate-200 bg-slate-50 ${kind === 'banner' ? 'h-24' : 'h-16'}`}
+      >
+        {url ? (
+          <img src={url} alt="" className={kind === 'banner' ? 'h-full w-full object-cover' : 'max-h-12 max-w-[220px]'} />
+        ) : (
+          <span className="text-[12px] text-slate-400">{t(`customerEmails.${kind}.empty`)}</span>
+        )}
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <input
+          ref={input}
+          type="file"
+          accept="image/png,image/jpeg,image/gif"
+          className="hidden"
+          onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])}
+        />
+        <Button size="sm" variant="ghost" isLoading={busy} onClick={() => input.current?.click()}>
+          {t('customerEmails.upload')}
+        </Button>
+        {url && (
+          <Button size="sm" variant="ghost" onClick={remove} disabled={busy}>
+            {t('customerEmails.removeImage')}
+          </Button>
+        )}
+      </div>
+      <div className="mt-2">
+        <Input
+          hideLabel
+          aria-label={t(`customerEmails.${kind}.urlLabel`)}
+          value={url}
+          placeholder={t('customerEmails.orPasteUrl')}
+          onChange={(e) => onUrl(e.target.value.trim())}
+        />
+      </div>
+      {error && <p className="mt-1 text-[12.5px] text-rose-600">{error}</p>}
+    </div>
   );
 }

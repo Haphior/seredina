@@ -70,6 +70,17 @@ describe('customer email rendering', () => {
     expect(html).not.toContain('Clic');
   });
 
+  it('shows the banner under the logo, as a link when one is set', () => {
+    const { html } = renderBrandedEmail(
+      { ...brand, logoUrl: 'https://cdn.test/logo.png', bannerUrl: 'https://cdn.test/banner.jpg', bannerLink: 'https://infra.test/promo' },
+      { body: 'x' },
+    );
+    expect(html).toContain('<img src="https://cdn.test/logo.png"');
+    expect(html.indexOf('logo.png')).toBeLessThan(html.indexOf('banner.jpg'));
+    expect(html).toContain('<a href="https://infra.test/promo" style="display:block;"><img src="https://cdn.test/banner.jpg"');
+    expect(renderBrandedEmail({ ...brand, bannerUrl: 'data:image/png;base64,xx' }, { body: 'x' }).html).not.toContain('data:image');
+  });
+
   it('turns blank lines into paragraphs and single newlines into breaks', () => {
     expect(textToHtml('uno\ndos\n\ntres', '#000')).toBe('<p style="margin:0 0 16px 0;">uno<br>dos</p><p style="margin:0 0 16px 0;">tres</p>');
   });
@@ -329,6 +340,51 @@ describe.skipIf(!hasDb)('customer email: settings API', () => {
     expect(p.html).toContain('Ana Rojas escribió:');
     expect(p.html).toContain('Powered by');
     expect(p.to).toBeUndefined();
+  });
+
+  it('uploads a logo and banner, serves them publicly and puts them in the emails', async () => {
+    const png = Buffer.from('89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000d49444154789c6360000002000154a24f5d0000000049454e44ae426082', 'hex');
+    const multipart = (data: Buffer, filename: string) => {
+      const boundary = '----seredina-test';
+      return {
+        headers: { ...as(), 'content-type': `multipart/form-data; boundary=${boundary}` },
+        payload: Buffer.concat([
+          Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="${filename}"\r\nContent-Type: image/png\r\n\r\n`),
+          data,
+          Buffer.from(`\r\n--${boundary}--\r\n`),
+        ]),
+      };
+    };
+
+    const svg = await app.inject({ method: 'POST', url: '/email-templates/images/banner', ...multipart(Buffer.from('<svg onload="x()"/>'), 'x.png') });
+    expect(svg.statusCode).toBe(400);
+
+    const up = await app.inject({ method: 'POST', url: '/email-templates/images/banner', ...multipart(png, 'banner.png') });
+    expect(up.statusCode).toBe(200);
+    const bannerUrl: string = up.json().bannerUrl;
+    expect(bannerUrl).toMatch(new RegExp(`^https://desk\\.example\\.com/api/public/${slug}/email-images/banner\\?v=[0-9a-f]{12}$`));
+
+    const served = await app.inject({ method: 'GET', url: `/public/${slug}/email-images/banner` });
+    expect(served.statusCode).toBe(200);
+    expect(served.headers['content-type']).toBe('image/png');
+    expect(served.rawPayload.equals(png)).toBe(true);
+    expect((await app.inject({ method: 'GET', url: `/public/${slug}/email-images/other` })).statusCode).toBe(404);
+
+    await app.inject({ method: 'PUT', url: '/email-templates/settings', headers: as(), payload: { bannerLink: 'https://mailapi.test/promo' } });
+    expect(
+      (await app.inject({ method: 'PUT', url: '/email-templates/settings', headers: as(), payload: { bannerLink: 'javascript:alert(1)' } })).statusCode,
+    ).toBe(400);
+    const preview = await app.inject({
+      method: 'POST',
+      url: '/email-templates/preview',
+      headers: as(),
+      payload: { event: 'ticket_created', subject: 'x', body: 'y' },
+    });
+    expect(preview.json().html).toContain(`<a href="https://mailapi.test/promo" style="display:block;"><img src="${bannerUrl.replace(/&/g, '&amp;')}"`);
+
+    const removed = await app.inject({ method: 'DELETE', url: '/email-templates/images/banner', headers: as() });
+    expect(removed.json()).toMatchObject({ bannerUrl: '', bannerLink: '' });
+    expect((await app.inject({ method: 'GET', url: `/public/${slug}/email-images/banner` })).statusCode).toBe(404);
   });
 
   it('keeps an agent signature per user, and needs a mailbox for a test send', async () => {

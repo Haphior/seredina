@@ -1984,7 +1984,7 @@
   },
   "customerEmails": {
     "title": "Customer emails",
-    "intro": "What your customers get by email: your logo and color (from Branding), your company's language and your own words. Every reply, acknowledgement and closing goes out in this design.",
+    "intro": "What your customers get by email: your logo, banner and color, your company's language and your own words. Every reply, acknowledgement and closing goes out in this design.",
     "loadFailed": "Could not load customer emails",
     "needsEmail": "Connect a mailbox so these emails can go out:",
     "settingsTitle": "General settings",
@@ -2042,6 +2042,23 @@
       "agent_name": "Agent name",
       "message": "Text of the agent's reply",
       "portal_link": "Link to the customer portal (if on)"
-    }
+    },
+    "logo": {
+      "label": "Logo",
+      "hint": "At the top of every email. PNG, JPG or GIF up to 2 MB, shown 48 px tall. Without one, the Branding logo is used.",
+      "empty": "No logo: your company name is shown",
+      "urlLabel": "Logo URL"
+    },
+    "banner": {
+      "label": "Banner",
+      "hint": "A wide image under the logo. 1200 × 400 px recommended (shown 600 px wide). PNG, JPG or GIF up to 2 MB.",
+      "empty": "No banner",
+      "urlLabel": "Banner URL"
+    },
+    "bannerLink": "Banner link (optional)",
+    "upload": "Upload image",
+    "removeImage": "Remove",
+    "orPasteUrl": "or paste the URL of a published image",
+    "uploadFailed": "Could not upload the image"
   }
 }

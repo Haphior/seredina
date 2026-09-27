@@ -98,6 +98,11 @@ Configuralo en **Administración → Correos al cliente**:
   tus agentes.
 - **Nombre del remitente**: el que aparece en el De, por ejemplo
   *Soporte TI &lt;soporte@tuempresa.cl&gt;*. Vacío usa el nombre de tu empresa.
+- **Logo** y **banner**: subí un PNG, JPG o GIF (hasta 2 MB), o pegá la
+  dirección de una imagen publicada en otro lado. El logo va arriba de
+  cada correo; si no subís uno, se usa el de Marca. El banner es una imagen
+  ancha debajo del logo: se recomienda de 1200 × 400 px, se muestra a 600 px
+  de ancho y puede llevar un enlace.
 - **Firma de la empresa**: va debajo de cada correo: equipo, teléfono,
   horario.
 - **Citar el último mensaje del cliente** bajo cada respuesta, y sumar la
@@ -121,6 +126,13 @@ predeterminada** deshace tus cambios.
 :::
 
 Cada agente pone su propia firma en **Seguridad de la cuenta**.
+
+::: tip Las imágenes necesitan una dirección que tus clientes alcancen
+Los programas de correo cargan el logo y el banner desde el `WEB_ORIGIN` de
+tu servidor. Si Seredina solo es accesible dentro de la red de tu empresa,
+los clientes de afuera no van a ver las imágenes subidas. Usá una dirección
+pública, o pegá la URL de una imagen publicada en tu sitio web.
+:::
 
 Las respuestas de fuera de oficina, los rebotes y las listas de correo
 igual crean tickets, pero nunca reciben acuse de recibo, así dos respuestas

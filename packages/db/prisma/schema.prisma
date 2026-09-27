@@ -89,6 +89,7 @@ model Tenant {
   telegramChannel       TelegramChannel?
   csatResponses         CsatResponse[]
   emailTemplates        EmailTemplate[]
+  emailImages           EmailImage[]
 
   @@map("tenants")
   auditLogs AuditLog[]
@@ -632,6 +633,24 @@ model EmailTemplate {
 
   @@unique([tenantId, event])
   @@map("email_templates")
+}
+
+// The logo and banner a tenant uploaded for its customer emails, served
+// publicly (GET /public/:tenantSlug/email-images/:kind) so mail clients can
+// load them. Bytes in Postgres, same reasoning as Attachment: no object
+// storage in this stack. See docs/adr/0070-customer-email-templates.md.
+model EmailImage {
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  kind      String // 'logo' | 'banner'
+  mimeType  String   @map("mime_type")
+  data      Bytes
+  sha256    String
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([tenantId, kind])
+  @@map("email_images")
 }
 
 // ---------------------------------------------------------------------------
