@@ -119,3 +119,51 @@ jobs:
 
       - name: Build and smoke-test the compose stack
         run: bash scripts/compose-smoke.sh
+
+  # Installs the previous release, fills it with data through its API,
+  # upgrades it with this code's migrations, and fails if any existing row
+  # changed or if the old data can't be read back through the new API.
+  # See scripts/upgrade-check.sh and docs/adr/0074-upgrade-check.md.
+  upgrade-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: app_migrator
+          POSTGRES_PASSWORD: ci_migrator_password
+          POSTGRES_DB: seredina
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U app_migrator"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The release tags are what it upgrades from.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '20'
+
+      - name: Install postgresql-client
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends postgresql-client
+
+      - name: Upgrade from the previous release
+        run: bash scripts/upgrade-check.sh

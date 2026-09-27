@@ -1,0 +1,7 @@
+# Tables whose existing rows this release changes on purpose during the
+# upgrade (a backfill, a data fix) -- one table name per line, with a comment
+# saying why. scripts/upgrade-check.sh still compares every other table.
+#
+# Empty it when cutting a release (docs/adr/0050-versioning-and-releases.md):
+# the next release is checked against this one, and its own changes start
+# from zero.

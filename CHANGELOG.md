@@ -9,6 +9,11 @@ contain breaking changes).
 
 ### Added
 
+- **Every change is checked against an upgrade from the previous release**
+  (`docs/adr/0074-upgrade-check.md`). CI installs the last release, fills it
+  with data, upgrades it with the new migrations and fails if any existing
+  row changed or the old data can't be read back.
+  `scripts/upgrade-check.sh` runs the same check locally.
 - **Frutiger Aero theme** (`docs/adr/0073-frutiger-aero-theme.md`), under
   Settings → Appearance: a sky gradient with bubbles, frosted-glass panels,
   an aqua accent and glossy buttons.
