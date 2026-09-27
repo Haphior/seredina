@@ -378,7 +378,9 @@
     "collisionReply": "{{name}} respondió mientras escribías. Revisa su respuesta antes de enviar la tuya, para que el cliente no reciba dos.",
     "collisionNote": "{{name}} agregó una nota interna mientras escribías.",
     "collisionCustomer": "{{name}} volvió a escribir mientras redactabas: léelo antes de enviar.",
-    "collisionDismiss": "Entendido"
+    "collisionDismiss": "Entendido",
+    "mentionHint": "Escribe @ para mencionar a un colega",
+    "mentionNobody": "Nadie coincide"
   },
   "tour": {
     "stepCount": "Paso {{current}} de {{total}}",
@@ -860,14 +862,28 @@
     "title": "Configuración de notificaciones",
     "loadFailed": "No se pudo cargar la configuración de notificaciones",
     "saveFailed": "No se pudo guardar",
-    "intro": "Cómo te avisamos de la actividad — en la aplicación siempre aparece en la campana; el correo necesita un canal de correo conectado para enviarse.",
+    "intro": "Cómo te avisamos de la actividad. En la aplicación aparece en la campana; el correo necesita un canal de correo conectado para enviarse.",
     "event": "Evento",
     "inApp": "En la app",
     "email": "Correo",
     "events": {
       "TICKET_ASSIGNED": "Se me asigna un ticket",
       "NEW_REPLY": "Un contacto responde un ticket asignado a mí",
-      "CONTRACT_EXPIRING": "Un contrato, garantía o licencia está por vencer (usuarios que gestionan activos)"
+      "CONTRACT_EXPIRING": "Un contrato, garantía o licencia está por vencer (usuarios que gestionan activos)",
+      "TEAM_TICKET": "Llega un ticket a uno de mis equipos sin responsable",
+      "TICKET_REOPENED": "Un cliente reabre un ticket mío o de mi equipo",
+      "MENTIONED": "Alguien me menciona en una nota interna",
+      "SLA_WARNING": "Un plazo de SLA de mi ticket está por vencer (80 % del tiempo usado)",
+      "SLA_BREACHED": "Se venció un plazo de SLA de mi ticket"
+    },
+    "useDefault": "Usar el valor de la organización",
+    "fromWorkspace": "Valor de la organización",
+    "defaultsTitle": "Valores por defecto para toda la organización",
+    "defaultsIntro": "Lo que recibe cada persona mientras no elija por su cuenta arriba. Cambiar un valor por defecto no pisa lo que alguien ya eligió.",
+    "groups": {
+      "tickets": "Tickets",
+      "sla": "SLA",
+      "assets": "Activos"
     }
   },
   "kbGate": {

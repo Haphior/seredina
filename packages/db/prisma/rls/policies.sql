@@ -35,7 +35,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON
   notifications, notification_preferences, ai_usage_logs, attachments, kb_chunks,
   autonomy_policies, ai_agent_runs, tenant_ai_settings, tenant_ui_settings, tenant_kb_settings, telegram_channels,
   csat_responses, device_enrollment_tokens, devices, tenant_sso_settings,
-  contracts, contract_assets, email_templates, email_images, team_members
+  contracts, contract_assets, email_templates, email_images, team_members,
+  tenant_notification_defaults
   TO app_tenant;
 
 -- Append-only: the app can write and read audit entries, never change or delete
@@ -75,7 +76,8 @@ BEGIN
     'notifications', 'notification_preferences', 'ai_usage_logs', 'attachments', 'kb_chunks',
     'autonomy_policies', 'ai_agent_runs', 'tenant_ai_settings', 'tenant_ui_settings', 'tenant_kb_settings', 'telegram_channels',
     'csat_responses', 'device_enrollment_tokens', 'devices', 'audit_logs', 'tenant_sso_settings',
-    'contracts', 'contract_assets', 'email_templates', 'email_images', 'team_members'
+    'contracts', 'contract_assets', 'email_templates', 'email_images', 'team_members',
+    'tenant_notification_defaults'
   ]
   LOOP
     EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', tbl);

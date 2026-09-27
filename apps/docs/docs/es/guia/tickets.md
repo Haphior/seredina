@@ -80,3 +80,34 @@ Más abajo, los datos de contacto de quien abrió el ticket, y los activos
 de CMDB vinculados — con la opción de vincular uno nuevo desde un
 desplegable, y ver qué servicios reales quedan afectados si ese activo
 tiene servicios asociados.
+
+## Notificaciones
+
+La campana arriba en la barra lateral muestra lo que te pasó. Cada evento
+también puede llegar por correo, lo que necesita un
+[canal de correo](/es/guia/canales#correo-electronico) conectado.
+
+| Evento | Quién lo recibe |
+|---|---|
+| Se me asigna un ticket | El nuevo responsable (no cuando te lo asignas tú) |
+| Un contacto responde | El responsable |
+| Llega un ticket a mi equipo | Cada miembro del equipo, si el ticket no tiene responsable |
+| Un cliente reabre un ticket | El responsable, o el equipo si no hay responsable |
+| Alguien me menciona | Las personas @mencionadas en una nota interna |
+| SLA por vencer | El responsable, o el equipo, al usarse el 80 % del plazo |
+| SLA vencido | El responsable, o el equipo, cuando pasa el plazo |
+| Un contrato está por vencer | Quienes pueden gestionar activos |
+
+Un cliente que vuelve a escribir en un ticket **resuelto o cerrado**, por
+correo o desde el portal, lo reabre.
+
+Para mencionar a alguien, marca **Nota interna** y escribe `@`: elige a un
+colega de la lista. Las menciones solo funcionan en notas internas, así el
+cliente nunca las ve.
+
+**Configuración de notificaciones** (desde la campana) define, para cada
+evento, si lo recibes en la aplicación y por correo. Los administradores
+también definen ahí los **valores por defecto para toda la organización**:
+lo que recibe cada persona mientras no elija por su cuenta. Lo que elige
+cada persona siempre manda, y **Usar el valor de la organización** vuelve a
+él.

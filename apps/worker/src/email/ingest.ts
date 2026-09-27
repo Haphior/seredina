@@ -1,4 +1,4 @@
-import { prisma, withTenantTx } from '@seredina/db';
+import { prisma, reopenOnCustomerReply, ticketNotificationRecipients, withTenantTx } from '@seredina/db';
 import { MAX_ATTACHMENTS_PER_MESSAGE, MAX_ATTACHMENT_SIZE_BYTES, emailString, parseEmailSettings, type EmailLanguage } from '@seredina/shared';
 import { publishLive } from '../lib/live';
 import { ticketFollowupQueue } from '../lib/queue';
@@ -27,18 +27,22 @@ export interface InboundEmail {
   automatic?: boolean;
 }
 
-export interface AssigneeNotice {
-  userId: string;
+export interface ReplyNotice {
+  /** TICKET_REOPENED when the reply reopened a resolved/closed ticket, else NEW_REPLY. */
+  event: 'NEW_REPLY' | 'TICKET_REOPENED';
+  userIds: string[];
+  ticketId: string;
   ticketNumber: number;
   ticketSubject: string;
 }
 
 export interface IngestResult {
   ticketId: string;
-  // Set only when this reply landed on an EXISTING, already-assigned ticket --
-  // a brand new ticket has no assignee yet. The caller notifies AFTER this
-  // transaction closes (see poll.ts) -- see docs/adr/0022-notifications.md.
-  assigneeToNotify: AssigneeNotice | null;
+  // Set only when this reply landed on an EXISTING ticket -- a brand new
+  // ticket has nobody to tell yet. The caller notifies AFTER this transaction
+  // closes (see poll.ts) -- see docs/adr/0022-notifications.md and
+  // docs/adr/0071-teams-and-notification-events.md.
+  replyNotice: ReplyNotice | null;
 }
 
 /**
@@ -62,7 +66,7 @@ export async function ingestInboundEmail(email: InboundEmail): Promise<IngestRes
     });
     if (alreadyIngested) {
       duplicate = true;
-      return { ticketId: alreadyIngested.ticketId, assigneeToNotify: null };
+      return { ticketId: alreadyIngested.ticketId, replyNotice: null };
     }
 
     // Notes written into the ticket are in the tenant's language, like
@@ -88,7 +92,7 @@ export async function ingestInboundEmail(email: InboundEmail): Promise<IngestRes
     });
 
     let ticketId: string;
-    let assigneeToNotify: AssigneeNotice | null = null;
+    let replyNotice: ReplyNotice | null = null;
 
     if (existingMessage) {
       const ticket = await tx.ticket.findUniqueOrThrow({
@@ -97,19 +101,23 @@ export async function ingestInboundEmail(email: InboundEmail): Promise<IngestRes
       });
       ticketId = ticket.id;
 
-      if (ticket.status.category === 'CLOSED') {
-        const openStatus = await tx.ticketStatus.findFirst({ where: { key: 'open' } });
-        if (openStatus) {
-          await tx.ticket.update({ where: { id: ticketId }, data: { statusId: openStatus.id, closedAt: null } });
-        }
-      }
+      const reopened = await reopenOnCustomerReply(tx, ticket);
 
       if (!ticket.emailChannelId && email.emailChannelId) {
         await tx.ticket.update({ where: { id: ticketId }, data: { emailChannelId: email.emailChannelId } });
       }
 
-      if (ticket.assigneeId) {
-        assigneeToNotify = { userId: ticket.assigneeId, ticketNumber: ticket.number, ticketSubject: ticket.subject };
+      // A plain reply tells the assignee; a reopen tells the assignee, or the
+      // team when nobody is assigned.
+      const userIds = reopened ? await ticketNotificationRecipients(tx, ticket) : ticket.assigneeId ? [ticket.assigneeId] : [];
+      if (userIds.length > 0) {
+        replyNotice = {
+          event: reopened ? 'TICKET_REOPENED' : 'NEW_REPLY',
+          userIds,
+          ticketId: ticket.id,
+          ticketNumber: ticket.number,
+          ticketSubject: ticket.subject,
+        };
       }
     } else {
       const openStatus = await tx.ticketStatus.findFirst({ where: { key: 'open' } });
@@ -159,7 +167,7 @@ export async function ingestInboundEmail(email: InboundEmail): Promise<IngestRes
       });
     }
 
-    return { ticketId, assigneeToNotify };
+    return { ticketId, replyNotice };
   });
 
   if (duplicate) return result;

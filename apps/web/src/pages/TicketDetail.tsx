@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { apiDelete, apiGet, apiPatch, apiPost, apiUpload, downloadFile, ApiError } from '../lib/api';
@@ -27,6 +27,7 @@ import { ChannelGlyph } from '../components/ChannelGlyph';
 import { BackArrowIcon, BoltIcon, ChevronDownIcon, ClockIcon, EyeIcon, LockIcon, PaperclipIcon, SparkleIcon } from '../components/icons';
 import { PRIORITY_TONE, STATUS_CATEGORY_TONE, formatDateTime, isFirstResponseOverdue, isResolutionOverdue } from '../lib/format';
 import { useTheme } from '../theme/ThemeContext';
+import { MentionTextarea, mentionedIn } from '../components/MentionTextarea';
 
 const PRIORITIES: TicketPriority[] = ['LOW', 'NORMAL', 'HIGH', 'URGENT'];
 
@@ -53,6 +54,7 @@ export function TicketDetail() {
 
   const [reply, setReply] = useState('');
   const [isPrivateNote, setIsPrivateNote] = useState(false);
+  const mentionable = useMemo(() => users.filter((u) => u.isActive), [users]);
   const [sending, setSending] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
@@ -247,7 +249,8 @@ export function TicketDetail() {
     if (!id || !reply.trim()) return;
     setSending(true);
     try {
-      const message = await apiPost<{ id: string }>(`/tickets/${id}/messages`, { body: reply, isPrivateNote });
+      const mentionedUserIds = isPrivateNote ? mentionedIn(reply, mentionable) : [];
+      const message = await apiPost<{ id: string }>(`/tickets/${id}/messages`, { body: reply, isPrivateNote, mentionedUserIds });
       for (const file of pendingFiles) {
         const form = new FormData();
         form.append('file', file);
@@ -629,10 +632,12 @@ export function TicketDetail() {
           </div>
         )}
         <div className="mt-1 rounded-xl border border-slate-200 bg-white p-1.5 pb-2.5 shadow-sm">
-          <textarea
+          <MentionTextarea
             value={reply}
-            onChange={(e) => onReplyChange(e.target.value)}
-            placeholder={t('ticketDetail.replyPlaceholder')}
+            onValueChange={onReplyChange}
+            people={mentionable}
+            mentions={isPrivateNote}
+            placeholder={isPrivateNote ? t('ticketDetail.mentionHint') : t('ticketDetail.replyPlaceholder')}
             rows={3}
             className="w-full resize-none rounded-lg border-0 px-2.5 py-2 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-indigo-100"
           />

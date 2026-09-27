@@ -1,5 +1,5 @@
 import { prisma, withTenantTx, type Prisma, type TicketPriority } from '@seredina/db';
-import { addBusinessMinutes, type BusinessHoursSchedule, type SlaMilestone } from '@seredina/shared';
+import { addBusinessMinutes, SLA_WARNING_FRACTION, type BusinessHoursSchedule, type SlaMilestone } from '@seredina/shared';
 import { slaBreachQueue } from '../../lib/queue';
 
 export interface UpsertSlaPolicyInput {
@@ -111,12 +111,23 @@ export async function scheduleSlaBreachChecks(tenantId: string, ticketId: string
   await Promise.all(
     jobs
       .filter((j) => j.dueAt)
-      .map((j) =>
-        slaBreachQueue.add(
-          'check',
-          { tenantId, ticketId, milestone: j.milestone },
-          { delay: Math.max(0, j.dueAt!.getTime() - now) },
-        ),
-      ),
+      .flatMap((j) => {
+        const due = j.dueAt!.getTime();
+        const checks = [slaBreachQueue.add('check', { tenantId, ticketId, milestone: j.milestone }, { delay: Math.max(0, due - now) })];
+        // The "due soon" heads-up, SLA_WARNING_FRACTION of the way through the
+        // window. Scheduling happens when the clock starts (creation or a
+        // priority change), so "now" is the window's start.
+        const warnAt = now + (due - now) * SLA_WARNING_FRACTION;
+        if (due > now && warnAt > now) {
+          checks.push(
+            slaBreachQueue.add(
+              'warn',
+              { tenantId, ticketId, milestone: j.milestone, warning: { dueAt: j.dueAt!.toISOString() } },
+              { delay: warnAt - now },
+            ),
+          );
+        }
+        return checks;
+      }),
   );
 }

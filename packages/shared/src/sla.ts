@@ -11,6 +11,24 @@ export interface SlaBreachCheckJobPayload {
   tenantId: string;
   ticketId: string;
   milestone: SlaMilestone;
+  /**
+   * A heads-up before the deadline instead of the breach check itself
+   * (docs/adr/0071-teams-and-notification-events.md). Carries the due-at it
+   * was scheduled for: if the ticket's due-at has moved since, it's stale.
+   */
+  warning?: { dueAt: string };
+}
+
+/** How far into an SLA window the "due soon" warning fires. */
+export const SLA_WARNING_FRACTION = 0.8;
+
+/** "45 min", "3 h", "2 h 30 min" -- how long is left, for a notification. */
+export function formatMinutesLeft(minutes: number): string {
+  const m = Math.max(1, Math.round(minutes));
+  if (m < 60) return `${m} min`;
+  const h = Math.floor(m / 60);
+  const rest = m % 60;
+  return rest ? `${h} h ${rest} min` : `${h} h`;
 }
 
 export interface DayWindow {

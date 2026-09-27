@@ -29,6 +29,7 @@ const TENANT_SCOPE_FIELD: Record<string, string> = {
   User: 'tenantId',
   Team: 'tenantId',
   TeamMember: 'tenantId',
+  TenantNotificationDefault: 'tenantId',
   Contact: 'tenantId',
   TicketStatus: 'tenantId',
   Ticket: 'tenantId',

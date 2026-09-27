@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto';
-import { prisma, withTenantTx } from '@seredina/db';
+import { prisma, reopenOnCustomerReply, ticketNotificationRecipients, withTenantTx } from '@seredina/db';
 import { emailString, sha256Hex } from '@seredina/shared';
 import { signPurposeToken, verifyPurposeToken } from '../../lib/purposeToken';
 import { contactEmailQueue } from '../../lib/queue';
@@ -9,7 +9,7 @@ import { resolveTenantIdBySlug } from '../tenants/service';
 import { addMessage, createTicketFromApi } from '../tickets/service';
 import { createTicketFromCatalogItem } from '../servicecatalog/service';
 import { createAttachment, getAttachment } from '../attachments/service';
-import { notifyUser } from '../notifications/service';
+import { notifyUser, notifyUsers } from '../notifications/service';
 import { brandedNotice, tenantLanguage } from '../emailtemplates/service';
 
 /**
@@ -214,7 +214,11 @@ export async function requestFromCatalog(session: PortalSession, itemId: string,
   }
 }
 
-/** The contact's follow-up. A reply to a closed ticket reopens it, same as a reply by email. */
+/**
+ * The contact's follow-up. A reply to a resolved or closed ticket reopens it,
+ * same as a reply by email, and tells the assignee (or the team) it was
+ * reopened rather than just "new reply".
+ */
 export async function replyToMyTicket(session: PortalSession, ticketId: string, body: string) {
   const ticket = await withTenantTx(prisma, session.tenantId, (tx) =>
     tx.ticket.findFirst({ where: { id: ticketId, contactId: session.contactId }, include: { status: true } }),
@@ -222,15 +226,19 @@ export async function replyToMyTicket(session: PortalSession, ticketId: string, 
   if (!ticket) throw new PortalError('not found', 404);
 
   const message = await addMessage(session.tenantId, ticketId, { authorType: 'CONTACT', body, isPrivateNote: false });
-  if (ticket.status.category === 'CLOSED') {
-    await withTenantTx(prisma, session.tenantId, async (tx) => {
-      const open = await tx.ticketStatus.findFirst({ where: { key: 'open' } });
-      if (open) await tx.ticket.update({ where: { id: ticketId }, data: { statusId: open.id, closedAt: null } });
+  const { reopened, recipients } = await withTenantTx(prisma, session.tenantId, async (tx) => ({
+    reopened: await reopenOnCustomerReply(tx, ticket),
+    recipients: await ticketNotificationRecipients(tx, ticket),
+  }));
+  const language = await tenantLanguage(session.tenantId);
+  const values = { n: ticket.number, subject: ticket.subject };
+  if (reopened) {
+    await notifyUsers(session.tenantId, recipients, 'TICKET_REOPENED', {
+      ticketId,
+      body: emailString(language, 'notifyReopenedBody', values),
+      subject: emailString(language, 'notifyReopenedSubject', values),
     });
-  }
-  if (ticket.assigneeId) {
-    const language = await tenantLanguage(session.tenantId);
-    const values = { n: ticket.number, subject: ticket.subject };
+  } else if (ticket.assigneeId) {
     await notifyUser(session.tenantId, ticket.assigneeId, 'NEW_REPLY', {
       ticketId,
       body: emailString(language, 'notifyReplyBody', values),

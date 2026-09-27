@@ -378,7 +378,9 @@
     "collisionReply": "{{name}} replied while you were writing. Check their reply before sending yours, so the customer doesn't get two.",
     "collisionNote": "{{name}} added an internal note while you were writing.",
     "collisionCustomer": "{{name}} wrote back while you were writing — read it before sending.",
-    "collisionDismiss": "Got it"
+    "collisionDismiss": "Got it",
+    "mentionHint": "Type @ to mention a colleague",
+    "mentionNobody": "Nobody matches"
   },
   "tour": {
     "stepCount": "Step {{current}} of {{total}}",
@@ -860,14 +862,28 @@
     "title": "Notification Settings",
     "loadFailed": "Failed to load notification settings",
     "saveFailed": "Failed to save",
-    "intro": "How you're told about activity — in-app always shows in the bell, email needs a connected email channel to actually send.",
+    "intro": "How we tell you about activity. In the app it shows in the bell; email needs a connected email channel to go out.",
     "event": "Event",
     "inApp": "In-app",
     "email": "Email",
     "events": {
       "TICKET_ASSIGNED": "A ticket is assigned to me",
       "NEW_REPLY": "A contact replies to a ticket assigned to me",
-      "CONTRACT_EXPIRING": "A contract, warranty or license is about to expire (users who manage assets)"
+      "CONTRACT_EXPIRING": "A contract, warranty or license is about to expire (users who manage assets)",
+      "TEAM_TICKET": "A ticket lands in one of my teams with nobody assigned",
+      "TICKET_REOPENED": "A customer reopens a ticket of mine or my team's",
+      "MENTIONED": "Someone mentions me in an internal note",
+      "SLA_WARNING": "An SLA target on my ticket is about to be missed (80% of the time used)",
+      "SLA_BREACHED": "An SLA target on my ticket was missed"
+    },
+    "useDefault": "Use the workspace default",
+    "fromWorkspace": "Workspace default",
+    "defaultsTitle": "Defaults for the whole workspace",
+    "defaultsIntro": "What everyone gets until they choose for themselves above. Changing a default doesn't override anyone's own choice.",
+    "groups": {
+      "tickets": "Tickets",
+      "sla": "SLA",
+      "assets": "Assets"
     }
   },
   "kbGate": {

@@ -14,6 +14,16 @@ contain breaking changes).
   members; a person can be in several teams. Until now a new workspace had
   only the "General" team and no way to add another. Deleting a team keeps
   its tickets, without a team.
+- **More notifications, and workspace defaults for them**
+  (`docs/adr/0071-teams-and-notification-events.md`).
+  - New events: a ticket lands in my team with nobody assigned; a customer
+    reopens a ticket; someone @mentions me in an internal note; an SLA target
+    is about to be missed (80% of its time used); an SLA target was missed.
+    Ticket events go to the assignee, or to the team when nobody is assigned.
+  - Type `@` in an internal note to mention a colleague.
+  - Admins set what everyone gets, in the app and by email, under
+    Notification settings. Each person can still choose for themselves, and
+    go back to the workspace default.
 - **Branded customer emails in your company's language**
   (`docs/adr/0070-customer-email-templates.md`).
   - Every email to a customer uses your logo, an optional banner and your
@@ -34,6 +44,9 @@ contain breaking changes).
 
 ### Changed
 
+- A customer reply to a **resolved** ticket now reopens it, as a reply to a
+  closed ticket already did. Its first resolution time is kept.
+- Assigning a ticket to yourself no longer sends you a notification.
 - **Nothing customer-facing is in English anymore for a Spanish-language
   company.** These now follow the email language:
   - portal sign-in, password reset and invitation emails;
@@ -47,6 +60,10 @@ contain breaking changes).
   for email and portal ones.
 - The worker needs `WEB_ORIGIN` (already set for `api`) for the portal link
   in emails; `infra/docker-compose.yml` passes it.
+
+### Fixed
+
+- The "contract about to expire" notification preference could not be saved.
 
 ## [0.2.0] - 2026-09-27
 

@@ -1,16 +1,22 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import type { NotificationEventType } from '@seredina/db';
+import { auditRequest } from '../audit/service';
 import { requirePermission } from '../rbac/permissions';
 import {
+  EVENT_TYPES,
   getPreferences,
   getUnreadCount,
+  getWorkspaceDefaults,
   listNotifications,
   markAllNotificationsRead,
   markNotificationRead,
+  resetPreference,
+  setWorkspaceDefault,
   updatePreference,
 } from './service';
 
-const EVENT_TYPE = z.enum(['TICKET_ASSIGNED', 'NEW_REPLY']);
+const EVENT_TYPE = z.enum(EVENT_TYPES as [NotificationEventType, ...NotificationEventType[]]);
 const updatePreferenceSchema = z.object({ inApp: z.boolean().optional(), email: z.boolean().optional() });
 
 // A personal inbox and personal settings -- tickets:read, the same tier
@@ -74,6 +80,41 @@ export default async function notificationRoutes(app: FastifyInstance) {
       }
       const preference = await updatePreference(request.user.tenantId, request.user.sub, eventTypeParsed.data, bodyParsed.data);
       return reply.send(preference);
+    },
+  );
+
+  app.delete(
+    '/notification-preferences/:eventType',
+    { preHandler: [app.authenticate, requirePermission('tickets:read')] },
+    async (request, reply) => {
+      const eventTypeParsed = EVENT_TYPE.safeParse((request.params as { eventType: string }).eventType);
+      if (!eventTypeParsed.success) return reply.code(400).send({ error: 'invalid event type' });
+      await resetPreference(request.user.tenantId, request.user.sub, eventTypeParsed.data);
+      return reply.code(204).send();
+    },
+  );
+
+  // Workspace defaults: what everyone gets until they choose for themselves.
+  // Tenant-wide configuration, so users:manage -- the admin tier that decides
+  // how people are set up (docs/adr/0071-teams-and-notification-events.md).
+  app.get(
+    '/notification-defaults',
+    { preHandler: [app.authenticate, requirePermission('users:manage')] },
+    async (request, reply) => reply.send({ defaults: await getWorkspaceDefaults(request.user.tenantId) }),
+  );
+
+  app.put(
+    '/notification-defaults/:eventType',
+    { preHandler: [app.authenticate, requirePermission('users:manage')] },
+    async (request, reply) => {
+      const eventTypeParsed = EVENT_TYPE.safeParse((request.params as { eventType: string }).eventType);
+      const bodyParsed = updatePreferenceSchema.safeParse(request.body);
+      if (!eventTypeParsed.success || !bodyParsed.success) {
+        return reply.code(400).send({ error: 'invalid event type or body' });
+      }
+      const row = await setWorkspaceDefault(request.user.tenantId, eventTypeParsed.data, bodyParsed.data);
+      await auditRequest(request, 'notification_default.updated', { type: 'notification_default', label: row.eventType }, bodyParsed.data);
+      return reply.send(row);
     },
   );
 }

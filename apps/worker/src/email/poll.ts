@@ -5,7 +5,7 @@ import { emailString } from '@seredina/shared';
 import { ingestInboundEmail, isAutomaticEmail } from './ingest';
 import { tenantLanguage } from '../lib/language';
 import { EmailChannelNeedsReconnectError, resolveMailAuth } from './credentials';
-import { notifyUser } from '../notifications/notify';
+import { notifyUsers } from '../notifications/notify';
 import { redisLock, type Lock } from '../lib/lock';
 
 // Longer than any sane poll of one mailbox; only matters if a replica dies holding it.
@@ -43,7 +43,7 @@ async function pollEmailChannel(channel: EmailChannel): Promise<void> {
             ? [parsed.references]
             : [];
 
-        const { assigneeToNotify } = await ingestInboundEmail({
+        const { replyNotice } = await ingestInboundEmail({
           tenantId: channel.tenantId,
           fromAddress,
           fromName: from?.name || fromAddress,
@@ -62,12 +62,14 @@ async function pollEmailChannel(channel: EmailChannel): Promise<void> {
           })),
         });
 
-        if (assigneeToNotify) {
+        if (replyNotice) {
           const language = await tenantLanguage(channel.tenantId);
-          const values = { n: assigneeToNotify.ticketNumber, subject: assigneeToNotify.ticketSubject };
-          await notifyUser(channel.tenantId, assigneeToNotify.userId, 'NEW_REPLY', {
-            body: emailString(language, 'notifyReplyBody', values),
-            subject: emailString(language, 'notifyReplySubject', values),
+          const values = { n: replyNotice.ticketNumber, subject: replyNotice.ticketSubject };
+          const reopened = replyNotice.event === 'TICKET_REOPENED';
+          await notifyUsers(channel.tenantId, replyNotice.userIds, replyNotice.event, {
+            ticketId: replyNotice.ticketId,
+            body: emailString(language, reopened ? 'notifyReopenedBody' : 'notifyReplyBody', values),
+            subject: emailString(language, reopened ? 'notifyReopenedSubject' : 'notifyReplySubject', values),
           });
         }
 

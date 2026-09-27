@@ -48,6 +48,7 @@ const createFromApiSchema = z.object({
 const addMessageSchema = z.object({
   body: z.string().min(1),
   isPrivateNote: z.boolean().default(false),
+  mentionedUserIds: z.array(z.string().uuid()).max(50).optional(),
 });
 
 const updateTicketSchema = z.object({
@@ -230,7 +231,7 @@ export default async function ticketRoutes(app: FastifyInstance) {
         return reply.code(400).send({ error: parsed.error.flatten() });
       }
       try {
-        const ticket = await updateTicket(request.user.tenantId, id, parsed.data);
+        const ticket = await updateTicket(request.user.tenantId, id, parsed.data, request.user.sub);
         return reply.send(ticket);
       } catch {
         return reply.code(404).send({ error: 'ticket not found' });
