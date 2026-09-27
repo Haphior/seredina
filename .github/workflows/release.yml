@@ -1,0 +1,67 @@
+name: Release
+
+# Publishes a Seredina release: the vX.Y.Z tag on the commit it runs on, and
+# a GitHub release whose notes are that version's CHANGELOG section. Run it
+# by hand (Actions -> Release -> Run workflow) on main with the version, or
+# push a v* tag. It refuses a version that doesn't match package.json or has
+# no CHANGELOG section, so a release always says what it contains.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release, e.g. v0.2.0 (must match package.json)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check the version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          version="${INPUT_VERSION:-$GITHUB_REF_NAME}"
+          echo "$version" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$' || { echo "::error::not a version: $version"; exit 1; }
+          pkg="v$(node -p "require('./package.json').version")"
+          [ "$pkg" = "$version" ] || { echo "::error::package.json says $pkg, not $version"; exit 1; }
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Release notes from CHANGELOG.md
+        run: |
+          # The lines under "## [X.Y.Z]" up to the next "## [" heading.
+          awk -v v="${VERSION#v}" '
+            index($0, "## [" v "]") == 1 { found = 1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md > notes.md
+          [ -s notes.md ] || { echo "::error::CHANGELOG.md has no section for ${VERSION#v}"; exit 1; }
+          cat >> notes.md <<EOF
+
+          ## Install or update
+
+          See the guide, "Updates and backups", in the documentation. In short:
+
+          \`\`\`bash
+          git fetch --tags && git checkout $VERSION
+          docker compose -f infra/docker-compose.yml up -d --build
+          \`\`\`
+
+          Back up the database first. Migrations run on start and only go forward.
+          EOF
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          prerelease=""
+          case "$VERSION" in *-*) prerelease="--prerelease" ;; esac
+          # A pushed tag already exists; a manual run creates it on this commit.
+          gh release create "$VERSION" --target "$GITHUB_SHA" --notes-file notes.md $prerelease \
+            --title "Seredina $VERSION"

@@ -1,12 +1,16 @@
 import { defineConfig } from 'vitepress';
 
+// GitHub Pages serves a project site under /<repository name>/. The Docs
+// workflow passes it, so renaming the repository doesn't break the site.
+const base = process.env.DOCS_BASE || '/helpdesk-seredina/';
+
 export default defineConfig({
   title: 'Seredina',
   description: 'Open-source ITSM that meets you in the middle.',
-  base: '/helpdesk-seredina/',
+  base,
   cleanUrls: true,
 
-  head: [['link', { rel: 'icon', type: 'image/svg+xml', href: '/helpdesk-seredina/favicon.svg' }]],
+  head: [['link', { rel: 'icon', type: 'image/svg+xml', href: `${base}favicon.svg` }]],
 
   locales: {
     root: {

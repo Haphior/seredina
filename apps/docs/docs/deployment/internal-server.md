@@ -39,7 +39,7 @@ browsers visit it.
 
 ```bash
 sudo mkdir -p /opt/seredina && sudo chown "$USER" /opt/seredina
-git clone https://github.com/Haphior/helpdesk-seredina.git /opt/seredina
+git clone --branch v0.2.0 https://github.com/Haphior/helpdesk-seredina.git /opt/seredina
 cd /opt/seredina
 ./scripts/setup.sh
 ```
@@ -172,8 +172,22 @@ Before going live, **restore a backup on a test machine** and sign in to it.
 
 ## 9. Updates
 
-Follow [Updating your instance](/deployment/updates-and-backups#updating-your-instance).
-Take a backup just before, and update outside working hours.
+Install and update by release tag, never from `main`: each release lists
+its changes on the
+[releases page](https://github.com/Haphior/helpdesk-seredina/releases).
+Follow [Updating your instance](/deployment/updates-and-backups#updating-your-instance):
+
+1. Read the notes.
+2. Take a backup.
+3. Run `git checkout <new version>` and `docker compose ... up -d --build`.
+4. Check that `/api/health` shows the new version.
+
+Update outside working hours. The same page explains how to roll back.
+
+Agents update separately, without enrollment tokens: run
+`seredina-agent update` on each computer, from your management tool if
+you have many. See
+[Updating the agents](/deployment/updates-and-backups#updating-the-agents).
 
 ## Go-live checklist
 

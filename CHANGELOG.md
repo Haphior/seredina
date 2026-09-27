@@ -7,7 +7,19 @@ contain breaking changes).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-27
+
+The first release meant for production use on a company server. See
+[Production on a company server](https://github.com/Haphior/helpdesk-seredina/blob/main/apps/docs/docs/deployment/internal-server.md)
+and [Updates and backups](https://github.com/Haphior/helpdesk-seredina/blob/main/apps/docs/docs/deployment/updates-and-backups.md).
+
 ### Added
+
+- **Versioned releases.**
+  - Install and update by release tag instead of following `main`.
+  - `/api/health` reports the running version (`{"status":"ok","version":"0.2.0"}`).
+  - A Release workflow publishes a tag with its CHANGELOG section as the
+    release notes.
 
 - **Full agent inventory, for workstations and servers**
   (`docs/adr/0069-full-agent-inventory.md`, agent v0.2.0). The agent
@@ -165,6 +177,10 @@ contain breaking changes).
 
 ### Changed
 
+- CI uses the Node 24 versions of the GitHub actions (checkout@v7,
+  setup-node@v7, cache@v6, and the Pages actions).
+- The docs site's base path follows the repository's name, so renaming
+  the repository doesn't break it.
 - The backup guide now uses `pg_dump -Fc` with a cron example, documents a
   restore procedure that re-creates the `app_tenant` role and RLS policies,
   and lists everything `ENCRYPTION_KEY` protects (OAuth tokens, SSO and MFA
@@ -189,6 +205,10 @@ contain breaking changes).
 
 ### Fixed
 
+- The restore procedure said `docker compose down -v`, which also deletes
+  `caddy_data`. With the `internal` TLS mode that regenerates the CA, and
+  browsers and every agent stop trusting the server. It now removes only
+  the database volume.
 - The `api`, `worker` and `mcp-server` Docker images failed to build: they
   import `@seredina/ai-adapters` but never copied it into the image.
 - The Docker images didn't run against the database: the slim Node base
@@ -293,5 +313,6 @@ production by anyone outside this project, hence alpha.
   `[tenantId, createdAt]`) after a real Lighthouse-against-production-build
   performance pass.
 
-[Unreleased]: https://github.com/Haphior/helpdesk-seredina/compare/v0.1.0-alpha.1...HEAD
+[Unreleased]: https://github.com/Haphior/helpdesk-seredina/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/Haphior/helpdesk-seredina/compare/v0.1.0-alpha.1...v0.2.0
 [0.1.0-alpha.1]: https://github.com/Haphior/helpdesk-seredina/releases/tag/v0.1.0-alpha.1
