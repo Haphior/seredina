@@ -7,6 +7,25 @@ contain breaking changes).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-27
+
+### Upgrading from 0.2.0
+
+Follow [Updating to a new release](https://github.com/Haphior/seredina/blob/main/apps/docs/docs/deployment/updates-and-backups.md):
+back up, `git checkout v0.3.0`, `docker compose -f infra/docker-compose.yml up -d --build`.
+
+- Four database migrations run automatically (teams' members, notification
+  defaults and events, customer email templates, first-run setup). They only
+  add tables and columns: the upgrade from 0.2.0 was checked with data
+  (`docs/adr/0074-upgrade-check.md`).
+- Administrators see a reminder on the dashboard to go through the new
+  initial setup; "It's already set up" dismisses it. Choosing Spanish there
+  renames the four default statuses (Open → Abierto...) unless you renamed
+  them yourself.
+- Existing workspaces switch to Spanish customer emails; set the language to
+  English under Settings → Customer emails to keep English.
+- Installed agents need nothing.
+
 ### Added
 
 - **Every change is checked against an upgrade from the previous release**
@@ -425,6 +444,7 @@ production by anyone outside this project, hence alpha.
   `[tenantId, createdAt]`) after a real Lighthouse-against-production-build
   performance pass.
 
-[Unreleased]: https://github.com/Haphior/helpdesk-seredina/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/Haphior/seredina/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/Haphior/seredina/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Haphior/helpdesk-seredina/compare/v0.1.0-alpha.1...v0.2.0
 [0.1.0-alpha.1]: https://github.com/Haphior/helpdesk-seredina/releases/tag/v0.1.0-alpha.1
