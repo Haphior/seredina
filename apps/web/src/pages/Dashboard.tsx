@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { apiGet, apiPut, ApiError } from '../lib/api';
+import { apiGet, apiPost, apiPut, ApiError } from '../lib/api';
 import { useAuth } from '../auth/AuthContext';
 import type {
   AgentWorkloadReport,
@@ -47,6 +47,20 @@ interface DashboardData {
 
 export function Dashboard() {
   const { t } = useTranslation();
+  const { hasPermission } = useAuth();
+  // Admins of a workspace that hasn't finished (or skipped) the setup wizard
+  // get a way back to it (docs/adr/0072-first-run-setup.md).
+  const [setupPending, setSetupPending] = useState(false);
+  useEffect(() => {
+    if (!hasPermission('tickets:manage_all')) return;
+    apiGet<{ completed: boolean }>('/setup')
+      .then((s) => setSetupPending(!s.completed))
+      .catch(() => {});
+  }, [hasPermission]);
+  async function dismissSetup() {
+    setSetupPending(false);
+    await apiPost('/setup/complete', {}).catch(() => {});
+  }
   const [prefs, setPrefs] = useState<DashboardPref[] | null>(null);
   const [data, setData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -180,6 +194,20 @@ export function Dashboard() {
         )}
       </div>
 
+      {setupPending && (
+        <div className="mb-5 flex flex-wrap items-center gap-3 rounded-xl border border-indigo-200 bg-indigo-50 px-5 py-4">
+          <div className="min-w-0 flex-1">
+            <p className="text-[14.5px] font-semibold text-indigo-900">{t('setup.banner.title')}</p>
+            <p className="text-[13px] text-indigo-800/80">{t('setup.banner.body')}</p>
+          </div>
+          <button onClick={dismissSetup} className="text-[12.5px] font-medium text-indigo-700/70 hover:text-indigo-900">
+            {t('setup.banner.dismiss')}
+          </button>
+          <Link to="/setup" className="rounded-lg bg-indigo-600 px-4 py-2 text-[13px] font-semibold text-white hover:bg-indigo-700">
+            {t('setup.banner.continue')}
+          </Link>
+        </div>
+      )}
       {error && <p className="mb-4 text-sm text-rose-600">{error}</p>}
       {(!prefs || !data) && !error && <p className="text-sm text-slate-500">{t('dashboard.loading')}</p>}
 

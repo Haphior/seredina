@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { apiDelete, apiGet, apiPost, ApiError } from '../lib/api';
 import type { EmailAuthType, EmailChannel } from '../lib/types';
 import { Modal } from '../components/Modal';
@@ -33,6 +33,24 @@ export function EmailChannels() {
   }
 
   useEffect(load, [t]);
+
+  // The setup wizard opens this page with ?new=<authType>&from=setup. The
+  // origin is kept in sessionStorage because an OAuth round trip to the
+  // provider drops the query string.
+  const [initialAuthType, setInitialAuthType] = useState<EmailAuthType | undefined>(undefined);
+  const [fromSetup, setFromSetup] = useState(() => readSetupReturn());
+  useEffect(() => {
+    const requested = params.get('new');
+    if (params.get('from') === 'setup') {
+      writeSetupReturn(true);
+      setFromSetup(true);
+    }
+    if (requested === 'password' || requested === 'google_oauth' || requested === 'microsoft_oauth') {
+      setInitialAuthType(requested);
+      setShowCreate(true);
+    }
+    if (params.has('new') || params.has('from')) setParams({}, { replace: true });
+  }, [params, setParams]);
 
   // The provider's callback lands back here with ?oauth=connected or ?oauth_error=...
   useEffect(() => {
@@ -68,6 +86,18 @@ export function EmailChannels() {
       </div>
       <p className="mb-5 text-[13.5px] text-slate-500">{t('emailChannels.intro')}</p>
 
+      {fromSetup && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-indigo-100 bg-indigo-50 px-4 py-2.5 text-[13px] text-indigo-800">
+          <span>{t('emailChannels.fromSetup')}</span>
+          <Link
+            to="/setup?step=email"
+            onClick={() => writeSetupReturn(false)}
+            className="font-semibold text-indigo-700 hover:underline"
+          >
+            {t('emailChannels.backToSetup')}
+          </Link>
+        </div>
+      )}
       {notice && <p className="mb-4 text-sm text-emerald-700">{notice}</p>}
       {error && <p className="mb-4 text-sm text-rose-600">{error}</p>}
 
@@ -128,7 +158,7 @@ export function EmailChannels() {
       )}
 
       {showCreate && (
-        <CreateChannelModal redirectUri={redirectUri} onClose={() => setShowCreate(false)} onCreated={load} />
+        <CreateChannelModal redirectUri={redirectUri} initialAuthType={initialAuthType} onClose={() => setShowCreate(false)} onCreated={load} />
       )}
     </div>
   );
@@ -145,17 +175,55 @@ function StatusBadge({ status }: { status: EmailChannel['connectionStatus'] }) {
   return <span className={`rounded-full px-2 py-0.5 text-[11.5px] font-semibold ${tone}`}>{t(`emailChannels.statusValue.${status}`)}</span>;
 }
 
+const SETUP_RETURN_KEY = 'seredina.setupReturn';
+
+function readSetupReturn(): boolean {
+  try {
+    return sessionStorage.getItem(SETUP_RETURN_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function writeSetupReturn(on: boolean) {
+  try {
+    if (on) sessionStorage.setItem(SETUP_RETURN_KEY, '1');
+    else sessionStorage.removeItem(SETUP_RETURN_KEY);
+  } catch {
+    // Only the "back to setup" link depends on it.
+  }
+}
+
+/**
+ * IMAP/SMTP servers of common providers, guessed from the address's domain
+ * so a password-based mailbox usually needs only the address and password.
+ */
+const KNOWN_PROVIDERS: { domains: string[]; imap: string; smtp: string; smtpPort: string; smtpSecure: boolean }[] = [
+  { domains: ['gmail.com', 'googlemail.com'], imap: 'imap.gmail.com', smtp: 'smtp.gmail.com', smtpPort: '465', smtpSecure: true },
+  { domains: ['outlook.com', 'hotmail.com', 'live.com', 'msn.com'], imap: 'outlook.office365.com', smtp: 'smtp.office365.com', smtpPort: '587', smtpSecure: false },
+  { domains: ['yahoo.com', 'yahoo.es'], imap: 'imap.mail.yahoo.com', smtp: 'smtp.mail.yahoo.com', smtpPort: '465', smtpSecure: true },
+  { domains: ['icloud.com', 'me.com'], imap: 'imap.mail.me.com', smtp: 'smtp.mail.me.com', smtpPort: '587', smtpSecure: false },
+  { domains: ['zoho.com'], imap: 'imap.zoho.com', smtp: 'smtp.zoho.com', smtpPort: '465', smtpSecure: true },
+];
+
+function providerFor(address: string) {
+  const domain = address.split('@')[1]?.trim().toLowerCase();
+  return domain ? KNOWN_PROVIDERS.find((p) => p.domains.includes(domain)) : undefined;
+}
+
 function CreateChannelModal({
   redirectUri,
+  initialAuthType,
   onClose,
   onCreated,
 }: {
   redirectUri: string | null;
+  initialAuthType?: EmailAuthType;
   onClose: () => void;
   onCreated: () => void;
 }) {
   const { t } = useTranslation();
-  const [authType, setAuthType] = useState<EmailAuthType>('microsoft_oauth');
+  const [authType, setAuthType] = useState<EmailAuthType>(initialAuthType ?? 'microsoft_oauth');
   const [name, setName] = useState('');
   const [fromAddress, setFromAddress] = useState('');
   // OAuth
@@ -243,6 +311,19 @@ function CreateChannelModal({
           type="email"
           value={fromAddress}
           onChange={(e) => setFromAddress(e.target.value)}
+          onBlur={() => {
+            // Fill in a known provider's servers, and the address as the login, without touching anything typed.
+            const provider = authType === 'password' ? providerFor(fromAddress) : undefined;
+            if (!provider) return;
+            if (!imapHost) setImapHost(provider.imap);
+            if (!smtpHost) {
+              setSmtpHost(provider.smtp);
+              setSmtpPort(provider.smtpPort);
+              setSmtpSecure(provider.smtpSecure);
+            }
+            if (!imapUsername) setImapUsername(fromAddress.trim());
+            if (!smtpUsername) setSmtpUsername(fromAddress.trim());
+          }}
           required
         />
 

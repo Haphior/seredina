@@ -129,7 +129,8 @@
       "customerEmails": "Customer Emails",
       "teams": "Teams",
       "settings": "Settings",
-      "notificationSettings": "Notifications"
+      "notificationSettings": "Notifications",
+      "setup": "Initial setup"
     }
   },
   "layout": {
@@ -504,7 +505,9 @@
     "port": "Port",
     "username": "Username",
     "password": "Password",
-    "useTls": "Use TLS"
+    "useTls": "Use TLS",
+    "fromSetup": "Connecting a mailbox as part of the initial setup.",
+    "backToSetup": "Back to setup →"
   },
   "auditLog": {
     "title": "Audit Log",
@@ -2185,7 +2188,170 @@
       "aiAgentActivity": "What the AI agent did on its own, for review.",
       "appearance": "The console's look.",
       "branding": "Your name, logo and colors on public pages.",
-      "dataExport": "Download your workspace's data."
+      "dataExport": "Download your workspace's data.",
+      "setup": "The five-step wizard: organization, email, kind of support, team."
+    }
+  },
+  "setup": {
+    "kicker": "Initial setup",
+    "title": "Get your help desk ready",
+    "intro": "Five short steps. Skip any of them and change everything later in Settings.",
+    "skipAll": "Skip setup",
+    "progress": "Setup steps",
+    "loadFailed": "Couldn't load setup.",
+    "saveFailed": "Couldn't save.",
+    "saveAndContinue": "Save and continue",
+    "continue": "Continue",
+    "later": "I'll do it later",
+    "steps": {
+      "organization": {
+        "short": "Organization",
+        "title": "Your organization",
+        "body": "The name your customers see, the language you write to them in, and your working hours."
+      },
+      "email": {
+        "short": "Email",
+        "title": "Connect your support mailbox",
+        "body": "Email arriving in this mailbox becomes tickets, and your replies go out from it."
+      },
+      "template": {
+        "short": "Kind of support",
+        "title": "What kind of support do you do?",
+        "body": "Pick a starting point and we'll create teams, categories, SLA targets, saved replies and a request catalog."
+      },
+      "team": {
+        "short": "Team",
+        "title": "Invite your team",
+        "body": "Each person gets an email to choose their password."
+      },
+      "done": {
+        "short": "Done",
+        "title": "All set!",
+        "body": "Here's what's set up. You can come back to any step from Settings."
+      }
+    },
+    "organization": {
+      "name": "Organization name",
+      "language": "Language",
+      "languageHint": "For emails to your customers and the default names of statuses and categories. Everyone can use the console in their own language.",
+      "hours": "Working hours",
+      "timezone": "Time zone"
+    },
+    "schedules": {
+      "office": {
+        "title": "Office",
+        "body": "Monday to Friday, 9:00 to 18:00"
+      },
+      "early": {
+        "title": "Early day",
+        "body": "Monday to Friday, 8:00 to 17:30"
+      },
+      "shifts": {
+        "title": "Shifts",
+        "body": "Monday to Saturday, around the clock"
+      },
+      "always": {
+        "title": "24/7",
+        "body": "Every day, around the clock"
+      },
+      "none": {
+        "title": "Decide later",
+        "body": "SLA targets count every hour"
+      },
+      "keep": "Keep the hours you already have"
+    },
+    "email": {
+      "other": "Another provider",
+      "oauthHint": "You sign in with your account; no password is stored.",
+      "passwordHint": "With a username and password (IMAP/SMTP).",
+      "why": "Without a mailbox, no requests arrive by email, your replies don't reach customers, and invitations and email notifications can't be sent.",
+      "connected_one": "You have {{count}} mailbox connected.",
+      "connected_other": "You have {{count}} mailboxes connected.",
+      "manage": "Manage"
+    },
+    "templates": {
+      "it_internal": {
+        "title": "Internal IT / help desk",
+        "body": "Support for your company's employees: computers, accounts, access and network.",
+        "includes": [
+          "Level 1, Level 2 and Networks",
+          "Categories: hardware, software, access…",
+          "Catalog: new computer, access, new employee",
+          "Office-hours SLAs"
+        ]
+      },
+      "customer_support": {
+        "title": "Customer support",
+        "body": "You handle your customers' questions, complaints and problems.",
+        "includes": [
+          "Customer service, Technical support and Billing",
+          "Categories: question, complaint, billing…",
+          "Catalog: report a problem, billing, changes",
+          "Replies: \"We're looking into it\", ask for details…"
+        ]
+      },
+      "manufacturing": {
+        "title": "Plant / manufacturing",
+        "body": "Machine faults, maintenance, quality and plant systems.",
+        "includes": [
+          "Maintenance, Plant IT and Quality",
+          "Categories: machine down, electrical fault…",
+          "\"Line or area\" field",
+          "10-minute urgent SLA"
+        ]
+      }
+    },
+    "template": {
+      "note": "Everything created can be renamed or deleted. Anything you already have with the same name is left alone.",
+      "apply": "Create with this template",
+      "created": "Created {{teams}} teams, {{slaPolicies}} SLA targets, {{macros}} saved replies, {{customFields}} fields and {{catalogItems}} catalog items."
+    },
+    "team": {
+      "needsMailbox": "To send invitations, connect a mailbox first. You can also create accounts with an initial password under",
+      "usersPage": "Settings → Users",
+      "people": "People (one per line)",
+      "peopleHint_one": "{{count}} person",
+      "peopleHint_other": "{{count}} people",
+      "role": "Role",
+      "team": "Team",
+      "noTeam": "None",
+      "invite_one": "Invite {{count}} person",
+      "invite_other": "Invite {{count}} people"
+    },
+    "done": {
+      "checks": {
+        "organization": "Name and language",
+        "hours": "Working hours",
+        "email": "Mailbox",
+        "template": "Teams, categories, SLAs and catalog",
+        "team": "Your team"
+      },
+      "nextTitle": "Next steps",
+      "next": {
+        "agent": {
+          "title": "Install the agent on computers",
+          "body": "Automatic hardware and software inventory."
+        },
+        "portal": {
+          "title": "Turn on the customer portal",
+          "body": "So customers can follow their requests themselves."
+        },
+        "emails": {
+          "title": "Customize emails",
+          "body": "Your logo, signature and wording."
+        },
+        "appearance": {
+          "title": "Choose the appearance",
+          "body": "The console's theme."
+        }
+      },
+      "finish": "Go to the dashboard"
+    },
+    "banner": {
+      "title": "Finish setting up your organization",
+      "body": "Connect your email, pick your kind of support and invite your team in a few minutes.",
+      "continue": "Continue",
+      "dismiss": "It's already set up"
     }
   }
 }

@@ -30,6 +30,22 @@ export async function seedDefaultTicketStatuses(tx: Prisma.TransactionClient, te
   return statuses;
 }
 
+/**
+ * Switches the four seeded statuses to `language` -- but only those still
+ * named exactly as seeded, in either language, so a name an admin chose is
+ * never overwritten. Used when a workspace changes its language
+ * (docs/adr/0072-first-run-setup.md).
+ */
+export async function translateSeededStatusLabels(tx: Prisma.TransactionClient, language: EmailLanguage) {
+  for (const seeded of DEFAULT_TICKET_STATUSES) {
+    const defaults = Object.values(seeded.label);
+    await tx.ticketStatus.updateMany({
+      where: { key: seeded.key, label: { in: defaults } },
+      data: { label: seeded.label[language] },
+    });
+  }
+}
+
 export interface CreateTicketFromApiInput {
   subject: string;
   body: string;

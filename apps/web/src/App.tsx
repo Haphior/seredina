@@ -25,6 +25,7 @@ const AssetDetail = lazy(() => import('./pages/AssetDetail').then((m) => ({ defa
 const Users = lazy(() => import('./pages/Users').then((m) => ({ default: m.Users })));
 const Teams = lazy(() => import('./pages/Teams').then((m) => ({ default: m.Teams })));
 const Settings = lazy(() => import('./pages/Settings').then((m) => ({ default: m.Settings })));
+const Setup = lazy(() => import('./pages/Setup').then((m) => ({ default: m.Setup })));
 const Roles = lazy(() => import('./pages/Roles').then((m) => ({ default: m.Roles })));
 const CustomerPortal = lazy(() => import('./pages/CustomerPortal').then((m) => ({ default: m.CustomerPortal })));
 const CustomerPortalAuth = lazy(() => import('./pages/CustomerPortal').then((m) => ({ default: m.CustomerPortalAuth })));
@@ -115,6 +116,7 @@ export function App() {
               <Route path="/users" element={<Users />} />
               <Route path="/teams" element={<Teams />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/setup" element={<Setup />} />
               <Route path="/roles" element={<Roles />} />
               <Route path="/email-channels" element={<EmailChannels />} />
               <Route path="/audit-log" element={<AuditLog />} />

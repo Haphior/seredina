@@ -129,7 +129,8 @@
       "customerEmails": "Correos al cliente",
       "teams": "Equipos",
       "settings": "Ajustes",
-      "notificationSettings": "Notificaciones"
+      "notificationSettings": "Notificaciones",
+      "setup": "Configuración inicial"
     }
   },
   "layout": {
@@ -504,7 +505,9 @@
     "port": "Puerto",
     "username": "Usuario",
     "password": "Contraseña",
-    "useTls": "Usar TLS"
+    "useTls": "Usar TLS",
+    "fromSetup": "Estás conectando un buzón como parte de la configuración inicial.",
+    "backToSetup": "Volver al asistente →"
   },
   "auditLog": {
     "title": "Registro de auditoría",
@@ -2185,7 +2188,170 @@
       "aiAgentActivity": "Lo que hizo el agente de IA por su cuenta, para revisar.",
       "appearance": "El aspecto de la consola.",
       "branding": "Tu nombre, logo y colores en las páginas públicas.",
-      "dataExport": "Descarga los datos de tu organización."
+      "dataExport": "Descarga los datos de tu organización.",
+      "setup": "El asistente de cinco pasos: organización, correo, tipo de soporte y equipo."
+    }
+  },
+  "setup": {
+    "kicker": "Configuración inicial",
+    "title": "Deja tu mesa de ayuda lista",
+    "intro": "Cinco pasos cortos. Puedes saltar cualquiera y cambiar todo después en Ajustes.",
+    "skipAll": "Saltar el asistente",
+    "progress": "Pasos de la configuración",
+    "loadFailed": "No se pudo cargar la configuración.",
+    "saveFailed": "No se pudo guardar.",
+    "saveAndContinue": "Guardar y continuar",
+    "continue": "Continuar",
+    "later": "Lo hago después",
+    "steps": {
+      "organization": {
+        "short": "Organización",
+        "title": "Tu organización",
+        "body": "El nombre que ven tus clientes, el idioma en que les escribes y tu horario de trabajo."
+      },
+      "email": {
+        "short": "Correo",
+        "title": "Conecta tu buzón de soporte",
+        "body": "Los correos que lleguen a este buzón se convierten en tickets, y tus respuestas salen desde él."
+      },
+      "template": {
+        "short": "Tipo de soporte",
+        "title": "¿Qué tipo de soporte das?",
+        "body": "Elige un punto de partida y creamos equipos, categorías, plazos de SLA, respuestas guardadas y un catálogo de solicitudes."
+      },
+      "team": {
+        "short": "Equipo",
+        "title": "Invita a tu equipo",
+        "body": "Cada persona recibe un correo para elegir su contraseña."
+      },
+      "done": {
+        "short": "Listo",
+        "title": "¡Todo listo!",
+        "body": "Esto es lo que quedó configurado. Puedes volver a cualquier paso desde Ajustes."
+      }
+    },
+    "organization": {
+      "name": "Nombre de la organización",
+      "language": "Idioma",
+      "languageHint": "El de los correos a tus clientes y los nombres por defecto de estados y categorías. Cada persona puede usar la consola en su propio idioma.",
+      "hours": "Horario de atención",
+      "timezone": "Zona horaria"
+    },
+    "schedules": {
+      "office": {
+        "title": "Oficina",
+        "body": "Lunes a viernes, 9:00 a 18:00"
+      },
+      "early": {
+        "title": "Jornada temprana",
+        "body": "Lunes a viernes, 8:00 a 17:30"
+      },
+      "shifts": {
+        "title": "Turnos",
+        "body": "Lunes a sábado, las 24 horas"
+      },
+      "always": {
+        "title": "24/7",
+        "body": "Todos los días, las 24 horas"
+      },
+      "none": {
+        "title": "Lo defino después",
+        "body": "Los plazos de SLA cuentan todas las horas"
+      },
+      "keep": "Mantener el horario que ya tienes"
+    },
+    "email": {
+      "other": "Otro proveedor",
+      "oauthHint": "Inicias sesión con tu cuenta; no guardamos contraseñas.",
+      "passwordHint": "Con usuario y contraseña (IMAP/SMTP).",
+      "why": "Sin un buzón conectado no llegan solicitudes por correo, tus respuestas no les llegan a los clientes y no se pueden enviar invitaciones ni avisos por correo.",
+      "connected_one": "Tienes {{count}} buzón conectado.",
+      "connected_other": "Tienes {{count}} buzones conectados.",
+      "manage": "Administrar"
+    },
+    "templates": {
+      "it_internal": {
+        "title": "TI interno / mesa de ayuda",
+        "body": "Soporte a los colaboradores de tu empresa: equipos, cuentas, accesos y red.",
+        "includes": [
+          "Soporte N1, N2 y Redes",
+          "Categorías: hardware, software, accesos…",
+          "Catálogo: equipo nuevo, accesos, ingreso de colaborador",
+          "SLA de oficina"
+        ]
+      },
+      "customer_support": {
+        "title": "Soporte a clientes",
+        "body": "Atiendes consultas, reclamos y problemas de tus clientes.",
+        "includes": [
+          "Atención, Soporte técnico y Facturación",
+          "Categorías: consulta, reclamo, facturación…",
+          "Catálogo: reportar problema, facturación, cambios",
+          "Respuestas: «Estamos revisando», pedir datos…"
+        ]
+      },
+      "manufacturing": {
+        "title": "Planta / manufactura",
+        "body": "Fallas de máquinas, mantención, calidad y sistemas de la planta.",
+        "includes": [
+          "Mantención, TI planta y Calidad",
+          "Categorías: máquina detenida, falla eléctrica…",
+          "Campo «Línea o área»",
+          "SLA urgente de 10 minutos"
+        ]
+      }
+    },
+    "template": {
+      "note": "Todo lo que se crea se puede renombrar o borrar. Si ya tienes algo con el mismo nombre, no se toca.",
+      "apply": "Crear con esta plantilla",
+      "created": "Creamos {{teams}} equipos, {{slaPolicies}} plazos de SLA, {{macros}} respuestas guardadas, {{customFields}} campos y {{catalogItems}} ítems del catálogo."
+    },
+    "team": {
+      "needsMailbox": "Para enviar invitaciones primero conecta un buzón de correo. También puedes crear cuentas con una contraseña inicial en",
+      "usersPage": "Ajustes → Usuarios",
+      "people": "Personas (una por línea)",
+      "peopleHint_one": "{{count}} persona",
+      "peopleHint_other": "{{count}} personas",
+      "role": "Rol",
+      "team": "Equipo",
+      "noTeam": "Ninguno",
+      "invite_one": "Invitar a {{count}} persona",
+      "invite_other": "Invitar a {{count}} personas"
+    },
+    "done": {
+      "checks": {
+        "organization": "Nombre e idioma",
+        "hours": "Horario de atención",
+        "email": "Buzón de correo",
+        "template": "Equipos, categorías, SLA y catálogo",
+        "team": "Tu equipo"
+      },
+      "nextTitle": "Siguientes pasos",
+      "next": {
+        "agent": {
+          "title": "Instalar el agente en los equipos",
+          "body": "Inventario automático de hardware y software."
+        },
+        "portal": {
+          "title": "Activar el portal de clientes",
+          "body": "Para que sigan sus solicitudes sin escribirte."
+        },
+        "emails": {
+          "title": "Personalizar los correos",
+          "body": "Tu logo, firma y textos."
+        },
+        "appearance": {
+          "title": "Elegir la apariencia",
+          "body": "El tema de la consola."
+        }
+      },
+      "finish": "Ir al panel"
+    },
+    "banner": {
+      "title": "Termina de configurar tu organización",
+      "body": "Conecta tu correo, elige tu tipo de soporte e invita a tu equipo en pocos minutos.",
+      "continue": "Continuar",
+      "dismiss": "Ya está configurado"
     }
   }
 }

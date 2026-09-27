@@ -25,7 +25,8 @@ export function Register() {
     setSubmitting(true);
     try {
       await register({ tenantSlug, tenantName, adminEmail, adminName, password, language: i18n.language === 'es' ? 'es' : 'en' });
-      navigate('/dashboard');
+      // A brand-new workspace starts at the setup wizard (docs/adr/0072-first-run-setup.md).
+      navigate('/setup');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : t('auth.register.failed'));
     } finally {

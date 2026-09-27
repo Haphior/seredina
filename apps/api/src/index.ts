@@ -17,6 +17,7 @@ import authRoutes from './modules/auth/routes';
 import apiKeyRoutes from './modules/apikeys/routes';
 import ticketRoutes from './modules/tickets/routes';
 import teamRoutes from './modules/teams/routes';
+import setupRoutes from './modules/setup/routes';
 import assetRoutes from './modules/assets/routes';
 import discoveryRoutes from './modules/discovery/routes';
 import emailChannelRoutes from './modules/emailchannels/routes';
@@ -126,6 +127,7 @@ export function buildApp() {
   app.register(apiKeyRoutes);
   app.register(ticketRoutes);
   app.register(teamRoutes);
+  app.register(setupRoutes);
   app.register(assetRoutes);
   app.register(discoveryRoutes);
   app.register(emailChannelRoutes);

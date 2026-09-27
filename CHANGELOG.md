@@ -9,6 +9,20 @@ contain breaking changes).
 
 ### Added
 
+- **First-run setup** (`docs/adr/0072-first-run-setup.md`): after
+  registering, five skippable steps take a workspace from empty to usable:
+  - organization name, language and working hours (presets and time zone);
+  - connect the support mailbox;
+  - pick a kind of support: internal IT, customer support or
+    plant/manufacturing. Each one creates teams, a Category field, SLA
+    targets, saved replies and service catalog items, in your language,
+    without touching anything you already have;
+  - invite your team from a pasted list;
+  - a summary with next steps.
+  Admins of a workspace that hasn't finished it see a reminder on the
+  dashboard; Settings → Initial setup reopens it.
+- Connecting a mailbox with a password fills in the servers of Gmail,
+  Outlook.com, Yahoo, iCloud and Zoho from the address.
 - **Teams you can manage** (`docs/adr/0071-teams-and-notification-events.md`).
   Administration → Teams creates, renames and deletes teams and sets their
   members; a person can be in several teams. Until now a new workspace had

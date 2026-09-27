@@ -18,13 +18,39 @@ only one organization can register — this is intentional, see
 [Cloud mode](/deployment/cloud-mode) if you need more than one.
 :::
 
+## Initial setup
+
+Right after you register, the console opens a five-step setup. Every step
+can be skipped, and **Settings → Initial setup** reopens it later.
+
+1. **Your organization** — its name, its language (for emails to
+   customers and the default names of statuses and categories) and your
+   working hours, from presets like "Monday to Friday, 9:00 to 18:00" or
+   "24/7", with the time zone. Switching the language renames the default
+   statuses, unless you've already renamed them yourself.
+2. **Email** — connect the support mailbox: Microsoft 365 or Google with
+   their sign-in, or any other provider with a username and password. For
+   common providers (Gmail, Outlook.com, Yahoo, iCloud, Zoho) the servers
+   are filled in from the address.
+3. **Kind of support** — pick *Internal IT*, *Customer support* or
+   *Plant / manufacturing*. Seredina creates teams, a **Category** field
+   with fitting options, SLA targets for each priority, saved replies
+   (macros), and service catalog items. Anything you already have with the
+   same name is left alone, so it's safe on a workspace that's in use.
+4. **Team** — paste a list of people, one per line (`Ana Pérez
+   <ana@company.com>` or just the address), pick their role and team, and
+   invite them all. Invitations need the mailbox from step 2.
+5. **Done** — what's set up, and what to do next.
+
+Until the setup is finished or skipped, administrators see a reminder at
+the top of the dashboard.
+
 ## The getting-started checklist
 
-The first time you log in, the dashboard shows a "Get started" widget
-with four tasks: customize your ticket statuses, set an SLA policy,
-create a macro, and invite a teammate. It's not mandatory to complete in
-order — it's a guide, not a forced flow — and you can hide it at any time
-with the eye icon in the widget's corner.
+The dashboard also shows a "Get started" widget: connect a mailbox,
+customize your ticket statuses, set an SLA policy, create a macro, and
+invite a teammate. It's a guide, not a forced flow, and you can hide it at
+any time with the eye icon in the widget's corner.
 
 ## Inviting your team
 

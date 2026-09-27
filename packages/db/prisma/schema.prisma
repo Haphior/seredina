@@ -107,6 +107,12 @@ model Tenant {
   teamMembers    TeamMember[]
   notificationDefaults TenantNotificationDefault[]
 
+  // First-run setup wizard (docs/adr/0072-first-run-setup.md). Null = not
+  // finished yet, so the console offers it; setupTemplate records which
+  // starting template was applied, if any.
+  setupCompletedAt DateTime? @map("setup_completed_at")
+  setupTemplate    String?   @map("setup_template")
+
   // Customer portal (docs/adr/0065-customer-portal.md): contacts sign in with
   // an emailed link to follow and reply to their own tickets. Off by default.
   customerPortalEnabled Boolean @default(false) @map("customer_portal_enabled")
