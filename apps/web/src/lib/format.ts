@@ -1,3 +1,4 @@
+import { uiLocale } from '../i18n';
 import type { BadgeTone } from '../components/Badge';
 import type { ChangeRiskLevel, ProblemStatus, Ticket, TicketPriority, TicketStatusCategory } from './types';
 
@@ -29,7 +30,7 @@ export const PROBLEM_STATUS_TONE: Record<ProblemStatus, BadgeTone> = {
 };
 
 export function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString();
+  return new Date(iso).toLocaleString(uiLocale(), { dateStyle: 'short', timeStyle: 'short' });
 }
 
 // A milestone is overdue when its due-at has passed and the matching "met"
@@ -47,4 +48,15 @@ export function isResolutionOverdue(ticket: Ticket): boolean {
 
 export function isTicketOverdue(ticket: Ticket): boolean {
   return isFirstResponseOverdue(ticket) || isResolutionOverdue(ticket);
+}
+
+const BUILTIN_ROLE_KEYS = new Set(['admin', 'team_lead', 'agent']);
+
+/**
+ * A role's display name. The three built-in roles are seeded with their key
+ * as their name; until an admin renames one, show it in the console's
+ * language instead of "admin"/"team_lead".
+ */
+export function roleDisplayName(role: { key: string; name: string }, t: (key: string) => string): string {
+  return BUILTIN_ROLE_KEYS.has(role.key) && role.name === role.key ? t(`roles.builtin.${role.key}`) : role.name;
 }

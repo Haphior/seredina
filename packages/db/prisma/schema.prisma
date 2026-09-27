@@ -104,6 +104,14 @@ model Tenant {
   aiTriageMode String @default("off") @map("ai_triage_mode")
   contracts      Contract[]
   contractAssets ContractAsset[]
+  teamMembers    TeamMember[]
+  notificationDefaults TenantNotificationDefault[]
+
+  // First-run setup wizard (docs/adr/0072-first-run-setup.md). Null = not
+  // finished yet, so the console offers it; setupTemplate records which
+  // starting template was applied, if any.
+  setupCompletedAt DateTime? @map("setup_completed_at")
+  setupTemplate    String?   @map("setup_template")
 
   // Customer portal (docs/adr/0065-customer-portal.md): contacts sign in with
   // an emailed link to follow and reply to their own tickets. Off by default.
@@ -216,6 +224,7 @@ model User {
   notificationPreferences NotificationPreference[]
   ownedProblems        Problem[]             @relation("ProblemOwner")
   reviewedAiAgentRuns  AiAgentRun[]
+  teamMemberships      TeamMember[]
 
   @@unique([tenantId, email])
   @@map("users")
@@ -233,9 +242,28 @@ model Team {
 
   tickets      Ticket[]
   processSteps ProcessStepTemplate[]
+  members      TeamMember[]
 
   @@unique([tenantId, name])
   @@map("teams")
+}
+
+// Who belongs to a team -- a plain join table, so a user can be in several
+// teams. Drives "a ticket landed in my team" notifications
+// (docs/adr/0071-teams-and-notification-events.md).
+model TeamMember {
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  teamId    String   @map("team_id") @db.Uuid
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId    String   @map("user_id") @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([teamId, userId])
+  @@index([userId])
+  @@map("team_members")
 }
 
 // The requester on a ticket -- deliberately separate from User (agents/admins), see
@@ -1404,6 +1432,12 @@ enum NotificationEventType {
   TICKET_ASSIGNED
   NEW_REPLY
   CONTRACT_EXPIRING
+  // docs/adr/0071-teams-and-notification-events.md
+  TEAM_TICKET
+  SLA_WARNING
+  SLA_BREACHED
+  MENTIONED
+  TICKET_REOPENED
 }
 
 // One row per notification actually delivered in-app -- only created when the
@@ -1441,6 +1475,21 @@ model NotificationPreference {
 
   @@unique([userId, eventType])
   @@map("notification_preferences")
+}
+
+// The workspace's own default for an event, set by an admin -- used for anyone
+// who hasn't set their own NotificationPreference for it. No row = the built-in
+// default (in-app on, email off). See docs/adr/0071-teams-and-notification-events.md.
+model TenantNotificationDefault {
+  id        String                @id @default(uuid()) @db.Uuid
+  tenantId  String                @map("tenant_id") @db.Uuid
+  tenant    Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  eventType NotificationEventType @map("event_type")
+  inApp     Boolean               @default(true) @map("in_app")
+  email     Boolean               @default(false)
+
+  @@unique([tenantId, eventType])
+  @@map("tenant_notification_defaults")
 }
 
 // One row per completed LLM call -- written by the AI copilot's own service

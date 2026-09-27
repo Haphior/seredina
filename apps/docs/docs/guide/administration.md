@@ -2,7 +2,7 @@
 
 ## Users and roles
 
-**Administration → Users** creates accounts in one of two ways:
+**Settings → Users** creates accounts in one of two ways:
 
 - **Email them an invitation** (needs a connected
   [email channel](/guide/channels#email)): the person gets a link, valid
@@ -18,7 +18,7 @@ password change, by any route, signs that person out of their other
 sessions, so a stolen session doesn't outlive the password.
 
 Three roles come predefined, and each one can be edited or you can create
-entirely new roles from **Administration → Roles**:
+entirely new roles from **Settings → Roles**:
 
 | Role | Default permissions |
 |---|---|
@@ -31,9 +31,20 @@ Permissions are granular (`tickets:read`, `tickets:write`,
 `users:manage`, `roles:manage`, `audit:read`, `contacts:manage`) — a custom role can combine them however
 you need, you're not tied to the three factory-default roles.
 
+## Teams
+
+**Settings → Teams** groups agents by what they handle, such as
+Level 1 support or Networks. Each team has a name and members; a person
+can belong to several teams. A ticket can be sent to a team from its
+Details panel, from a macro or from a process step.
+
+When a ticket lands in a team with nobody assigned, the team's members
+get a notification (see [Notifications](/guide/tickets#notifications)).
+Deleting a team keeps its tickets; they just no longer have a team.
+
 ## Single sign-on (SSO)
 
-**Administration → Single Sign-On** lets people sign in with their
+**Settings → Single Sign-On** lets people sign in with their
 Microsoft 365 (Entra ID), Google Workspace, or any OpenID Connect account
 (Okta, Auth0, Keycloak, Authentik…) instead of a separate password. You
 register an app in your identity provider (the page shows the exact steps
@@ -63,7 +74,7 @@ Authy…) and type the 6-digit code. From then on, sign-in asks for a code
 after the password. Ten one-time **recovery codes** are shown once. Keep
 them somewhere safe; each one lets you in once if you lose the phone.
 
-On **Administration → Users**, an admin can:
+On **Settings → Users**, an admin can:
 
 - **Require two-factor sign-in for everyone.** Users who haven't set it up
   are walked through it at their next sign-in, and can't turn it off while
@@ -75,7 +86,7 @@ Wrong codes count toward the same 5-attempt lockout as wrong passwords.
 
 ## Audit log
 
-**Administration → Audit Log** lists security-relevant activity: sign-ins
+**Settings → Audit Log** lists security-relevant activity: sign-ins
 (successful and failed, with IP address and browser), account lockouts,
 users created, deactivated or given a new role, role changes, API keys,
 webhooks, email channels, Telegram, endpoint agents, AI settings, the
@@ -90,13 +101,13 @@ existing installs, after upgrading).
 
 ## API Keys
 
-**Administration → API Keys** — for external integrations, not for human
+**Settings → API Keys** — for external integrations, not for human
 agents. See [Authentication](/api/#api-keys-for-integrations-what-you-want)
 for the full detail.
 
 ## Custom fields
 
-**Configuration → Custom Fields** — define extra fields that show up in
+**Settings → Custom Fields** — define extra fields that show up in
 every ticket's properties panel. Five available types: text, number,
 yes/no, date, and a list of options. A custom field can also be attached
 to a [service catalog item](/guide/service-catalog#service-catalog-requests),
@@ -104,20 +115,25 @@ so different kinds of requests ask for different data.
 
 ## Appearance
 
-**Administration → Appearance** — two visual themes for the whole
+**Settings → Appearance** — three visual themes for the whole
 console, with immediate effect for anyone who has it open:
 
 - **Meet in the Middle** (default) — a warm stone palette, with a
   three-circle glyph on each ticket showing which channel it arrived
   through.
 - **Refined** — the original look, a cool slate palette, no glyph.
+- **Frutiger Aero** — glossy and bright, in the style of mid-2000s
+  interfaces: a sky-to-grass gradient with bubbles behind everything,
+  frosted-glass panels, an aqua accent and glossy buttons. It uses Segoe UI
+  where available (Windows). If the operating system asks for reduced
+  transparency, panels turn solid white.
 
 It's a per-tenant preference, not per person — every agent at the same
 organization sees the same theme.
 
 ## White-labeling
 
-**Administration → Branding** — your own logo and accent color, visible
+**Settings → Branding** — your own logo and accent color, visible
 on the [self-service portal and public status page](/guide/public-portal)
 your customers see. The internal agent console keeps Seredina's own
 identity — white-labeling is for the customer-facing surfaces, not for

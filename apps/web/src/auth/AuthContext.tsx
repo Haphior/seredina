@@ -24,6 +24,8 @@ interface AuthContextValue {
     adminEmail: string;
     adminName: string;
     password: string;
+    /** The workspace's starting language: default status names and customer emails. */
+    language?: 'es' | 'en';
   }) => Promise<void>;
   logout: () => void;
 }

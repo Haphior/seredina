@@ -2,13 +2,17 @@
 
 ## SLA policies
 
-From **Configuration → SLA Policies**, you define, per priority
-(Low/Normal/High/Urgent), how many minutes the first response and the
-resolution are due in. Each priority has its own policy — an urgent
-ticket typically has much tighter deadlines than a low-priority one.
+From **Settings → SLA Policies**, you define, per priority
+(Low/Normal/High/Urgent), how long the first response and the
+resolution may take, in minutes, hours or days. Each priority has its own
+policy — an urgent ticket typically has much tighter deadlines than a
+low-priority one. **Fill in suggested targets** proposes a common starting
+point for the priorities you haven't set (Urgent: 15 min / 4 h, High: 1 h /
+8 h, Normal: 4 h / 2 days, Low: 8 h / 5 days); **Save changes** saves every
+priority you edited at once.
 
 Each policy has a **business hours only** toggle: when on, the time
-count pauses outside the schedule configured in **Operations → Business
+count pauses outside the schedule configured in **Settings → Business
 Hours** (timezone and windows per day of the week) — an urgent ticket
 opened on a Friday night doesn't start "aging" until the office reopens.
 
@@ -23,7 +27,7 @@ one.
 
 ## Escalation
 
-Escalation is a chain of tiers (**Operations → On-Call & Escalation**),
+Escalation is a chain of tiers (**Settings → On-Call & Escalation**),
 each with its own wait time. A tier can point at a specific person or at
 an [on-call schedule](#on-call) — if nobody acknowledges within the
 current tier's time, it automatically moves to the next one.

@@ -129,7 +129,7 @@ export function OnCall() {
   }
 
   return (
-    <div className="px-8 py-7">
+    <div className="px-4 py-5 md:px-8 md:py-7">
       <h1 className="mb-1 text-[22px] font-extrabold tracking-tight text-slate-900">{t('onCall.title')}</h1>
       <p className="mb-6 text-[13.5px] text-slate-500">
         {t('onCall.intro')}

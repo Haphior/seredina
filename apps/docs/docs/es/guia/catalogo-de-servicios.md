@@ -5,7 +5,7 @@ pena distinguirlas de entrada:
 
 | Pantalla | Grupo en el menú | Para qué |
 |---|---|---|
-| **Catálogo de Servicios** | Configuración | Ítems que un usuario puede *pedir* — arman un ticket con campos precargados |
+| **Catálogo de Servicios** | Ajustes | Ítems que un usuario puede *pedir* — arman un ticket con campos precargados |
 | **Servicios** | CMDB | Servicios de negocio reales (Email, VPN, Facturación...) mapeados a los activos que los sostienen |
 
 ## Catálogo de Servicios (pedidos)

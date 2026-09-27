@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { apiDelete, apiGet, apiPatch, apiPost, apiUpload, downloadFile, ApiError } from '../lib/api';
@@ -27,6 +27,7 @@ import { ChannelGlyph } from '../components/ChannelGlyph';
 import { BackArrowIcon, BoltIcon, ChevronDownIcon, ClockIcon, EyeIcon, LockIcon, PaperclipIcon, SparkleIcon } from '../components/icons';
 import { PRIORITY_TONE, STATUS_CATEGORY_TONE, formatDateTime, isFirstResponseOverdue, isResolutionOverdue } from '../lib/format';
 import { useTheme } from '../theme/ThemeContext';
+import { MentionTextarea, mentionedIn } from '../components/MentionTextarea';
 
 const PRIORITIES: TicketPriority[] = ['LOW', 'NORMAL', 'HIGH', 'URGENT'];
 
@@ -53,6 +54,7 @@ export function TicketDetail() {
 
   const [reply, setReply] = useState('');
   const [isPrivateNote, setIsPrivateNote] = useState(false);
+  const mentionable = useMemo(() => users.filter((u) => u.isActive), [users]);
   const [sending, setSending] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
@@ -247,7 +249,8 @@ export function TicketDetail() {
     if (!id || !reply.trim()) return;
     setSending(true);
     try {
-      const message = await apiPost<{ id: string }>(`/tickets/${id}/messages`, { body: reply, isPrivateNote });
+      const mentionedUserIds = isPrivateNote ? mentionedIn(reply, mentionable) : [];
+      const message = await apiPost<{ id: string }>(`/tickets/${id}/messages`, { body: reply, isPrivateNote, mentionedUserIds });
       for (const file of pendingFiles) {
         const form = new FormData();
         form.append('file', file);
@@ -348,8 +351,8 @@ export function TicketDetail() {
   if (!ticket) return <div className="p-6 text-sm text-slate-500">{t('common.loading')}</div>;
 
   return (
-    <div className="flex h-full">
-      <div className="flex-1 overflow-y-auto px-9 py-7">
+    <div className="flex flex-col md:h-full md:flex-row">
+      <div className="min-w-0 px-4 py-5 md:flex-1 md:overflow-y-auto md:px-9 md:py-7">
         <Link to="/tickets" className="mb-3.5 flex items-center gap-1.5 text-[13px] font-medium text-slate-400 hover:text-slate-600">
           <BackArrowIcon width={15} height={15} />
           {t('ticketDetail.backToTickets')}
@@ -358,16 +361,16 @@ export function TicketDetail() {
         <div className="mb-5">
           <span className="text-[13px] font-medium text-slate-400">#{ticket.number}</span>
           <h1 className="mb-2.5 mt-0.5 text-[22px] font-extrabold tracking-tight text-slate-900">{ticket.subject}</h1>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Badge tone={STATUS_CATEGORY_TONE[ticket.status.category]} dot>
               {ticket.status.label}
             </Badge>
             <Badge tone={PRIORITY_TONE[ticket.priority]} dot>
-              {t('ticketDetail.priorityLabel', { priority: ticket.priority })}
+              {t('ticketDetail.priorityLabel', { priority: t(`priority.${ticket.priority}`) })}
             </Badge>
             <span className="flex items-center gap-1.5">
               {theme !== 'refined' && <ChannelGlyph channel={ticket.channel} />}
-              <Badge tone={ticket.channel === 'alert' ? 'rose' : 'slate'}>{ticket.channel}</Badge>
+              <Badge tone={ticket.channel === 'alert' ? 'rose' : 'slate'}>{t(`channel.short.${ticket.channel}`, { defaultValue: ticket.channel })}</Badge>
             </span>
             {ticket.externalId && <span className="text-xs text-slate-400">{t('ticketDetail.ref', { id: ticket.externalId })}</span>}
             {isFirstResponseOverdue(ticket) && (
@@ -383,7 +386,7 @@ export function TicketDetail() {
               </Badge>
             )}
 
-            <div className="ml-auto flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 md:ml-auto">
               {presenceUserIds.length > 0 && (
                 <div className="flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
                   <EyeIcon width={12} height={12} />
@@ -629,10 +632,12 @@ export function TicketDetail() {
           </div>
         )}
         <div className="mt-1 rounded-xl border border-slate-200 bg-white p-1.5 pb-2.5 shadow-sm">
-          <textarea
+          <MentionTextarea
             value={reply}
-            onChange={(e) => onReplyChange(e.target.value)}
-            placeholder={t('ticketDetail.replyPlaceholder')}
+            onValueChange={onReplyChange}
+            people={mentionable}
+            mentions={isPrivateNote}
+            placeholder={isPrivateNote ? t('ticketDetail.mentionHint') : t('ticketDetail.replyPlaceholder')}
             rows={3}
             className="w-full resize-none rounded-lg border-0 px-2.5 py-2 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-indigo-100"
           />
@@ -663,8 +668,8 @@ export function TicketDetail() {
               ))}
             </div>
           )}
-          <div className="flex items-center justify-between px-1.5">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2 px-1.5">
+            <div className="flex flex-wrap items-center gap-2">
               <label className="flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[12.5px] font-medium text-slate-500">
                 <input
                   type="checkbox"
@@ -700,7 +705,7 @@ export function TicketDetail() {
         </div>
       </div>
 
-      <aside className="w-[280px] flex-shrink-0 overflow-y-auto border-l border-slate-200 bg-white px-5 py-[22px]">
+      <aside className="w-full flex-shrink-0 border-t border-slate-200 bg-white px-5 py-[22px] md:w-[280px] md:overflow-y-auto md:border-l md:border-t-0">
         <h2 className="mb-4 text-[13px] font-bold uppercase tracking-wide text-slate-400">{t('ticketDetail.detailsHeading')}</h2>
 
         <div className="flex flex-col gap-3.5">

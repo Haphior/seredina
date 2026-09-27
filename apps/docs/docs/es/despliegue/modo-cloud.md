@@ -21,7 +21,7 @@ segundo intento de `/register` es el que se bloquea.
 propia organización en `/register`, cada una aislada de las demás por
 Row-Level Security de Postgres (ver la
 [arquitectura de multi-tenancy](https://github.com/Haphior/helpdesk-seredina/blob/main/docs/adr/0001-multi-tenancy-rls.md)
-si te interesa el detalle técnico). Esto es lo que necesitás si vas a
+si te interesa el detalle técnico). Esto es lo que necesitas si vas a
 operar Seredina como tu propio servicio para múltiples clientes.
 
 El modo cloud también desactiva los **escaneos de red desde el servidor**
@@ -46,7 +46,7 @@ Sé directo sobre esto en vez de dar a entender que es un interruptor
   servicio, igual que con cualquier otro software autoalojado.
 - **Sin Términos de Servicio ni Política de Privacidad.** Si vas a procesar
   datos reales de clientes en tu propia infraestructura, esos documentos
-  (y el cumplimiento de GDPR si tenés usuarios en la UE) son tuyos que
+  (y el cumplimiento de GDPR si tienes usuarios en la UE) son tuyos que
   resolver — Seredina no asume nada sobre tu situación legal.
 
 ## Aislamiento entre tenants

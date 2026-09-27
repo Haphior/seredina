@@ -7,6 +7,7 @@ import type {
   CustomFieldDefinition,
   SavedView,
   ServiceCatalogItem,
+  Team,
   Ticket,
   TicketPriority,
   TicketStatus,
@@ -202,7 +203,7 @@ export function TicketsQueue() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex flex-col gap-4 px-8 pb-5 pt-7">
+      <div className="flex flex-col gap-4 px-4 pb-4 pt-5 md:px-8 md:pb-5 md:pt-7">
         <div className="flex items-baseline justify-between gap-2.5">
           <div className="flex items-baseline gap-2.5">
             <h1 className="text-[22px] font-extrabold tracking-tight text-slate-900">{t('tickets.title')}</h1>
@@ -292,7 +293,7 @@ export function TicketsQueue() {
             <option value="">{t('tickets.filters.anyPriority')}</option>
             {PRIORITIES.map((p) => (
               <option key={p} value={p}>
-                {p}
+                {t(`priority.${p}`)}
               </option>
             ))}
           </select>
@@ -348,7 +349,7 @@ export function TicketsQueue() {
               </option>
               {(['LOW', 'NORMAL', 'HIGH', 'URGENT'] as const).map((p) => (
                 <option key={p} value={p}>
-                  {p}
+                  {t(`priority.${p}`)}
                 </option>
               ))}
             </select>
@@ -360,13 +361,63 @@ export function TicketsQueue() {
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto px-8 pb-7">
+      <div className="flex-1 overflow-y-auto px-4 pb-5 md:px-8 md:pb-7">
         {error && <p className="text-sm text-rose-600">{error}</p>}
         {tickets === null && !error && <p className="text-sm text-slate-500">{t('common.loading')}</p>}
-        {tickets?.length === 0 && <p className="text-sm text-slate-500">{t('tickets.empty')}</p>}
+        {tickets?.length === 0 &&
+          (tab === 'ALL' && !assigneeFilter && !priorityFilter && !q.trim() ? (
+            // Nothing at all yet: say how tickets get here, not just that there are none.
+            <div className="flex max-w-lg flex-col items-start gap-3 rounded-xl border border-dashed border-slate-300 bg-white/60 px-6 py-6">
+              <p className="text-[15px] font-semibold text-slate-800">{t('tickets.emptyFirst.title')}</p>
+              <p className="text-[13.5px] text-slate-500">{t('tickets.emptyFirst.body')}</p>
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" onClick={() => setShowRequest(true)}>
+                  {t('tickets.emptyFirst.create')}
+                </Button>
+                <Link to="/email-channels" className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[13px] font-semibold text-slate-700 hover:bg-slate-50">
+                  {t('tickets.emptyFirst.connectEmail')}
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-slate-500">{t('tickets.empty')}</p>
+          ))}
 
         {tickets && tickets.length > 0 && (
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          // Phones: one compact card per ticket instead of a nine-column grid.
+          <div className="flex flex-col gap-2 md:hidden">
+            {tickets.map((ticket) => (
+              <Link
+                key={ticket.id}
+                to={`/tickets/${ticket.id}`}
+                className={`rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm ${flashIds.has(ticket.id) ? 'live-flash' : ''}`}
+              >
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="min-w-0 truncate text-[14px] font-semibold text-slate-800">
+                    <span className="mr-1.5 font-medium text-slate-400">#{ticket.number}</span>
+                    {ticket.subject}
+                  </span>
+                  {isTicketOverdue(ticket) && <ClockIcon width={13} height={13} className="flex-shrink-0 text-rose-500" />}
+                </div>
+                <div className="mb-2 truncate text-[12.5px] text-slate-400">
+                  {ticket.contact.name} · {ticket.assignee?.name ?? t('common.unassigned')}
+                </div>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <Badge tone={STATUS_CATEGORY_TONE[ticket.status.category]} dot>
+                    {ticket.status.label}
+                  </Badge>
+                  <Badge tone={PRIORITY_TONE[ticket.priority]} dot>
+                    {t(`priority.${ticket.priority}`)}
+                  </Badge>
+                  <span className="ml-auto text-[11.5px] text-slate-400">{formatDateTime(ticket.updatedAt)}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {tickets && tickets.length > 0 && (
+          <div className="hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm md:block">
             <div
               className="grid items-center gap-3 border-b border-slate-200 bg-slate-50 px-5 py-2.5 text-[11.5px] font-bold uppercase tracking-wide text-slate-400"
               style={{ gridTemplateColumns: ROW_COLUMNS }}
@@ -442,7 +493,7 @@ export function TicketsQueue() {
                     )}
                     <span className="flex w-fit items-center gap-1.5">
                       {theme !== 'refined' && <ChannelGlyph channel={ticket.channel} />}
-                      <Badge tone={CHANNEL_TONE[ticket.channel] ?? 'slate'}>{ticket.channel}</Badge>
+                      <Badge tone={CHANNEL_TONE[ticket.channel] ?? 'slate'}>{t(`channel.short.${ticket.channel}`, { defaultValue: ticket.channel })}</Badge>
                     </span>
                     <span className="text-right text-[12px] text-slate-400">{formatDateTime(ticket.updatedAt)}</span>
                   </Link>
@@ -607,15 +658,34 @@ function BlankTicketForm({ onClose, onCreated }: { onClose: () => void; onCreate
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [priority, setPriority] = useState<TicketPriority>('NORMAL');
+  const [teamId, setTeamId] = useState('');
+  const [assigneeId, setAssigneeId] = useState('');
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [agents, setAgents] = useState<UserSummary[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Who takes it, right from the start -- optional, and just empty if these
+  // can't be listed (an agent without access to the user list).
+  useEffect(() => {
+    apiGet<{ teams: Team[] }>('/teams').then((r) => setTeams(r.teams)).catch(() => {});
+    apiGet<{ users: UserSummary[] }>('/users').then((r) => setAgents(r.users.filter((u) => u.isActive))).catch(() => {});
+  }, []);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
     setSubmitting(true);
     try {
-      const ticket = await apiPost<{ id: string }>('/tickets', { subject, body, contactName, contactEmail, priority });
+      const ticket = await apiPost<{ id: string }>('/tickets', {
+        subject,
+        body,
+        contactName,
+        contactEmail,
+        priority,
+        teamId: teamId || undefined,
+        assigneeId: assigneeId || undefined,
+      });
       onClose();
       onCreated(ticket.id);
     } catch (err) {
@@ -679,11 +749,40 @@ function BlankTicketForm({ onClose, onCreated }: { onClose: () => void; onCreate
         >
           {PRIORITIES.map((p) => (
             <option key={p} value={p}>
-              {p}
+              {t(`priority.${p}`)}
             </option>
           ))}
         </select>
       </label>
+
+      <div className="flex gap-2">
+        {teams.length > 0 && (
+          <label className="block flex-1 text-sm">
+            <span className="mb-1 block font-medium text-slate-700">{t('tickets.form.team')}</span>
+            <select value={teamId} onChange={(e) => setTeamId(e.target.value)} className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm">
+              <option value="">{t('common.unassigned')}</option>
+              {teams.map((team) => (
+                <option key={team.id} value={team.id}>
+                  {team.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+        {agents.length > 0 && (
+          <label className="block flex-1 text-sm">
+            <span className="mb-1 block font-medium text-slate-700">{t('tickets.form.assignee')}</span>
+            <select value={assigneeId} onChange={(e) => setAssigneeId(e.target.value)} className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm">
+              <option value="">{t('common.unassigned')}</option>
+              {agents.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+      </div>
 
       {error && <p className="text-sm text-rose-600">{error}</p>}
 

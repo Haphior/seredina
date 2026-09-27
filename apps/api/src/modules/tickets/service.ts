@@ -1,28 +1,49 @@
-import { prisma, withTenantTx, type MessageAuthorType, type Prisma, type TicketPriority, type TicketStatusCategory } from '@seredina/db';
+import { prisma, ticketNotificationRecipients, withTenantTx, type MessageAuthorType, type Prisma, type TicketPriority, type TicketStatusCategory } from '@seredina/db';
 import { emailSendQueue, telegramSendQueue, ticketFollowupQueue } from '../../lib/queue';
 import { dispatchWebhookEvent } from '../../lib/webhookDispatch';
 import { publishLive } from '../../lib/live';
 import { computeSlaDueAts, scheduleSlaBreachChecks } from '../sla/service';
 import { getActiveEscalationForTicket } from '../oncall/service';
-import { notifyUser } from '../notifications/service';
+import { notifyUser, notifyUsers } from '../notifications/service';
 import { createCsatSurveyLink } from '../csat/service';
 import { loadEmailContext, templateFor, tenantLanguage } from '../emailtemplates/service';
-import { emailString, parseEmailSettings, renderTemplate, surveyButton, type EmailMeta } from '@seredina/shared';
+import { emailString, parseEmailSettings, renderTemplate, surveyButton, type EmailLanguage, type EmailMeta } from '@seredina/shared';
 
-const DEFAULT_TICKET_STATUSES: { key: string; label: string; category: TicketStatusCategory; sortOrder: number }[] = [
-  { key: 'open', label: 'Open', category: 'OPEN', sortOrder: 0 },
-  { key: 'pending', label: 'Pending', category: 'PENDING', sortOrder: 1 },
-  { key: 'resolved', label: 'Resolved', category: 'RESOLVED', sortOrder: 2 },
-  { key: 'closed', label: 'Closed', category: 'CLOSED', sortOrder: 3 },
+const DEFAULT_TICKET_STATUSES: { key: string; label: Record<EmailLanguage, string>; category: TicketStatusCategory; sortOrder: number }[] = [
+  { key: 'open', label: { en: 'Open', es: 'Abierto' }, category: 'OPEN', sortOrder: 0 },
+  { key: 'pending', label: { en: 'Pending', es: 'Pendiente' }, category: 'PENDING', sortOrder: 1 },
+  { key: 'resolved', label: { en: 'Resolved', es: 'Resuelto' }, category: 'RESOLVED', sortOrder: 2 },
+  { key: 'closed', label: { en: 'Closed', es: 'Cerrado' }, category: 'CLOSED', sortOrder: 3 },
 ];
 
-/** Called from auth/service.ts's registerTenant, inside its own tenant transaction -- not a standalone entry point. */
-export async function seedDefaultTicketStatuses(tx: Prisma.TransactionClient, tenantId: string) {
+/**
+ * Called from auth/service.ts's registerTenant, inside its own tenant
+ * transaction -- not a standalone entry point. The labels are tenant data
+ * from then on (renamable), so they're written in the language the
+ * workspace was created in.
+ */
+export async function seedDefaultTicketStatuses(tx: Prisma.TransactionClient, tenantId: string, language: EmailLanguage = 'en') {
   const statuses = [];
-  for (const status of DEFAULT_TICKET_STATUSES) {
-    statuses.push(await tx.ticketStatus.create({ data: { tenantId, ...status } }));
+  for (const { label, ...status } of DEFAULT_TICKET_STATUSES) {
+    statuses.push(await tx.ticketStatus.create({ data: { tenantId, ...status, label: label[language] } }));
   }
   return statuses;
+}
+
+/**
+ * Switches the four seeded statuses to `language` -- but only those still
+ * named exactly as seeded, in either language, so a name an admin chose is
+ * never overwritten. Used when a workspace changes its language
+ * (docs/adr/0072-first-run-setup.md).
+ */
+export async function translateSeededStatusLabels(tx: Prisma.TransactionClient, language: EmailLanguage) {
+  for (const seeded of DEFAULT_TICKET_STATUSES) {
+    const defaults = Object.values(seeded.label);
+    await tx.ticketStatus.updateMany({
+      where: { key: seeded.key, label: { in: defaults } },
+      data: { label: seeded.label[language] },
+    });
+  }
 }
 
 export interface CreateTicketFromApiInput {
@@ -426,6 +447,9 @@ export interface AddMessageInput {
   isPrivateNote: boolean;
   // The layout data of an automatic ticket-event email (docs/adr/0070-customer-email-templates.md).
   emailMeta?: EmailMeta;
+  // People @mentioned in an internal note -- each gets a MENTIONED
+  // notification. Ignored on a public reply: a mention is between colleagues.
+  mentionedUserIds?: string[];
 }
 
 export async function addMessage(tenantId: string, ticketId: string, input: AddMessageInput) {
@@ -438,9 +462,21 @@ export async function addMessage(tenantId: string, ticketId: string, input: AddM
   // deliberately outside it (network I/O doesn't belong inside a tenant transaction
   // -- see docs/adr/0001-multi-tenancy-rls.md), so the transaction closes first and
   // only then do we tell the worker there's an email to send.
-  const { message, shouldEmail, shouldTelegram } = await withTenantTx(prisma, tenantId, async (tx) => {
+  const { message, shouldEmail, shouldTelegram, mentioned, mention } = await withTenantTx(prisma, tenantId, async (tx) => {
     const ticket = await tx.ticket.findUnique({ where: { id: ticketId } });
     if (!ticket) throw new Error('ticket not found');
+
+    // Only real users of this tenant (RLS hides the rest), never the author.
+    const mentionIds = input.isPrivateNote && authorType === 'AGENT' ? [...new Set(input.mentionedUserIds ?? [])] : [];
+    const mentioned =
+      mentionIds.length > 0
+        ? (await tx.user.findMany({ where: { id: { in: mentionIds } }, select: { id: true } }))
+            .map((u) => u.id)
+            .filter((id) => id !== input.authorUserId)
+        : [];
+    const author = mentioned.length > 0 && input.authorUserId
+      ? await tx.user.findUnique({ where: { id: input.authorUserId }, select: { name: true } })
+      : null;
 
     const message = await tx.message.create({
       data: {
@@ -478,6 +514,8 @@ export async function addMessage(tenantId: string, ticketId: string, input: AddM
     const shouldNotifyCustomer = authorType !== 'CONTACT' && !input.isPrivateNote;
     return {
       message,
+      mentioned,
+      mention: { n: ticket.number, subject: ticket.subject, name: author?.name ?? '' },
       // Portal and catalog tickets get agent replies by email too -- see
       // CUSTOMER_EMAIL_CHANNELS.
       shouldEmail: CUSTOMER_EMAIL_CHANNELS.has(ticket.channel) && shouldNotifyCustomer,
@@ -503,6 +541,15 @@ export async function addMessage(tenantId: string, ticketId: string, input: AddM
     await publishLive(tenantId, { type: 'message.created', ticketId });
   }
 
+  if (mentioned.length > 0) {
+    const language = await tenantLanguage(tenantId);
+    await notifyUsers(tenantId, mentioned, 'MENTIONED', {
+      ticketId,
+      body: emailString(language, 'notifyMentionBody', mention),
+      subject: emailString(language, 'notifyMentionSubject', mention),
+    });
+  }
+
   return message;
 }
 
@@ -519,9 +566,13 @@ export interface UpdateTicketInput {
   problemId?: string | null;
 }
 
-export async function updateTicket(tenantId: string, ticketId: string, input: UpdateTicketInput) {
+/** actorUserId: the person making the change, who isn't notified about their own action. */
+export async function updateTicket(tenantId: string, ticketId: string, input: UpdateTicketInput, actorUserId?: string) {
   let priorityChanged = false;
   let newAssigneeId: string | null = null;
+  // A ticket that lands in a team with nobody assigned tells the team
+  // (docs/adr/0071-teams-and-notification-events.md).
+  let teamToNotify = null as { teamId: string; recipients: string[] } | null;
   let justResolved = false;
   let justClosed = false;
 
@@ -535,6 +586,12 @@ export async function updateTicket(tenantId: string, ticketId: string, input: Up
     // clearing an assignee, or re-saving the same one, is not "assigned to you."
     if (input.assigneeId && input.assigneeId !== ticket.assigneeId) {
       newAssigneeId = input.assigneeId;
+    }
+
+    const assigneeAfter = input.assigneeId === undefined ? ticket.assigneeId : input.assigneeId;
+    if (input.teamId && input.teamId !== ticket.teamId && !assigneeAfter) {
+      const recipients = await ticketNotificationRecipients(tx, { assigneeId: null, teamId: input.teamId }, actorUserId);
+      teamToNotify = { teamId: input.teamId, recipients };
     }
 
     const data: Prisma.TicketUpdateInput = {
@@ -596,7 +653,15 @@ export async function updateTicket(tenantId: string, ticketId: string, input: Up
   if (priorityChanged) {
     await scheduleSlaBreachChecks(tenantId, updated.id, { firstResponseDueAt: updated.firstResponseDueAt, resolutionDueAt: updated.resolutionDueAt });
   }
-  if (newAssigneeId) {
+  // Assigned inside the transaction callback, which TypeScript's narrowing can't see.
+  const team = teamToNotify as { teamId: string; recipients: string[] } | null;
+  if (team && team.recipients.length > 0) {
+    await notifyUsers(tenantId, team.recipients, 'TEAM_TICKET', {
+      ticketId: updated.id,
+      ...(await teamNotice(tenantId, team.teamId, updated.number, updated.subject)),
+    });
+  }
+  if (newAssigneeId && newAssigneeId !== actorUserId) {
     await notifyUser(tenantId, newAssigneeId, 'TICKET_ASSIGNED', {
       ticketId: updated.id,
       ...(await assignedNotice(tenantId, updated.number, updated.subject)),
@@ -613,6 +678,16 @@ export async function updateTicket(tenantId: string, ticketId: string, input: Up
     if (event) await sendTicketEvent(tenantId, updated.id, event, { survey: justResolved });
   }
     return updated;
+}
+
+/** "Landed in <team>", in the tenant's language. */
+export async function teamNotice(tenantId: string, teamId: string, n: number, subject: string) {
+  const [language, team] = await Promise.all([
+    tenantLanguage(tenantId),
+    withTenantTx(prisma, tenantId, (tx) => tx.team.findUnique({ where: { id: teamId }, select: { name: true } })),
+  ]);
+  const values = { n, subject, team: team?.name ?? '' };
+  return { body: emailString(language, 'notifyTeamBody', values), subject: emailString(language, 'notifyTeamSubject', values) };
 }
 
 /** "Assigned to you", in the tenant's language. */

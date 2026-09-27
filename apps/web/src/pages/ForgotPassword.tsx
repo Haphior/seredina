@@ -1,7 +1,8 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { apiPost, ApiError } from '../lib/api';
+import { useRegistrationInfo } from '../lib/registration';
 import { AuthLayout, Field } from '../components/AuthLayout';
 
 /** Asks for a password reset link -- docs/adr/0067-account-self-service.md. */
@@ -12,6 +13,10 @@ export function ForgotPassword() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const knownOrg = useRegistrationInfo()?.tenantSlug ?? null;
+  useEffect(() => {
+    if (knownOrg) setTenantSlug(knownOrg);
+  }, [knownOrg]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -44,7 +49,7 @@ export function ForgotPassword() {
             <p className="text-[13.5px] text-slate-400">{t('auth.forgot.subtitle')}</p>
           </div>
           <div className="flex flex-col gap-3.5">
-            <Field label={t('auth.fields.orgSlug')} value={tenantSlug} onChange={setTenantSlug} placeholder="acme" />
+            {!knownOrg && <Field label={t('auth.fields.orgSlug')} value={tenantSlug} onChange={setTenantSlug} placeholder="acme" />}
             <Field label={t('auth.fields.email')} type="email" value={email} onChange={setEmail} placeholder="you@company.com" />
           </div>
           {error && <p className="text-sm text-rose-600">{error}</p>}

@@ -7,6 +7,7 @@ import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Card } from '../components/Card';
+import { roleDisplayName } from '../lib/format';
 
 const ALL_PERMISSIONS: Permission[] = [
   'tickets:read',
@@ -48,7 +49,7 @@ export function Roles() {
   }
 
   return (
-    <div className="px-8 py-7">
+    <div className="px-4 py-5 md:px-8 md:py-7">
       <div className="mb-1 flex items-center justify-between">
         <h1 className="text-[22px] font-extrabold tracking-tight text-slate-900">{t('roles.title')}</h1>
         <Button onClick={() => setEditing('new')}>{t('roles.new')}</Button>
@@ -67,7 +68,7 @@ export function Roles() {
               <div key={r.id} className="flex items-center justify-between px-5 py-3.5">
                 <button onClick={() => setEditing(r)} className="min-w-0 text-left">
                   <div className="flex items-center gap-2">
-                    <span className="text-[14px] font-semibold text-slate-800">{r.name}</span>
+                    <span className="text-[14px] font-semibold text-slate-800">{roleDisplayName(r, t)}</span>
                     <span className="font-mono text-[11.5px] text-slate-400">{r.key}</span>
                   </div>
                   <div className="mt-1 flex flex-wrap gap-1">

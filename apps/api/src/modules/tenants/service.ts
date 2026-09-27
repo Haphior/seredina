@@ -25,3 +25,9 @@ export async function countTenants(): Promise<number> {
   const rows = await prisma.$queryRaw<{ count: bigint }[]>`SELECT count_tenants() AS count`;
   return Number(rows[0]?.count ?? 0);
 }
+
+/** The only tenant's slug on an instance with exactly one, else null -- see single_tenant_slug() in prisma/rls/policies.sql. */
+export async function singleTenantSlug(): Promise<string | null> {
+  const rows = await prisma.$queryRaw<{ slug: string | null }[]>`SELECT single_tenant_slug() AS slug`;
+  return rows[0]?.slug ?? null;
+}

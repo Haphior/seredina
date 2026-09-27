@@ -8,7 +8,7 @@ see [Outbound Webhooks](/api/webhooks).
 
 ## Email
 
-**Administration → Email Channels → New channel** offers three kinds of
+**Settings → Email Channels → New channel** offers three kinds of
 mailbox:
 
 - **Microsoft 365 / Outlook** and **Gmail / Google Workspace** — sign in
@@ -82,7 +82,7 @@ acknowledgement, the "request resolved" email with its satisfaction survey,
 and portal sign-in links. It is written in your company's language, and a
 small "Powered by Seredina" line sits under the message.
 
-Set it up in **Administration → Customer Emails**:
+Set it up in **Settings → Customer Emails**:
 
 - **Email language**: Spanish (the default) or English. Everything Seredina
   writes for you is in this language: the default texts, buttons, the
@@ -142,7 +142,7 @@ account or credential involved. See
 
 ## Telegram
 
-**Administration → Telegram** — connect your own bot (created with
+**Settings → Telegram** — connect your own bot (created with
 [@BotFather](https://t.me/BotFather)) by pasting its token. A direct
 message to the bot creates a ticket; the agent replies from the console
 like any other channel, and the reply reaches the user through Telegram.
@@ -156,7 +156,7 @@ address. `localhost` doesn't work for this particular channel. See
 
 ## Monitoring alerts (NOC/SOC)
 
-**Administration → Monitoring Integrations** has copy-paste-ready
+**Settings → Monitoring Integrations** has copy-paste-ready
 instructions for connecting:
 
 - **Grafana Alerting** — a webhook-type "contact point" pointing at

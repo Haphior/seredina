@@ -8,8 +8,10 @@
  * slate-* class in the app already resolves through whichever block below is
  * active -- no component file needed to change for this to work.
  *
- * The accent (indigo/violet) is NOT themed here -- it's the actual brand
- * identity (docs/BRAND.md), shared by both themes on purpose.
+ * The accent (indigo/violet) is remapped the same way, to --a-* and --v-*.
+ * It's the brand identity (docs/BRAND.md), so the default and "refined"
+ * themes keep Tailwind's exact indigo/violet; only Aero replaces it
+ * (docs/adr/0073-frutiger-aero-theme.md).
  */
 
 :root {
@@ -25,6 +27,30 @@
   --n-800: #34302a;
   --n-900: #26221d;
   --n-950: #181512;
+
+  /* Accent: Tailwind's own indigo and violet, exactly. */
+  --a-50: #eef2ff;
+  --a-100: #e0e7ff;
+  --a-200: #c7d2fe;
+  --a-300: #a5b4fc;
+  --a-400: #818cf8;
+  --a-500: #6366f1;
+  --a-600: #4f46e5;
+  --a-700: #4338ca;
+  --a-800: #3730a3;
+  --a-900: #312e81;
+  --a-950: #1e1b4b;
+  --v-50: #f5f3ff;
+  --v-100: #ede9fe;
+  --v-200: #ddd6fe;
+  --v-300: #c4b5fd;
+  --v-400: #a78bfa;
+  --v-500: #8b5cf6;
+  --v-600: #7c3aed;
+  --v-700: #6d28d9;
+  --v-800: #5b21b6;
+  --v-900: #4c1d95;
+  --v-950: #2e1065;
 }
 
 [data-theme='refined'] {
@@ -43,6 +69,136 @@
   --n-800: #1e293b;
   --n-900: #0f172a;
   --n-950: #020617;
+}
+
+/*
+ * "Frutiger Aero" (docs/adr/0073-frutiger-aero-theme.md): the glossy,
+ * sky-and-water look of mid-2000s interfaces. A sky gradient with soft
+ * bubbles behind everything, white panels as frosted glass, glossy accent
+ * buttons, an aqua accent and a humanist sans. Text contrast stays on
+ * opaque-enough surfaces: glass panels are 70% white.
+ */
+[data-theme='aero'] {
+  --n-50: rgba(240, 249, 255, 0.55);
+  --n-100: rgba(222, 240, 250, 0.85);
+  --n-200: #c9e1ee;
+  --n-300: #a4c4d6;
+  --n-400: #7898ad;
+  --n-500: #56778c;
+  --n-600: #405b6d;
+  --n-700: #304756;
+  --n-800: #1f3341;
+  --n-900: #13242f;
+  --n-950: #0a151c;
+
+  --a-50: #ebf8ff;
+  --a-100: #d4f0ff;
+  --a-200: #ade2fc;
+  --a-300: #78cdf6;
+  --a-400: #38b3ea;
+  --a-500: #1498d6;
+  --a-600: #0879b5;
+  --a-700: #0a6399;
+  --a-800: #0e527d;
+  --a-900: #104566;
+  --a-950: #0a2c43;
+  --v-50: #ecfdf5;
+  --v-100: #d1fae5;
+  --v-200: #a7f3d0;
+  --v-300: #6ee7b7;
+  --v-400: #34d399;
+  --v-500: #10b981;
+  --v-600: #059669;
+  --v-700: #047857;
+  --v-800: #065f46;
+  --v-900: #064e3b;
+  --v-950: #022c22;
+}
+
+[data-theme='aero'] body {
+  background:
+    radial-gradient(circle at 30% 85%, rgba(150, 230, 170, 0.6) 0, rgba(150, 230, 170, 0) 260px),
+    radial-gradient(ellipse at 50% 125%, #9fe3a8 0%, rgba(159, 227, 168, 0) 58%),
+    radial-gradient(ellipse at 85% -10%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 45%),
+    linear-gradient(172deg, #5fc3f7 0%, #a6defd 26%, #dff4ff 55%, #dff7e6 100%);
+  background-attachment: fixed;
+}
+
+/* Bubbles: a ring with a highlight, drifting nowhere -- purely decorative, behind everything. */
+[data-theme='aero'] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.95) 0 5%, rgba(255, 255, 255, 0) 12%) 88% 16% / 120px 120px no-repeat,
+    radial-gradient(circle, rgba(255, 255, 255, 0.12) 55%, rgba(255, 255, 255, 0.7) 66%, rgba(255, 255, 255, 0) 70%) 88% 16% / 120px 120px no-repeat,
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.95) 0 5%, rgba(255, 255, 255, 0) 12%) 70% 78% / 70px 70px no-repeat,
+    radial-gradient(circle, rgba(255, 255, 255, 0.12) 55%, rgba(255, 255, 255, 0.7) 66%, rgba(255, 255, 255, 0) 70%) 70% 78% / 70px 70px no-repeat,
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.95) 0 5%, rgba(255, 255, 255, 0) 12%) 96% 55% / 44px 44px no-repeat,
+    radial-gradient(circle, rgba(255, 255, 255, 0.12) 55%, rgba(255, 255, 255, 0.7) 66%, rgba(255, 255, 255, 0) 70%) 96% 55% / 44px 44px no-repeat,
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.95) 0 5%, rgba(255, 255, 255, 0) 12%) 40% 92% / 90px 90px no-repeat,
+    radial-gradient(circle, rgba(255, 255, 255, 0.12) 55%, rgba(255, 255, 255, 0.65) 66%, rgba(255, 255, 255, 0) 70%) 40% 92% / 90px 90px no-repeat,
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.95) 0 5%, rgba(255, 255, 255, 0) 12%) 55% 8% / 34px 34px no-repeat,
+    radial-gradient(circle, rgba(255, 255, 255, 0.12) 55%, rgba(255, 255, 255, 0.7) 66%, rgba(255, 255, 255, 0) 70%) 55% 8% / 34px 34px no-repeat;
+}
+
+/* The sidebar: aqua-tinted glass with a light edge. */
+[data-theme='aero'] aside.bg-white {
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(214, 240, 255, 0.35) 100%);
+  border-right-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 1px 0 0 rgba(120, 190, 230, 0.35);
+}
+[data-theme='aero'] h1 {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+[data-theme='aero'] .font-sans {
+  font-family: 'Segoe UI', 'Frutiger', 'Frutiger Linotype', 'Myriad Pro', 'Trebuchet MS', 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+/* Frosted glass: every white panel, card, sidebar and modal. */
+[data-theme='aero'] .bg-white {
+  background-color: rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  backdrop-filter: blur(16px) saturate(1.5);
+}
+/* A frosted field is its own stacking context, so icons laid over it
+   (search magnifiers) need to sit above it explicitly. */
+[data-theme='aero'] .pointer-events-none.absolute {
+  z-index: 1;
+}
+[data-theme='aero'] .shadow-sm,
+[data-theme='aero'] .shadow-lg,
+[data-theme='aero'] .shadow-xl {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 6px 20px rgba(16, 92, 140, 0.12);
+}
+[data-theme='aero'] .rounded-xl {
+  border-color: rgba(255, 255, 255, 0.75);
+}
+
+/* Glossy accent: a highlight on the top half, like a bubble. */
+[data-theme='aero'] .bg-indigo-600 {
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.14) 49%, rgba(255, 255, 255, 0) 51%, rgba(255, 255, 255, 0.16) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 2px 8px rgba(8, 121, 181, 0.35);
+  text-shadow: 0 1px 1px rgba(0, 60, 100, 0.35);
+}
+[data-theme='aero'] .bg-indigo-50 {
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 60%);
+  box-shadow: inset 0 0 0 1px rgba(56, 179, 234, 0.35);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  [data-theme='aero'] .bg-white {
+    background-color: #fff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 /* Live updates (docs/adr/0053-live-updates.md): a row that just changed or

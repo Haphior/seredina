@@ -9,6 +9,38 @@ contain breaking changes).
 
 ### Added
 
+- **Frutiger Aero theme** (`docs/adr/0073-frutiger-aero-theme.md`), under
+  Settings → Appearance: a sky gradient with bubbles, frosted-glass panels,
+  an aqua accent and glossy buttons.
+- **First-run setup** (`docs/adr/0072-first-run-setup.md`): after
+  registering, five skippable steps take a workspace from empty to usable:
+  - organization name, language and working hours (presets and time zone);
+  - connect the support mailbox;
+  - pick a kind of support: internal IT, customer support or
+    plant/manufacturing. Each one creates teams, a Category field, SLA
+    targets, saved replies and service catalog items, in your language,
+    without touching anything you already have;
+  - invite your team from a pasted list;
+  - a summary with next steps.
+  Admins of a workspace that hasn't finished it see a reminder on the
+  dashboard; Settings → Initial setup reopens it.
+- Connecting a mailbox with a password fills in the servers of Gmail,
+  Outlook.com, Yahoo, iCloud and Zoho from the address.
+- **Teams you can manage** (`docs/adr/0071-teams-and-notification-events.md`).
+  Administration → Teams creates, renames and deletes teams and sets their
+  members; a person can be in several teams. Until now a new workspace had
+  only the "General" team and no way to add another. Deleting a team keeps
+  its tickets, without a team.
+- **More notifications, and workspace defaults for them**
+  (`docs/adr/0071-teams-and-notification-events.md`).
+  - New events: a ticket lands in my team with nobody assigned; a customer
+    reopens a ticket; someone @mentions me in an internal note; an SLA target
+    is about to be missed (80% of its time used); an SLA target was missed.
+    Ticket events go to the assignee, or to the team when nobody is assigned.
+  - Type `@` in an internal note to mention a colleague.
+  - Admins set what everyone gets, in the app and by email, under
+    Notification settings. Each person can still choose for themselves, and
+    go back to the workspace default.
 - **Branded customer emails in your company's language**
   (`docs/adr/0070-customer-email-templates.md`).
   - Every email to a customer uses your logo, an optional banner and your
@@ -29,6 +61,41 @@ contain breaking changes).
 
 ### Changed
 
+- **Settings in one place**: the sidebar keeps the daily work (tickets,
+  contacts, processes, knowledge base, CMDB) and a **Settings** entry. The
+  Settings page groups the 27 configuration pages by what you're setting up
+  (channels, tickets and service, people and access, AI, organization), each
+  with a one-line description, and a search box. Configuration pages link
+  back to it.
+- **Works on a phone**: a top bar with a menu button opens the sidebar as a
+  drawer; the ticket queue shows one card per ticket; ticket detail stacks
+  its details under the conversation; pages use narrower margins.
+- **Spanish that reads as Spanish everywhere.**
+  - A workspace registered in Spanish starts with Spanish status names
+    (Abierto, Pendiente, Resuelto, Cerrado) and Spanish customer emails.
+  - Priorities, the ticket's channel and the built-in role names show in the
+    console's language instead of LOW/URGENT, "agent" or "admin".
+  - Dates follow the console's language and the browser's region
+    (27/9/26, 18:40 rather than 9/27/2026, 5:57:07 PM).
+  - The console and the Spanish documentation use "tú" throughout; a few
+    screens and most of the docs used "vos".
+- **Sign-in on a self-hosted server no longer asks for the organization**:
+  there is only one, so the page fills it in. The "create an organization"
+  link is gone there too, and `/register` explains that the server already
+  has its organization instead of failing with a technical error.
+- **New ticket** can set the team and the assignee right away, and they
+  are notified as if assigned afterward.
+- **SLA policies** take minutes, hours or days, save every edited priority
+  with one button, and can be filled in with suggested targets.
+- **The dashboard** no longer shows hidden widgets as empty cards (they're
+  under "Add widget"), and the first-steps checklist starts with connecting
+  a mailbox.
+- The ticket queue explains where tickets come from when there are none
+  yet, with buttons to log one or connect a mailbox; the assignee filter
+  says "Any assignee" instead of just "Any".
+- A customer reply to a **resolved** ticket now reopens it, as a reply to a
+  closed ticket already did. Its first resolution time is kept.
+- Assigning a ticket to yourself no longer sends you a notification.
 - **Nothing customer-facing is in English anymore for a Spanish-language
   company.** These now follow the email language:
   - portal sign-in, password reset and invitation emails;
@@ -42,6 +109,10 @@ contain breaking changes).
   for email and portal ones.
 - The worker needs `WEB_ORIGIN` (already set for `api`) for the portal link
   in emails; `infra/docker-compose.yml` passes it.
+
+### Fixed
+
+- The "contract about to expire" notification preference could not be saved.
 
 ## [0.2.0] - 2026-09-27
 

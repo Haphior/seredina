@@ -2,7 +2,7 @@
 
 ## Process templates
 
-From **Configuration → Process Templates**, you define a reusable list of
+From **Settings → Process Templates**, you define a reusable list of
 steps — for example, "New employee onboarding" with five fixed steps.
 Every template has a kind:
 

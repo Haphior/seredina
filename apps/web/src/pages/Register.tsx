@@ -4,10 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../auth/AuthContext';
 import { AuthLayout, Field } from '../components/AuthLayout';
 import { ApiError } from '../lib/api';
+import { useRegistrationInfo } from '../lib/registration';
 
 export function Register() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { register } = useAuth();
+  const registration = useRegistrationInfo();
   const navigate = useNavigate();
   const [tenantSlug, setTenantSlug] = useState('');
   const [tenantName, setTenantName] = useState('');
@@ -22,13 +24,30 @@ export function Register() {
     setError(null);
     setSubmitting(true);
     try {
-      await register({ tenantSlug, tenantName, adminEmail, adminName, password });
-      navigate('/dashboard');
+      await register({ tenantSlug, tenantName, adminEmail, adminName, password, language: i18n.language === 'es' ? 'es' : 'en' });
+      // A brand-new workspace starts at the setup wizard (docs/adr/0072-first-run-setup.md).
+      navigate('/setup');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : t('auth.register.failed'));
     } finally {
       setSubmitting(false);
     }
+  }
+
+  // A self-hosted instance takes one organization; once it exists, there's
+  // nothing to register here.
+  if (registration && !registration.open) {
+    return (
+      <AuthLayout tagline={t('auth.register.tagline')} bullets={t('auth.register.bullets', { returnObjects: true }) as string[]}>
+        <div className="flex flex-col gap-4">
+          <h1 className="text-[23px] font-extrabold tracking-tight text-slate-900">{t('auth.register.closedTitle')}</h1>
+          <p className="text-[13.5px] text-slate-500">{t('auth.register.closedBody')}</p>
+          <Link to="/login" className="w-full rounded-[9px] bg-indigo-600 px-4 py-2.5 text-center text-[13.5px] font-bold text-white shadow-sm hover:bg-indigo-700">
+            {t('auth.register.signIn')}
+          </Link>
+        </div>
+      </AuthLayout>
+    );
   }
 
   return (

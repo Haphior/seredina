@@ -56,7 +56,7 @@ You can also run it directly with `MCP_TRANSPORT=http` in
 ## Authorization
 
 Every tool call that changes data goes through the tenant's Autonomy
-Policy (**Operations → AI Agent Activity** in the console): tools not on
+Policy (**Settings → AI Agent Activity** in the console): tools not on
 the auto-execute allow-list wait there for a human to approve or reject —
 and **every** call, whether auto-executed or not, lands in the same audit
 log. Your external agent has exactly the same limits as the internal

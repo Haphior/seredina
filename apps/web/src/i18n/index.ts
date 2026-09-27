@@ -28,6 +28,18 @@ export function setLanguage(lang: SupportedLanguage) {
   }
 }
 
+/**
+ * The locale to format dates and numbers in: the browser's own regional
+ * locale when it speaks the console's language (es-CL for a Chilean browser
+ * showing Spanish), else the console language itself -- never an English
+ * US format under a Spanish console.
+ */
+export function uiLocale(): string {
+  const lang = i18n.language || 'en';
+  const browser = typeof navigator !== 'undefined' ? navigator.languages ?? [navigator.language] : [];
+  return browser.find((l) => l.toLowerCase().startsWith(lang)) ?? lang;
+}
+
 i18n.use(initReactI18next).init({
   resources: { en: { translation: en }, es: { translation: es } },
   lng: detectLanguage(),

@@ -126,7 +126,7 @@ export function Devices() {
   }
 
   return (
-    <div className="px-8 py-7">
+    <div className="px-4 py-5 md:px-8 md:py-7">
       <div className="mb-1 flex items-center justify-between">
         <h1 className="text-[22px] font-extrabold tracking-tight text-slate-900">{t('devices.title')}</h1>
         <Button onClick={generateToken} isLoading={generating}>

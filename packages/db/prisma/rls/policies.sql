@@ -35,7 +35,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON
   notifications, notification_preferences, ai_usage_logs, attachments, kb_chunks,
   autonomy_policies, ai_agent_runs, tenant_ai_settings, tenant_ui_settings, tenant_kb_settings, telegram_channels,
   csat_responses, device_enrollment_tokens, devices, tenant_sso_settings,
-  contracts, contract_assets, email_templates, email_images
+  contracts, contract_assets, email_templates, email_images, team_members,
+  tenant_notification_defaults
   TO app_tenant;
 
 -- Append-only: the app can write and read audit entries, never change or delete
@@ -75,7 +76,8 @@ BEGIN
     'notifications', 'notification_preferences', 'ai_usage_logs', 'attachments', 'kb_chunks',
     'autonomy_policies', 'ai_agent_runs', 'tenant_ai_settings', 'tenant_ui_settings', 'tenant_kb_settings', 'telegram_channels',
     'csat_responses', 'device_enrollment_tokens', 'devices', 'audit_logs', 'tenant_sso_settings',
-    'contracts', 'contract_assets', 'email_templates', 'email_images'
+    'contracts', 'contract_assets', 'email_templates', 'email_images', 'team_members',
+    'tenant_notification_defaults'
   ]
   LOOP
     EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', tbl);
@@ -164,6 +166,22 @@ $$;
 
 REVOKE ALL ON FUNCTION public.count_tenants() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.count_tenants() TO app_tenant;
+
+-- Same pattern, for the sign-in page of a self-hosted instance: with exactly
+-- one tenant, the organization field is noise, so the page asks for the slug
+-- instead of the user. Returns NULL unless there is exactly one tenant, and
+-- only its slug -- already public, it's in every portal and KB URL.
+CREATE OR REPLACE FUNCTION public.single_tenant_slug()
+RETURNS text
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT CASE WHEN count(*) = 1 THEN min(slug) END FROM tenants;
+$$;
+
+REVOKE ALL ON FUNCTION public.single_tenant_slug() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.single_tenant_slug() TO app_tenant;
 
 -- Same escape-hatch pattern as resolve_tenant_id_by_api_key_hash: an incoming
 -- Telegram webhook POST (docs/adr/0044-telegram-channel.md) carries only the

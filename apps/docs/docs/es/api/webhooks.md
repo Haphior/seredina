@@ -1,8 +1,8 @@
 # Webhooks salientes
 
-La dirección contraria a la API REST: en vez de que vos llames a
-Seredina, Seredina te avisa a vos cuando algo pasa. Se configuran desde
-**Operaciones → Webhooks** en la consola.
+La dirección contraria a la API REST: en vez de que tú llames a
+Seredina, Seredina te avisa a ti cuando algo pasa. Se configuran desde
+**Ajustes → Webhooks** en la consola.
 
 ## Tipos de webhook
 
@@ -12,14 +12,14 @@ todas formas):
 
 | Tipo | Para qué | Firma |
 |---|---|---|
-| `generic` | Tu propio receptor — un endpoint que vos escribiste | Sí, HMAC-SHA256 |
+| `generic` | Tu propio receptor — un endpoint que tú escribiste | Sí, HMAC-SHA256 |
 | `slack` | Publica directo a un canal de Slack, vía sus "Incoming Webhooks" | No |
 | `teams` | Publica directo a un canal de Teams, vía la app "Workflows" | No |
 
 Los webhooks de Slack/Teams son deliberadamente **"trae tu propia URL"**:
-vos generás el webhook en tu propio workspace (Slack: Incoming Webhooks;
+tú generas el webhook en tu propio workspace (Slack: Incoming Webhooks;
 Teams: la plantilla "Post to a channel when a webhook request is
-received" de la app Workflows) y pegás esa URL en Seredina — no hay una
+received" de la app Workflows) y pegas esa URL en Seredina — no hay una
 app de Slack/Teams que Seredina opere ni un proceso de aprobación de
 terceros de por medio.
 
@@ -102,5 +102,5 @@ curl -X POST https://tu-instancia.example.com/webhooks \
 
 `kind` es opcional y por defecto es `generic`. Esta llamada usa tu propia
 sesión de agente (no una API Key) porque es configuración de tenant, no un
-endpoint público — hacela desde la consola en vez de a mano si no
-necesitás automatizarlo.
+endpoint público — hazla desde la consola en vez de a mano si no
+necesitas automatizarlo.

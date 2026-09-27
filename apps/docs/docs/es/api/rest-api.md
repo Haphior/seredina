@@ -1,6 +1,6 @@
 # API REST
 
-La API pública (autenticada con [API Keys](/es/api/#api-keys-para-integraciones-lo-que-necesitás-vos))
+La API pública (autenticada con [API Keys](/es/api/#api-keys-para-integraciones-lo-que-necesitas))
 es deliberadamente chica: crear tickets desde afuera y convertir alertas de
 monitoreo en tickets. No es un CRUD completo — la consola web habla con
 una API interna mucho más grande (`/tickets`, `/users`, `/assets`, ...),

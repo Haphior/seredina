@@ -13,7 +13,7 @@ agent console.
 
 ### Creating a key
 
-From the console: **Administration → API Keys → New Key**. The full value
+From the console: **Settings → API Keys → New Key**. The full value
 (prefixed `sk_`) is shown **once** when created — Seredina only stores its
 hash, never the plaintext value, so if you lose it you'll need to
 generate a new one.
@@ -37,7 +37,7 @@ The key identifies the tenant automatically — no need to send a
 
 ### Revoking a key
 
-From the same place you created it — **Administration → API Keys**. A
+From the same place you created it — **Settings → API Keys**. A
 revoked key stops working immediately; any integration still using it
 starts getting `401`.
 

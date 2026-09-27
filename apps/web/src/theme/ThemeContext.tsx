@@ -5,7 +5,7 @@ import { apiGet } from '../lib/api';
 // document (no data-theme attribute) already renders it via index.css's :root
 // block, so this context starting at 'middle' before the fetch below
 // resolves is already correct for most tenants, not just a placeholder.
-export type UiTheme = 'middle' | 'refined';
+export type UiTheme = 'middle' | 'refined' | 'aero';
 
 interface ThemeContextValue {
   theme: UiTheme;
@@ -16,10 +16,10 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function applyThemeToDocument(theme: UiTheme) {
-  if (theme === 'refined') {
-    document.documentElement.dataset.theme = 'refined';
-  } else {
+  if (theme === 'middle') {
     delete document.documentElement.dataset.theme;
+  } else {
+    document.documentElement.dataset.theme = theme;
   }
 }
 

@@ -27,6 +27,12 @@ export default {
           900: 'var(--n-900)',
           950: 'var(--n-950)',
         },
+        // The accent, same mechanism. Every theme but Aero keeps Tailwind's
+        // own indigo/violet (the :root values in index.css are those exact
+        // hex codes); Aero swaps in its sky blue -- see
+        // docs/adr/0073-frutiger-aero-theme.md.
+        indigo: Object.fromEntries(['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'].map((k) => [k, `var(--a-${k})`])),
+        violet: Object.fromEntries(['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'].map((k) => [k, `var(--v-${k})`])),
       },
     },
   },

@@ -11,6 +11,27 @@ interface ThemeOption {
 }
 
 function ThemeSwatch({ theme }: { theme: UiTheme }) {
+  if (theme === 'aero') {
+    // Sky, frosted glass and a glossy aqua bar -- what the theme looks like.
+    return (
+      <div
+        className="h-20 w-full overflow-hidden rounded-lg border"
+        style={{ background: 'linear-gradient(172deg, #8fd4fb 0%, #c3eaff 45%, #e4f8ec 100%)', borderColor: '#c9e1ee' }}
+      >
+        <div className="flex h-full items-center gap-2 p-2.5">
+          <div className="h-full w-8 rounded" style={{ background: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.9)' }} />
+          <div className="flex flex-1 flex-col gap-1.5">
+            <div
+              className="h-2.5 w-3/4 rounded-full"
+              style={{ background: 'linear-gradient(180deg, #7fd0f8 0%, #1498d6 50%, #0879b5 51%, #1a8fcb 100%)' }}
+            />
+            <div className="h-2 w-full rounded-full" style={{ background: 'rgba(255,255,255,0.75)' }} />
+            <div className="h-2 w-1/2 rounded-full" style={{ background: 'rgba(255,255,255,0.75)' }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
   const bg = theme === 'refined' ? '#f8fafc' : '#f7f5f1';
   const card = '#fff';
   const border = theme === 'refined' ? '#e2e8f0' : '#e4ded2';
@@ -59,7 +80,7 @@ export function ThemeSettings() {
   }
 
   return (
-    <div className="px-8 py-7">
+    <div className="px-4 py-5 md:px-8 md:py-7">
       <h1 className="mb-1 text-[22px] font-extrabold tracking-tight text-slate-900">{t('theme.title')}</h1>
       <p className="mb-6 max-w-xl text-[13.5px] text-slate-500">
         {t('theme.intro')}
@@ -69,7 +90,7 @@ export function ThemeSettings() {
       {!options && !error && <p className="text-sm text-slate-500">{t('common.loading')}</p>}
 
       {options && (
-        <div className="grid max-w-2xl grid-cols-2 gap-4">
+        <div className="grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {options.map((opt) => {
             const selected = theme === opt.key;
             return (

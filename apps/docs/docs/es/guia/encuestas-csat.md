@@ -8,8 +8,8 @@ configuración adicional por tu parte. Se pide **como máximo una vez por
 ticket**, nunca se re-envía.
 
 Por correo es un botón **Calificar la atención** en el aviso de solicitud
-resuelta, en el idioma y con las palabras de tu empresa. Desactivala o
-cambiá ese correo en [Correos al cliente](/es/guia/canales#correos-a-tus-clientes).
+resuelta, en el idioma y con las palabras de tu empresa. Desactívala o
+cambia ese correo en [Correos al cliente](/es/guia/canales#correos-a-tus-clientes).
 
 ::: tip Requiere `WEB_ORIGIN` configurada
 Sin esa variable de entorno, la encuesta simplemente no se genera —

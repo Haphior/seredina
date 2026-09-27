@@ -5,7 +5,7 @@ distinguishing upfront:
 
 | Screen | Menu group | For |
 |---|---|---|
-| **Service Catalog** | Configuration | Items a user can *request* — build a ticket with pre-filled fields |
+| **Service Catalog** | Settings | Items a user can *request* — build a ticket with pre-filled fields |
 | **Services** | CMDB | Real business services (Email, VPN, Billing...) mapped to the assets that underpin them |
 
 ## Service Catalog (requests)

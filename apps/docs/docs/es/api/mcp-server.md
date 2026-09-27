@@ -9,7 +9,7 @@ negocio ni saltarte los controles de autorización.
 
 ## Dos transportes
 
-Elegís con `MCP_TRANSPORT` (por defecto `stdio`):
+Eliges con `MCP_TRANSPORT` (por defecto `stdio`):
 
 ### `stdio`
 
@@ -20,12 +20,12 @@ servidor MCP local. El tenant se resuelve una sola vez al arrancar, a
 partir de `SEREDINA_API_KEY`.
 
 ```bash
-# 1. Creá una API Key desde Administración → Claves de API en la consola.
+# 1. Crea una API Key desde Ajustes → Claves de API en la consola.
 
 # 2. Construí la imagen:
 docker build -f infra/docker/Dockerfile.mcp-server -t seredina-mcp-server .
 
-# 3. Apuntá tu cliente MCP a:
+# 3. Apunta tu cliente MCP a:
 docker run -i --rm \
   -e SEREDINA_API_KEY=<tu clave> \
   -e DATABASE_URL=... \
@@ -56,7 +56,7 @@ levanta. También se puede correr directo con `MCP_TRANSPORT=http` en
 ## Autorización
 
 Cada llamada de herramienta que modifica datos pasa por la Política de
-Autonomía del tenant (**Operaciones → Actividad del Agente de IA** en la
+Autonomía del tenant (**Ajustes → Actividad del Agente de IA** en la
 consola): las herramientas que no están en la lista de auto-ejecución
 esperan ahí a que un humano apruebe o rechace — y **toda** llamada,
 auto-ejecutada o no, queda en el mismo registro de auditoría. Tu agente

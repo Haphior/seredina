@@ -423,3 +423,20 @@ export function ShrinkIcon(props: SVGProps<SVGSVGElement>) {
     </Icon>
   );
 }
+
+export function MenuIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <path d="M3.5 6h13M3.5 10h13M3.5 14h13" />
+    </Icon>
+  );
+}
+
+export function GearIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <circle cx="10" cy="10" r="2.6" />
+      <path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M4.7 15.3l1.4-1.4M13.9 6.1l1.4-1.4" />
+    </Icon>
+  );
+}

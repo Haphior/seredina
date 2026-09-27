@@ -28,7 +28,9 @@
       "submitting": "Creando…",
       "haveAccount": "¿Ya tienes una cuenta?",
       "signIn": "Iniciar sesión",
-      "failed": "Error al registrarse"
+      "failed": "Error al registrarse",
+      "closedTitle": "Este servidor ya tiene su organización",
+      "closedBody": "Un Seredina instalado en tu servidor funciona con una sola organización. Para tener una cuenta, pídele a un administrador que te invite."
     },
     "fields": {
       "orgSlug": "Identificador de la organización",
@@ -80,7 +82,12 @@
       "cmdb": "CMDB",
       "configuration": "Configuración",
       "operations": "Operaciones",
-      "administration": "Administración"
+      "administration": "Administración",
+      "channels": "Canales",
+      "service": "Tickets y servicio",
+      "people": "Personas y acceso",
+      "ai": "IA",
+      "organization": "Organización"
     },
     "items": {
       "dashboard": "Panel",
@@ -119,12 +126,19 @@
       "contracts": "Contratos",
       "customerPortal": "Portal de clientes",
       "contacts": "Contactos",
-      "customerEmails": "Correos al cliente"
+      "customerEmails": "Correos al cliente",
+      "teams": "Equipos",
+      "settings": "Ajustes",
+      "notificationSettings": "Notificaciones",
+      "setup": "Configuración inicial"
     }
   },
   "layout": {
     "logOut": "Cerrar sesión",
-    "accountSecurity": "Seguridad de la cuenta"
+    "accountSecurity": "Seguridad de la cuenta",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "menu": "Menú"
   },
   "language": {
     "english": "English",
@@ -132,7 +146,7 @@
   },
   "dashboard": {
     "title": "Panel",
-    "subtitle": "Oculta, redimensiona, reordena o agregá widgets — se guarda por persona, no por tenant.",
+    "subtitle": "Oculta, redimensiona, reordena o agrega widgets. Se guarda por persona, no para toda la organización.",
     "loading": "Cargando…",
     "loadFailed": "No se pudo cargar el panel",
     "hidden": "Oculto",
@@ -173,14 +187,15 @@
         "customize_status": "Personaliza tus estados de tickets",
         "set_sla_policy": "Define una política de SLA",
         "create_macro": "Crea una macro",
-        "invite_teammate": "Invita a un compañero de equipo"
+        "invite_teammate": "Invita a un compañero de equipo",
+        "connect_email": "Conecta un buzón de correo"
       }
     },
     "recentActivity": {
       "empty": "Aún no hay tickets."
     },
     "myOpenTickets": {
-      "empty": "No tenés tickets abiertos asignados."
+      "empty": "No tienes tickets abiertos asignados."
     },
     "unassignedTickets": {
       "empty": "No hay tickets sin asignar — buen trabajo."
@@ -230,7 +245,7 @@
       "closed": "Cerrados"
     },
     "filters": {
-      "anyone": "Cualquiera",
+      "anyone": "Cualquier responsable",
       "assignedToMe": "Asignados a mí",
       "anyPriority": "Cualquier prioridad",
       "saveThisView": "+ Guardar esta vista"
@@ -254,7 +269,7 @@
       "slaOverdue": "SLA vencido",
       "sla": "SLA"
     },
-    "empty": "No hay tickets aquí.",
+    "empty": "Ningún ticket coincide con estos filtros.",
     "loadFailed": "No se pudieron cargar los tickets",
     "loadMore": "Cargar más ({{count}} restantes)",
     "removeSavedViewFailed": "No se pudo quitar la vista guardada",
@@ -278,7 +293,9 @@
       "subjectOptional": "Asunto (opcional)",
       "request": "Solicitud",
       "createTicket": "Crear ticket",
-      "createFailed": "No se pudo crear el ticket"
+      "createFailed": "No se pudo crear el ticket",
+      "team": "Equipo",
+      "assignee": "Responsable"
     },
     "live": {
       "live": "En vivo",
@@ -287,11 +304,17 @@
       "connectingHint": "Conectando con las actualizaciones en vivo",
       "offline": "Reconectando…",
       "offlineHint": "Las actualizaciones en vivo están en pausa; recarga para ver lo último"
+    },
+    "emptyFirst": {
+      "title": "Todavía no hay tickets",
+      "body": "Los tickets llegan desde un buzón de correo conectado, el portal de clientes, la API o una alerta de monitoreo. También puedes registrar uno a mano, por una llamada o una visita.",
+      "create": "Registrar un ticket",
+      "connectEmail": "Conectar un buzón"
     }
   },
   "ticketDetail": {
     "backToTickets": "Tickets",
-    "priorityLabel": "prioridad {{priority}}",
+    "priorityLabel": "Prioridad {{priority}}",
     "ref": "ref: {{id}}",
     "firstResponseOverdue": "Primera respuesta vencida",
     "resolutionOverdue": "Resolución vencida",
@@ -377,7 +400,9 @@
     "collisionReply": "{{name}} respondió mientras escribías. Revisa su respuesta antes de enviar la tuya, para que el cliente no reciba dos.",
     "collisionNote": "{{name}} agregó una nota interna mientras escribías.",
     "collisionCustomer": "{{name}} volvió a escribir mientras redactabas: léelo antes de enviar.",
-    "collisionDismiss": "Entendido"
+    "collisionDismiss": "Entendido",
+    "mentionHint": "Escribe @ para mencionar a un colega",
+    "mentionNobody": "Nadie coincide"
   },
   "tour": {
     "stepCount": "Paso {{current}} de {{total}}",
@@ -389,19 +414,19 @@
     "steps": {
       "welcome": {
         "title": "¡Bienvenido a Seredina!",
-        "body": "Un vistazo rápido a dónde está todo. Podés saltar este tour cuando quieras."
+        "body": "Un vistazo rápido a dónde está todo. Puedes saltar este tour cuando quieras."
       },
       "dashboard": {
         "title": "Tu panel",
-        "body": "Acá aterrizás cada vez que entrás — widgets de volumen de tickets, SLA y más, que podés ocultar o reordenar."
+        "body": "Aquí llegas cada vez que entras: widgets de volumen de tickets, SLA y más, que puedes ocultar o reordenar."
       },
       "checklist": {
         "title": "Primeros pasos",
-        "body": "Esta lista te guía para configurar tu organización: personalizar estados de tickets, una política de SLA, una macro, e invitar a tu equipo."
+        "body": "Esta lista te guía para configurar tu organización: conectar un buzón de correo, personalizar los estados de tickets, definir un SLA, crear una macro e invitar a tu equipo."
       },
       "tickets": {
         "title": "Tickets",
-        "body": "Todo lo que llega — por correo, la API, o una alerta de monitoreo — termina siendo un ticket acá."
+        "body": "Todo lo que llega, por correo, la API o una alerta de monitoreo, termina siendo un ticket aquí."
       },
       "processes": {
         "title": "Procesos",
@@ -409,15 +434,19 @@
       },
       "knowledgeBase": {
         "title": "Base de conocimiento",
-        "body": "Artículos que usa tu equipo — publicá uno y tus clientes también van a poder leerlo."
+        "body": "Artículos que usa tu equipo. Publica uno y tus clientes también podrán leerlo."
       },
       "language": {
         "title": "Idioma",
-        "body": "Cambiá el idioma de la consola cuando quieras — es tu propia preferencia, no la de todo el equipo."
+        "body": "Cambia el idioma de la consola cuando quieras. Es tu propia preferencia, no la de todo el equipo."
       },
       "done": {
         "title": "¡Listo!",
-        "body": "Podés volver a ver este tour cuando quieras con el ícono de ayuda, justo abajo."
+        "body": "Puedes volver a ver este tour cuando quieras con el ícono de ayuda, justo abajo."
+      },
+      "settings": {
+        "title": "Ajustes",
+        "body": "Todo lo que configura tu organización: buzones, SLA, usuarios, equipos, IA y más, agrupado y con buscador."
       }
     }
   },
@@ -476,7 +505,9 @@
     "port": "Puerto",
     "username": "Usuario",
     "password": "Contraseña",
-    "useTls": "Usar TLS"
+    "useTls": "Usar TLS",
+    "fromSetup": "Estás conectando un buzón como parte de la configuración inicial.",
+    "backToSetup": "Volver al asistente →"
   },
   "auditLog": {
     "title": "Registro de auditoría",
@@ -859,14 +890,28 @@
     "title": "Configuración de notificaciones",
     "loadFailed": "No se pudo cargar la configuración de notificaciones",
     "saveFailed": "No se pudo guardar",
-    "intro": "Cómo te avisamos de la actividad — en la aplicación siempre aparece en la campana; el correo necesita un canal de correo conectado para enviarse.",
+    "intro": "Cómo te avisamos de la actividad. En la aplicación aparece en la campana; el correo necesita un canal de correo conectado para enviarse.",
     "event": "Evento",
     "inApp": "En la app",
     "email": "Correo",
     "events": {
       "TICKET_ASSIGNED": "Se me asigna un ticket",
       "NEW_REPLY": "Un contacto responde un ticket asignado a mí",
-      "CONTRACT_EXPIRING": "Un contrato, garantía o licencia está por vencer (usuarios que gestionan activos)"
+      "CONTRACT_EXPIRING": "Un contrato, garantía o licencia está por vencer (usuarios que gestionan activos)",
+      "TEAM_TICKET": "Llega un ticket a uno de mis equipos sin responsable",
+      "TICKET_REOPENED": "Un cliente reabre un ticket mío o de mi equipo",
+      "MENTIONED": "Alguien me menciona en una nota interna",
+      "SLA_WARNING": "Un plazo de SLA de mi ticket está por vencer (80 % del tiempo usado)",
+      "SLA_BREACHED": "Se venció un plazo de SLA de mi ticket"
+    },
+    "useDefault": "Usar el valor de la organización",
+    "fromWorkspace": "Valor de la organización",
+    "defaultsTitle": "Valores por defecto para toda la organización",
+    "defaultsIntro": "Lo que recibe cada persona mientras no elija por su cuenta arriba. Cambiar un valor por defecto no pisa lo que alguien ya eligió.",
+    "groups": {
+      "tickets": "Tickets",
+      "sla": "SLA",
+      "assets": "Activos"
     }
   },
   "kbGate": {
@@ -929,7 +974,21 @@
     "saveFailed": "No se pudo guardar el tema — se revirtió",
     "title": "Apariencia",
     "intro": "Elige cómo se ve Seredina para todos en este espacio de trabajo. Se aplica al instante para cualquiera que tenga la aplicación abierta.",
-    "active": "Activo"
+    "active": "Activo",
+    "options": {
+      "aero": {
+        "name": "Frutiger Aero",
+        "description": "Brillante y luminoso: un cielo degradado, paneles de vidrio esmerilado, un acento aqua y botones con brillo."
+      },
+      "middle": {
+        "name": "Meet in the Middle",
+        "description": "El predeterminado, cálido y fiel a la marca: neutros en tonos piedra y un ícono en cada ticket que muestra cómo llegó."
+      },
+      "refined": {
+        "name": "Refined",
+        "description": "El aspecto original: neutros grises fríos, sin el ícono de canal."
+      }
+    }
   },
   "aiUsage": {
     "loadFailed": "No se pudo cargar el uso de IA",
@@ -1026,7 +1085,7 @@
     "title": "Roles",
     "new": "Nuevo rol",
     "edit": "Editar rol",
-    "intro": "Cada rol de aquí está disponible de inmediato al asignarle uno a un usuario (Administración → Usuarios) — sin reiniciar, sin una lista fija.",
+    "intro": "Cada rol de aquí está disponible de inmediato al asignárselo a un usuario (Ajustes → Usuarios), sin reiniciar y sin una lista fija.",
     "delete": "eliminar",
     "key": "Clave",
     "keyHint": "Minúsculas, letras, números y guiones bajos. No se puede cambiar después.",
@@ -1043,6 +1102,11 @@
       "roles:manage": "Gestionar roles",
       "audit:read": "Ver el registro de auditoría",
       "contacts:manage": "Gestionar los datos personales de los contactos"
+    },
+    "builtin": {
+      "admin": "Administrador",
+      "team_lead": "Líder de equipo",
+      "agent": "Agente"
     }
   },
   "equipment": {
@@ -1082,22 +1146,30 @@
     "removeFailed": "No se pudo quitar la política de SLA",
     "confirmRemove": "¿Quitar la política de SLA de prioridad {{priority}}? Los tickets con esa prioridad dejarán de tener fechas de vencimiento.",
     "title": "Políticas de SLA",
-    "intro": "Objetivos de primera respuesta y resolución por prioridad. Una prioridad sin política no tiene vencimientos — el seguimiento de SLA es opcional. Los objetivos \"solo horario laboral\" usan el horario de la página Horario laboral.",
+    "intro": "Plazos de primera respuesta y resolución por prioridad. Una prioridad sin plazo no tiene vencimientos; el seguimiento de SLA es opcional. Los plazos «solo horario laboral» cuentan solo las horas definidas en Horario laboral.",
     "firstResponse": "Primera respuesta",
-    "firstResponseAria": "Minutos de primera respuesta para prioridad {{priority}}",
+    "firstResponseAria": "Plazo de primera respuesta para prioridad {{priority}}",
     "resolution": "Resolución",
-    "resolutionAria": "Minutos de resolución para prioridad {{priority}}",
-    "placeholder": "p. ej. 30",
-    "min": "min",
+    "resolutionAria": "Plazo de resolución para prioridad {{priority}}",
     "businessHoursOnly": "Solo horario laboral",
     "remove": "quitar",
-    "update": "Actualizar",
     "left": "Quedan {{time}}",
     "overdueBy": "Vencido hace {{time}}",
     "firstResponseDue": "Primera respuesta vence {{time}}",
     "resolutionDue": "Resolución vence {{time}}",
     "firstResponseShort": "Respuesta",
-    "resolutionShort": "Resolución"
+    "resolutionShort": "Resolución",
+    "useSuggested": "Completar con plazos sugeridos",
+    "saveChanges": "Guardar cambios",
+    "saved": "Guardado.",
+    "bothNeeded": "Cada prioridad necesita un plazo de primera respuesta y uno de resolución.",
+    "noTarget": "Sin plazo",
+    "unit": "unidad",
+    "units": {
+      "min": "min",
+      "h": "horas",
+      "d": "días"
+    }
   },
   "assetStatus": {
     "ACTIVE": "Activo",
@@ -1155,7 +1227,17 @@
       "agent": "Registrado por un agente",
       "portal": "Por portal de clientes"
     },
-    "viaOther": "Por {{channel}}"
+    "viaOther": "Por {{channel}}",
+    "short": {
+      "email": "Correo",
+      "api": "API",
+      "catalog": "Catálogo",
+      "widget": "Widget",
+      "telegram": "Telegram",
+      "alert": "Alerta",
+      "agent": "Agente",
+      "portal": "Portal"
+    }
   },
   "catalog": {
     "loadFailed": "No se pudo cargar el catálogo de servicios",
@@ -2060,5 +2142,230 @@
     "removeImage": "Quitar",
     "orPasteUrl": "o pega la URL de una imagen publicada",
     "uploadFailed": "No se pudo subir la imagen"
+  },
+  "teams": {
+    "title": "Equipos",
+    "new": "Nuevo equipo",
+    "intro": "Agrupa a los agentes según lo que atienden. Un ticket se puede enviar a un equipo, y sus miembros reciben un aviso cuando llega uno sin responsable.",
+    "empty": "Todavía no hay equipos. Crea uno por cada grupo que atiende tickets, como Soporte N1 o Redes.",
+    "loadFailed": "No se pudieron cargar los equipos.",
+    "saveFailed": "No se pudo guardar el equipo.",
+    "deleteFailed": "No se pudo eliminar el equipo.",
+    "confirmDelete": "¿Eliminar el equipo «{{name}}»?",
+    "confirmDeleteWithTickets_one": "¿Eliminar el equipo «{{name}}»? Su {{count}} ticket se mantiene, sin equipo.",
+    "confirmDeleteWithTickets_other": "¿Eliminar el equipo «{{name}}»? Sus {{count}} tickets se mantienen, sin equipo.",
+    "memberCount_one": "{{count}} miembro",
+    "memberCount_other": "{{count}} miembros",
+    "ticketCount_one": "{{count}} ticket",
+    "ticketCount_other": "{{count}} tickets",
+    "edit": "editar",
+    "delete": "eliminar",
+    "editTitle": "Editar {{name}}",
+    "name": "Nombre",
+    "namePlaceholder": "p. ej. Soporte N1",
+    "members": "Miembros",
+    "selected_one": "{{count}} seleccionado",
+    "selected_other": "{{count}} seleccionados",
+    "searchPeople": "Buscar personas…",
+    "noPeople": "Nadie coincide.",
+    "membersHint": "Los miembros reciben el aviso «ticket en mi equipo»."
+  },
+  "settings": {
+    "title": "Ajustes",
+    "intro": "Todo lo que define cómo funciona tu organización.",
+    "search": "Buscar en ajustes…",
+    "noMatch": "Ningún ajuste coincide.",
+    "descriptions": {
+      "emailChannels": "Buzones que convierten correos en tickets y envían tus respuestas.",
+      "customerEmails": "Idioma, logo, firma y textos de lo que reciben los clientes.",
+      "customerPortal": "Una página donde los clientes siguen y responden sus solicitudes.",
+      "telegram": "Recibe solicitudes por un bot de Telegram.",
+      "monitoringIntegrations": "Convierte alertas de Zabbix, Grafana y otros en tickets.",
+      "webhooks": "Avisa a otros sistemas, Slack o Teams cuando algo pasa.",
+      "apiKeys": "Claves para scripts e integraciones que crean tickets.",
+      "ticketStatuses": "Las etapas de un ticket, con tus propios nombres.",
+      "slaPolicies": "Qué tan rápido responder y resolver, por prioridad.",
+      "businessHours": "Tu horario laboral, para SLA que se pausan fuera de él.",
+      "macros": "Respuestas y acciones guardadas, aplicadas con un clic.",
+      "customFields": "Campos extra en los tickets, como sede o centro de costo.",
+      "serviceCatalog": "Servicios que se pueden solicitar, con su propio formulario.",
+      "processTemplates": "Checklists reutilizables: ingresos, cambios, despliegues.",
+      "onCall": "Quién está de guardia y cómo escala un ticket sin respuesta.",
+      "users": "Cuentas, invitaciones y roles de quienes atienden tickets.",
+      "teams": "Grupos de agentes; un ticket se puede enviar a un equipo.",
+      "roles": "Qué puede hacer cada rol.",
+      "notificationSettings": "De qué te avisamos, y los valores de la organización.",
+      "sso": "Inicia sesión con el proveedor de identidad de tu empresa.",
+      "auditLog": "Quién cambió qué, y cuándo.",
+      "aiSettings": "El modelo de IA, tu clave y lo que la IA puede hacer.",
+      "aiUsage": "Llamadas a la IA y su costo.",
+      "aiAgentActivity": "Lo que hizo el agente de IA por su cuenta, para revisar.",
+      "appearance": "El aspecto de la consola.",
+      "branding": "Tu nombre, logo y colores en las páginas públicas.",
+      "dataExport": "Descarga los datos de tu organización.",
+      "setup": "El asistente de cinco pasos: organización, correo, tipo de soporte y equipo."
+    }
+  },
+  "setup": {
+    "kicker": "Configuración inicial",
+    "title": "Deja tu mesa de ayuda lista",
+    "intro": "Cinco pasos cortos. Puedes saltar cualquiera y cambiar todo después en Ajustes.",
+    "skipAll": "Saltar el asistente",
+    "progress": "Pasos de la configuración",
+    "loadFailed": "No se pudo cargar la configuración.",
+    "saveFailed": "No se pudo guardar.",
+    "saveAndContinue": "Guardar y continuar",
+    "continue": "Continuar",
+    "later": "Lo hago después",
+    "steps": {
+      "organization": {
+        "short": "Organización",
+        "title": "Tu organización",
+        "body": "El nombre que ven tus clientes, el idioma en que les escribes y tu horario de trabajo."
+      },
+      "email": {
+        "short": "Correo",
+        "title": "Conecta tu buzón de soporte",
+        "body": "Los correos que lleguen a este buzón se convierten en tickets, y tus respuestas salen desde él."
+      },
+      "template": {
+        "short": "Tipo de soporte",
+        "title": "¿Qué tipo de soporte das?",
+        "body": "Elige un punto de partida y creamos equipos, categorías, plazos de SLA, respuestas guardadas y un catálogo de solicitudes."
+      },
+      "team": {
+        "short": "Equipo",
+        "title": "Invita a tu equipo",
+        "body": "Cada persona recibe un correo para elegir su contraseña."
+      },
+      "done": {
+        "short": "Listo",
+        "title": "¡Todo listo!",
+        "body": "Esto es lo que quedó configurado. Puedes volver a cualquier paso desde Ajustes."
+      }
+    },
+    "organization": {
+      "name": "Nombre de la organización",
+      "language": "Idioma",
+      "languageHint": "El de los correos a tus clientes y los nombres por defecto de estados y categorías. Cada persona puede usar la consola en su propio idioma.",
+      "hours": "Horario de atención",
+      "timezone": "Zona horaria"
+    },
+    "schedules": {
+      "office": {
+        "title": "Oficina",
+        "body": "Lunes a viernes, 9:00 a 18:00"
+      },
+      "early": {
+        "title": "Jornada temprana",
+        "body": "Lunes a viernes, 8:00 a 17:30"
+      },
+      "shifts": {
+        "title": "Turnos",
+        "body": "Lunes a sábado, las 24 horas"
+      },
+      "always": {
+        "title": "24/7",
+        "body": "Todos los días, las 24 horas"
+      },
+      "none": {
+        "title": "Lo defino después",
+        "body": "Los plazos de SLA cuentan todas las horas"
+      },
+      "keep": "Mantener el horario que ya tienes"
+    },
+    "email": {
+      "other": "Otro proveedor",
+      "oauthHint": "Inicias sesión con tu cuenta; no guardamos contraseñas.",
+      "passwordHint": "Con usuario y contraseña (IMAP/SMTP).",
+      "why": "Sin un buzón conectado no llegan solicitudes por correo, tus respuestas no les llegan a los clientes y no se pueden enviar invitaciones ni avisos por correo.",
+      "connected_one": "Tienes {{count}} buzón conectado.",
+      "connected_other": "Tienes {{count}} buzones conectados.",
+      "manage": "Administrar"
+    },
+    "templates": {
+      "it_internal": {
+        "title": "TI interno / mesa de ayuda",
+        "body": "Soporte a los colaboradores de tu empresa: equipos, cuentas, accesos y red.",
+        "includes": [
+          "Soporte N1, N2 y Redes",
+          "Categorías: hardware, software, accesos…",
+          "Catálogo: equipo nuevo, accesos, ingreso de colaborador",
+          "SLA de oficina"
+        ]
+      },
+      "customer_support": {
+        "title": "Soporte a clientes",
+        "body": "Atiendes consultas, reclamos y problemas de tus clientes.",
+        "includes": [
+          "Atención, Soporte técnico y Facturación",
+          "Categorías: consulta, reclamo, facturación…",
+          "Catálogo: reportar problema, facturación, cambios",
+          "Respuestas: «Estamos revisando», pedir datos…"
+        ]
+      },
+      "manufacturing": {
+        "title": "Planta / manufactura",
+        "body": "Fallas de máquinas, mantención, calidad y sistemas de la planta.",
+        "includes": [
+          "Mantención, TI planta y Calidad",
+          "Categorías: máquina detenida, falla eléctrica…",
+          "Campo «Línea o área»",
+          "SLA urgente de 10 minutos"
+        ]
+      }
+    },
+    "template": {
+      "note": "Todo lo que se crea se puede renombrar o borrar. Si ya tienes algo con el mismo nombre, no se toca.",
+      "apply": "Crear con esta plantilla",
+      "created": "Creamos {{teams}} equipos, {{slaPolicies}} plazos de SLA, {{macros}} respuestas guardadas, {{customFields}} campos y {{catalogItems}} ítems del catálogo."
+    },
+    "team": {
+      "needsMailbox": "Para enviar invitaciones primero conecta un buzón de correo. También puedes crear cuentas con una contraseña inicial en",
+      "usersPage": "Ajustes → Usuarios",
+      "people": "Personas (una por línea)",
+      "peopleHint_one": "{{count}} persona",
+      "peopleHint_other": "{{count}} personas",
+      "role": "Rol",
+      "team": "Equipo",
+      "noTeam": "Ninguno",
+      "invite_one": "Invitar a {{count}} persona",
+      "invite_other": "Invitar a {{count}} personas"
+    },
+    "done": {
+      "checks": {
+        "organization": "Nombre e idioma",
+        "hours": "Horario de atención",
+        "email": "Buzón de correo",
+        "template": "Equipos, categorías, SLA y catálogo",
+        "team": "Tu equipo"
+      },
+      "nextTitle": "Siguientes pasos",
+      "next": {
+        "agent": {
+          "title": "Instalar el agente en los equipos",
+          "body": "Inventario automático de hardware y software."
+        },
+        "portal": {
+          "title": "Activar el portal de clientes",
+          "body": "Para que sigan sus solicitudes sin escribirte."
+        },
+        "emails": {
+          "title": "Personalizar los correos",
+          "body": "Tu logo, firma y textos."
+        },
+        "appearance": {
+          "title": "Elegir la apariencia",
+          "body": "El tema de la consola."
+        }
+      },
+      "finish": "Ir al panel"
+    },
+    "banner": {
+      "title": "Termina de configurar tu organización",
+      "body": "Conecta tu correo, elige tu tipo de soporte e invita a tu equipo en pocos minutos.",
+      "continue": "Continuar",
+      "dismiss": "Ya está configurado"
+    }
   }
 }

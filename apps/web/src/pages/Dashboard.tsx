@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { apiGet, apiPut, ApiError } from '../lib/api';
+import { apiGet, apiPost, apiPut, ApiError } from '../lib/api';
 import { useAuth } from '../auth/AuthContext';
 import type {
   AgentWorkloadReport,
@@ -30,6 +30,7 @@ import {
   ShrinkIcon,
 } from '../components/icons';
 import { PRIORITY_TONE, STATUS_CATEGORY_TONE } from '../lib/format';
+import { uiLocale } from '../i18n';
 
 interface DashboardData {
   onboarding: OnboardingChecklist;
@@ -46,6 +47,20 @@ interface DashboardData {
 
 export function Dashboard() {
   const { t } = useTranslation();
+  const { hasPermission } = useAuth();
+  // Admins of a workspace that hasn't finished (or skipped) the setup wizard
+  // get a way back to it (docs/adr/0072-first-run-setup.md).
+  const [setupPending, setSetupPending] = useState(false);
+  useEffect(() => {
+    if (!hasPermission('tickets:manage_all')) return;
+    apiGet<{ completed: boolean }>('/setup')
+      .then((s) => setSetupPending(!s.completed))
+      .catch(() => {});
+  }, [hasPermission]);
+  async function dismissSetup() {
+    setSetupPending(false);
+    await apiPost('/setup/complete', {}).catch(() => {});
+  }
   const [prefs, setPrefs] = useState<DashboardPref[] | null>(null);
   const [data, setData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -110,7 +125,9 @@ export function Dashboard() {
   async function move(widgetType: WidgetType, direction: -1 | 1) {
     if (!prefs) return;
     const i = prefs.findIndex((p) => p.widgetType === widgetType);
-    const j = i + direction;
+    // Swap with the next *visible* widget: hidden ones aren't on the grid.
+    let j = i + direction;
+    while (j >= 0 && j < prefs.length && !prefs[j].visible) j += direction;
     if (i < 0 || j < 0 || j >= prefs.length) return;
 
     const a = prefs[i];
@@ -159,9 +176,11 @@ export function Dashboard() {
   }
 
   const hiddenPrefs = prefs?.filter((p) => !p.visible) ?? [];
+  // Hidden widgets live in "Add widget", not as empty cards on the grid.
+  const visiblePrefs = prefs?.filter((p) => p.visible) ?? [];
 
   return (
-    <div className="px-8 py-7">
+    <div className="px-4 py-5 md:px-8 md:py-7">
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
           <h1 className="mb-1 text-[22px] font-extrabold tracking-tight text-slate-900">{t('dashboard.title')}</h1>
@@ -175,17 +194,31 @@ export function Dashboard() {
         )}
       </div>
 
+      {setupPending && (
+        <div className="mb-5 flex flex-wrap items-center gap-3 rounded-xl border border-indigo-200 bg-indigo-50 px-5 py-4">
+          <div className="min-w-0 flex-1">
+            <p className="text-[14.5px] font-semibold text-indigo-900">{t('setup.banner.title')}</p>
+            <p className="text-[13px] text-indigo-800/80">{t('setup.banner.body')}</p>
+          </div>
+          <button onClick={dismissSetup} className="text-[12.5px] font-medium text-indigo-700/70 hover:text-indigo-900">
+            {t('setup.banner.dismiss')}
+          </button>
+          <Link to="/setup" className="rounded-lg bg-indigo-600 px-4 py-2 text-[13px] font-semibold text-white hover:bg-indigo-700">
+            {t('setup.banner.continue')}
+          </Link>
+        </div>
+      )}
       {error && <p className="mb-4 text-sm text-rose-600">{error}</p>}
       {(!prefs || !data) && !error && <p className="text-sm text-slate-500">{t('dashboard.loading')}</p>}
 
       {prefs && data && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {prefs.map((pref, i) => (
+          {visiblePrefs.map((pref, i) => (
             <WidgetCard
               key={pref.widgetType}
               pref={pref}
               canMoveUp={i > 0}
-              canMoveDown={i < prefs.length - 1}
+              canMoveDown={i < visiblePrefs.length - 1}
               isDragging={dragging === pref.widgetType}
               onToggle={() => setVisible(pref.widgetType, !pref.visible)}
               onMoveUp={() => move(pref.widgetType, -1)}
@@ -194,7 +227,7 @@ export function Dashboard() {
               onDragStart={() => setDragging(pref.widgetType)}
               onDragEnd={() => setDragging(null)}
               onDropOn={() => {
-                if (dragging && dragging !== pref.widgetType) reorderTo(dragging, i);
+                if (dragging && dragging !== pref.widgetType) reorderTo(dragging, prefs.findIndex((p) => p.widgetType === pref.widgetType));
                 setDragging(null);
               }}
             >
@@ -394,7 +427,7 @@ function TicketVolumeWidget({ points }: { points: TicketVolumePoint[] }) {
               width={barW * 0.64}
               height={Math.max(h, 1)}
               rx={0.6}
-              fill="#6366f1"
+              fill="var(--a-500)"
             />
           );
         })}
@@ -409,7 +442,7 @@ function TicketVolumeWidget({ points }: { points: TicketVolumePoint[] }) {
 
 function formatShortDate(iso?: string) {
   if (!iso) return '';
-  return new Date(iso + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  return new Date(iso + 'T00:00:00').toLocaleDateString(uiLocale(), { month: 'short', day: 'numeric' });
 }
 
 // The one-segment gauge shared by PriorityBreakdownWidget and
@@ -429,6 +462,7 @@ function ProgressBar({ value, max, colorClassName }: { value: number; max: numbe
 const PRIORITY_ORDER = ['LOW', 'NORMAL', 'HIGH', 'URGENT'] as const;
 
 function PriorityBreakdownWidget({ counts }: { counts: Record<string, number> }) {
+  const { t } = useTranslation();
   const max = Math.max(1, ...PRIORITY_ORDER.map((p) => counts[p] ?? 0));
   return (
     <div className="flex flex-col gap-2">
@@ -437,7 +471,7 @@ function PriorityBreakdownWidget({ counts }: { counts: Record<string, number> })
         return (
           <div key={p} className="flex items-center gap-2.5">
             <Badge tone={PRIORITY_TONE[p]} dot>
-              {p}
+              {t(`priority.${p}`)}
             </Badge>
             <ProgressBar value={count} max={max} colorClassName="bg-indigo-400" />
             <span className="w-6 text-right text-[12.5px] font-medium text-slate-600">{count}</span>

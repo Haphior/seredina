@@ -21,7 +21,7 @@ own. If it used an article, it's listed as "Based on:" below the box.
 
 ## Triage of new tickets
 
-**Operations → AI Settings → AI triage of new tickets** has the AI read each
+**Settings → AI Settings → AI triage of new tickets** has the AI read each
 new ticket's subject and first message (or an alert's description) and pick
 a priority and one of your teams:
 
@@ -48,7 +48,7 @@ Policy.
 
 ### Autonomy Policy
 
-From **Operations → AI Agent Activity**, you configure:
+From **Settings → AI Agent Activity**, you configure:
 
 - **Auto-execute tool allow-list** — only the tools explicitly allowed
   there execute immediately. Any other call lands in a "pending approval"
@@ -65,7 +65,7 @@ external integrations).
 
 ## AI cost transparency
 
-**Operations → AI Usage** shows the real dollar cost of every copilot
+**Settings → AI Usage** shows the real dollar cost of every copilot
 call, aggregated per tenant. Since the AI provider key can be the
 tenant's own (bring your own key, from **Settings → AI**), Seredina never
 adds a markup — the cost shown is exactly what the provider charges.

@@ -15,6 +15,11 @@ export const UI_THEMES = [
     name: 'Refined',
     description: 'The original look: a cool slate neutral palette, no channel glyph.',
   },
+  {
+    key: 'aero',
+    name: 'Frutiger Aero',
+    description: 'Glossy and bright: a sky gradient, frosted-glass panels, an aqua accent and glossy buttons.',
+  },
 ] as const;
 export type UiTheme = (typeof UI_THEMES)[number]['key'];
 

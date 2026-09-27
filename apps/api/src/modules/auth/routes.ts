@@ -13,6 +13,7 @@ import {
   listUsers,
   login,
   registerTenant,
+  registrationInfo,
   resetUserPassword,
   SsoRequiredError,
   unlockUser,
@@ -54,6 +55,7 @@ const registerSchema = z.object({
   adminEmail: z.string().email(),
   adminName: z.string().min(1),
   password: z.string().min(8).max(128),
+  language: z.enum(['es', 'en']).optional(),
 });
 
 const loginSchema = z.object({
@@ -111,6 +113,8 @@ export default async function authRoutes(app: FastifyInstance) {
   // automated credential-stuffing/mass-registration attempt would actually hit.
   // Account lockout (service.ts's login()) is a second, independent layer: this
   // limit is per-IP and resets every window, lockout is per-account and doesn't.
+  app.get('/auth/registration', async (_request, reply) => reply.send(await registrationInfo()));
+
   app.post(
     '/auth/register',
     { config: { rateLimit: { max: 5, timeWindow: '1 minute' } } },

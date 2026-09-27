@@ -8,7 +8,7 @@ para notificaciones *salientes* (Slack, Teams, tu propio webhook), ver
 
 ## Correo electrónico
 
-**Administración → Canales de correo → Nuevo canal** ofrece tres tipos de
+**Ajustes → Canales de correo → Nuevo canal** ofrece tres tipos de
 buzón:
 
 - **Microsoft 365 / Outlook** y **Gmail / Google Workspace** — inicio de
@@ -90,17 +90,17 @@ aviso de solicitud resuelta con su encuesta de satisfacción y los enlaces de
 acceso al portal. Va escrito en el idioma de tu empresa, con una línea chica
 "Powered by Seredina" debajo del mensaje.
 
-Configuralo en **Administración → Correos al cliente**:
+Configúralo en **Ajustes → Correos al cliente**:
 
 - **Idioma de los correos**: español (por defecto) o inglés. Todo lo que
-  Seredina escribe por vos sale en ese idioma: los textos predeterminados,
+  Seredina escribe por ti sale en ese idioma: los textos predeterminados,
   los botones, el pie, los correos de acceso y contraseña, y los avisos a
   tus agentes.
 - **Nombre del remitente**: el que aparece en el De, por ejemplo
   *Soporte TI &lt;soporte@tuempresa.cl&gt;*. Vacío usa el nombre de tu empresa.
-- **Logo** y **banner**: subí un PNG, JPG o GIF (hasta 2 MB), o pegá la
+- **Logo** y **banner**: sube un PNG, JPG o GIF (hasta 2 MB), o pega la
   dirección de una imagen publicada en otro lado. El logo va arriba de
-  cada correo; si no subís uno, se usa el de Marca. El banner es una imagen
+  cada correo; si no subes uno, se usa el de Marca. El banner es una imagen
   ancha debajo del logo: se recomienda de 1200 × 400 px, se muestra a 600 px
   de ancho y puede llevar un enlace.
 - **Firma de la empresa**: va debajo de cada correo: equipo, teléfono,
@@ -118,7 +118,7 @@ Cada correo automático tiene su propia tarjeta:
 | Solicitud cerrada | La solicitud se cierra | No |
 
 ::: v-pre
-Editá el asunto y el mensaje de cada tarjeta con variables como
+Edita el asunto y el mensaje de cada tarjeta con variables como
 `{{contact.name}}`, `{{ticket.number}}` o `{{ticket.subject}}`; con un clic
 se insertan. **Vista previa** muestra el correo con datos de ejemplo, y
 **Enviarme una prueba** lo manda a tu propia dirección. **Restaurar
@@ -130,8 +130,8 @@ Cada agente pone su propia firma en **Seguridad de la cuenta**.
 ::: tip Las imágenes necesitan una dirección que tus clientes alcancen
 Los programas de correo cargan el logo y el banner desde el `WEB_ORIGIN` de
 tu servidor. Si Seredina solo es accesible dentro de la red de tu empresa,
-los clientes de afuera no van a ver las imágenes subidas. Usá una dirección
-pública, o pegá la URL de una imagen publicada en tu sitio web.
+los clientes de afuera no van a ver las imágenes subidas. Usa una dirección
+pública, o pega la URL de una imagen publicada en tu sitio web.
 :::
 
 Las respuestas de fuera de oficina, los rebotes y las listas de correo
@@ -152,13 +152,13 @@ cuenta ni credencial de por medio. Ver
 
 ## Telegram
 
-**Administración → Telegram** — conectá tu propio bot (creado con
+**Ajustes → Telegram** — conecta tu propio bot (creado con
 [@BotFather](https://t.me/BotFather)) pegando su token. Un mensaje directo
 al bot crea un ticket; el agente responde desde la consola como cualquier
 otro canal, y la respuesta llega al usuario por Telegram.
 
 ::: warning Requiere una URL pública real
-Telegram entrega mensajes llamando directamente a tu API — necesitás
+Telegram entrega mensajes llamando directamente a tu API — necesitas
 `API_PUBLIC_URL` configurada con una dirección HTTPS real y alcanzable
 desde internet. `localhost` no funciona para este canal en particular. Ver
 [Variables de entorno](/es/despliegue/variables-de-entorno#red-y-puertos).
@@ -166,7 +166,7 @@ desde internet. `localhost` no funciona para este canal en particular. Ver
 
 ## Alertas de monitoreo (NOC/SOC)
 
-**Administración → Integraciones de Monitoreo** trae instrucciones
+**Ajustes → Integraciones de Monitoreo** trae instrucciones
 listas para copiar y pegar para conectar:
 
 - **Grafana Alerting** — un "contact point" tipo webhook apuntando a

@@ -2,7 +2,7 @@
 
 ## Plantillas de proceso
 
-Desde **Configuración → Plantillas de Procesos** se define una lista de
+Desde **Ajustes → Plantillas de Procesos** se define una lista de
 pasos reutilizable — por ejemplo, "Onboarding de nuevo empleado" con
 cinco pasos fijos. Cada plantilla tiene un tipo:
 

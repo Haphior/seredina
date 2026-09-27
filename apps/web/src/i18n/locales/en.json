@@ -28,7 +28,9 @@
       "submitting": "Creating…",
       "haveAccount": "Already have an account?",
       "signIn": "Sign in",
-      "failed": "Registration failed"
+      "failed": "Registration failed",
+      "closedTitle": "This server already has its organization",
+      "closedBody": "A self-hosted Seredina runs one organization. To get an account, ask an administrator to invite you."
     },
     "fields": {
       "orgSlug": "Organization slug",
@@ -80,7 +82,12 @@
       "cmdb": "CMDB",
       "configuration": "Configuration",
       "operations": "Operations",
-      "administration": "Administration"
+      "administration": "Administration",
+      "channels": "Channels",
+      "service": "Tickets and service",
+      "people": "People and access",
+      "ai": "AI",
+      "organization": "Organization"
     },
     "items": {
       "dashboard": "Dashboard",
@@ -119,12 +126,19 @@
       "contracts": "Contracts",
       "customerPortal": "Customer Portal",
       "contacts": "Contacts",
-      "customerEmails": "Customer Emails"
+      "customerEmails": "Customer Emails",
+      "teams": "Teams",
+      "settings": "Settings",
+      "notificationSettings": "Notifications",
+      "setup": "Initial setup"
     }
   },
   "layout": {
     "logOut": "Log out",
-    "accountSecurity": "Account security"
+    "accountSecurity": "Account security",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "menu": "Menu"
   },
   "language": {
     "english": "English",
@@ -173,7 +187,8 @@
         "customize_status": "Customize your ticket statuses",
         "set_sla_policy": "Set an SLA policy",
         "create_macro": "Create a macro",
-        "invite_teammate": "Invite a teammate"
+        "invite_teammate": "Invite a teammate",
+        "connect_email": "Connect a mailbox"
       }
     },
     "recentActivity": {
@@ -230,7 +245,7 @@
       "closed": "Closed"
     },
     "filters": {
-      "anyone": "Anyone",
+      "anyone": "Any assignee",
       "assignedToMe": "Assigned to me",
       "anyPriority": "Any priority",
       "saveThisView": "+ Save this view"
@@ -254,7 +269,7 @@
       "slaOverdue": "SLA overdue",
       "sla": "SLA"
     },
-    "empty": "No tickets here.",
+    "empty": "No tickets match these filters.",
     "loadFailed": "Failed to load tickets",
     "loadMore": "Load more ({{count}} remaining)",
     "removeSavedViewFailed": "Failed to remove saved view",
@@ -278,7 +293,9 @@
       "subjectOptional": "Subject (optional)",
       "request": "Request",
       "createTicket": "Create ticket",
-      "createFailed": "Failed to create ticket"
+      "createFailed": "Failed to create ticket",
+      "team": "Team",
+      "assignee": "Assignee"
     },
     "live": {
       "live": "Live",
@@ -287,6 +304,12 @@
       "connectingHint": "Connecting to live updates",
       "offline": "Reconnecting…",
       "offlineHint": "Live updates are paused; reload to see the latest"
+    },
+    "emptyFirst": {
+      "title": "No tickets yet",
+      "body": "Tickets arrive from a connected mailbox, the customer portal, the API or a monitoring alert. You can also log one by hand, for a call or a walk-in.",
+      "create": "Log a ticket",
+      "connectEmail": "Connect a mailbox"
     }
   },
   "ticketDetail": {
@@ -377,7 +400,9 @@
     "collisionReply": "{{name}} replied while you were writing. Check their reply before sending yours, so the customer doesn't get two.",
     "collisionNote": "{{name}} added an internal note while you were writing.",
     "collisionCustomer": "{{name}} wrote back while you were writing — read it before sending.",
-    "collisionDismiss": "Got it"
+    "collisionDismiss": "Got it",
+    "mentionHint": "Type @ to mention a colleague",
+    "mentionNobody": "Nobody matches"
   },
   "tour": {
     "stepCount": "Step {{current}} of {{total}}",
@@ -397,7 +422,7 @@
       },
       "checklist": {
         "title": "Get started",
-        "body": "This checklist walks you through setting up your organization: customizing ticket statuses, an SLA policy, a macro, and inviting your team."
+        "body": "This list walks you through setting up your organization: connect a mailbox, customize ticket statuses, set an SLA, create a macro and invite your team."
       },
       "tickets": {
         "title": "Tickets",
@@ -418,6 +443,10 @@
       "done": {
         "title": "You're all set!",
         "body": "You can watch this tour again anytime with the help icon right below."
+      },
+      "settings": {
+        "title": "Settings",
+        "body": "Everything that configures your workspace: mailboxes, SLAs, users, teams, AI and more, grouped and searchable."
       }
     }
   },
@@ -476,7 +505,9 @@
     "port": "Port",
     "username": "Username",
     "password": "Password",
-    "useTls": "Use TLS"
+    "useTls": "Use TLS",
+    "fromSetup": "Connecting a mailbox as part of the initial setup.",
+    "backToSetup": "Back to setup →"
   },
   "auditLog": {
     "title": "Audit Log",
@@ -859,14 +890,28 @@
     "title": "Notification Settings",
     "loadFailed": "Failed to load notification settings",
     "saveFailed": "Failed to save",
-    "intro": "How you're told about activity — in-app always shows in the bell, email needs a connected email channel to actually send.",
+    "intro": "How we tell you about activity. In the app it shows in the bell; email needs a connected email channel to go out.",
     "event": "Event",
     "inApp": "In-app",
     "email": "Email",
     "events": {
       "TICKET_ASSIGNED": "A ticket is assigned to me",
       "NEW_REPLY": "A contact replies to a ticket assigned to me",
-      "CONTRACT_EXPIRING": "A contract, warranty or license is about to expire (users who manage assets)"
+      "CONTRACT_EXPIRING": "A contract, warranty or license is about to expire (users who manage assets)",
+      "TEAM_TICKET": "A ticket lands in one of my teams with nobody assigned",
+      "TICKET_REOPENED": "A customer reopens a ticket of mine or my team's",
+      "MENTIONED": "Someone mentions me in an internal note",
+      "SLA_WARNING": "An SLA target on my ticket is about to be missed (80% of the time used)",
+      "SLA_BREACHED": "An SLA target on my ticket was missed"
+    },
+    "useDefault": "Use the workspace default",
+    "fromWorkspace": "Workspace default",
+    "defaultsTitle": "Defaults for the whole workspace",
+    "defaultsIntro": "What everyone gets until they choose for themselves above. Changing a default doesn't override anyone's own choice.",
+    "groups": {
+      "tickets": "Tickets",
+      "sla": "SLA",
+      "assets": "Assets"
     }
   },
   "kbGate": {
@@ -929,7 +974,21 @@
     "saveFailed": "Failed to save theme — reverted",
     "title": "Appearance",
     "intro": "Pick how Seredina looks for everyone in this workspace. Takes effect immediately for anyone with the app open.",
-    "active": "Active"
+    "active": "Active",
+    "options": {
+      "aero": {
+        "name": "Frutiger Aero",
+        "description": "Glossy and bright: a sky gradient, frosted-glass panels, an aqua accent and glossy buttons."
+      },
+      "middle": {
+        "name": "Meet in the Middle",
+        "description": "Warm, on-brand default. A stone-warm neutral palette and a channel glyph on each ticket showing how it arrived."
+      },
+      "refined": {
+        "name": "Refined",
+        "description": "The original look: a cool slate neutral palette, no channel glyph."
+      }
+    }
   },
   "aiUsage": {
     "loadFailed": "Failed to load AI usage",
@@ -1026,7 +1085,7 @@
     "title": "Roles",
     "new": "New role",
     "edit": "Edit role",
-    "intro": "Every role here is available immediately when assigning a user (Administration → Users) — no restart, no fixed list.",
+    "intro": "Every role here is available immediately when assigning a user (Settings → Users), with no restart and no fixed list.",
     "delete": "delete",
     "key": "Key",
     "keyHint": "Lowercase, alphanumeric and underscores. Can't be changed later.",
@@ -1043,6 +1102,11 @@
       "roles:manage": "Manage roles",
       "audit:read": "See the audit log",
       "contacts:manage": "Manage contacts’ personal data"
+    },
+    "builtin": {
+      "admin": "Administrator",
+      "team_lead": "Team lead",
+      "agent": "Agent"
     }
   },
   "equipment": {
@@ -1082,22 +1146,30 @@
     "removeFailed": "Failed to remove SLA policy",
     "confirmRemove": "Remove the SLA policy for {{priority}} priority? Tickets at this priority will no longer get due dates.",
     "title": "SLA Policies",
-    "intro": "First response and resolution targets, per priority. A priority with no policy here gets no due dates at all — SLA tracking is opt-in. Business-hours-only targets use the schedule set on the Business Hours page.",
+    "intro": "First-response and resolution targets per priority. A priority without a target has no due dates; SLA tracking is optional. \"Business hours only\" targets count only the hours set under Business Hours.",
     "firstResponse": "First response",
-    "firstResponseAria": "First response minutes for {{priority}} priority",
+    "firstResponseAria": "First response target for {{priority}} priority",
     "resolution": "Resolution",
-    "resolutionAria": "Resolution minutes for {{priority}} priority",
-    "placeholder": "e.g. 30",
-    "min": "min",
+    "resolutionAria": "Resolution target for {{priority}} priority",
     "businessHoursOnly": "Business hours only",
     "remove": "remove",
-    "update": "Update",
     "left": "{{time}} left",
     "overdueBy": "{{time}} overdue",
     "firstResponseDue": "First response due {{time}}",
     "resolutionDue": "Resolution due {{time}}",
     "firstResponseShort": "Response",
-    "resolutionShort": "Resolution"
+    "resolutionShort": "Resolution",
+    "useSuggested": "Fill in suggested targets",
+    "saveChanges": "Save changes",
+    "saved": "Saved.",
+    "bothNeeded": "Each priority needs both a first-response and a resolution target.",
+    "noTarget": "No target",
+    "unit": "unit",
+    "units": {
+      "min": "min",
+      "h": "hours",
+      "d": "days"
+    }
   },
   "assetStatus": {
     "ACTIVE": "Active",
@@ -1155,7 +1227,17 @@
       "agent": "Logged by an agent",
       "portal": "Via customer portal"
     },
-    "viaOther": "Via {{channel}}"
+    "viaOther": "Via {{channel}}",
+    "short": {
+      "email": "Email",
+      "api": "API",
+      "catalog": "Catalog",
+      "widget": "Widget",
+      "telegram": "Telegram",
+      "alert": "Alert",
+      "agent": "Agent",
+      "portal": "Portal"
+    }
   },
   "catalog": {
     "loadFailed": "Failed to load the service catalog",
@@ -2060,5 +2142,230 @@
     "removeImage": "Remove",
     "orPasteUrl": "or paste the URL of a published image",
     "uploadFailed": "Could not upload the image"
+  },
+  "teams": {
+    "title": "Teams",
+    "new": "New team",
+    "intro": "Group agents by what they handle. A ticket can be sent to a team, and its members are notified when one lands there with nobody assigned.",
+    "empty": "No teams yet. Create one for each group that takes tickets, like Level 1 support or Networks.",
+    "loadFailed": "Couldn't load teams.",
+    "saveFailed": "Couldn't save the team.",
+    "deleteFailed": "Couldn't delete the team.",
+    "confirmDelete": "Delete the team \"{{name}}\"?",
+    "confirmDeleteWithTickets_one": "Delete the team \"{{name}}\"? Its {{count}} ticket stays, without a team.",
+    "confirmDeleteWithTickets_other": "Delete the team \"{{name}}\"? Its {{count}} tickets stay, without a team.",
+    "memberCount_one": "{{count}} member",
+    "memberCount_other": "{{count}} members",
+    "ticketCount_one": "{{count}} ticket",
+    "ticketCount_other": "{{count}} tickets",
+    "edit": "edit",
+    "delete": "delete",
+    "editTitle": "Edit {{name}}",
+    "name": "Name",
+    "namePlaceholder": "e.g. Level 1 support",
+    "members": "Members",
+    "selected_one": "{{count}} selected",
+    "selected_other": "{{count}} selected",
+    "searchPeople": "Search people…",
+    "noPeople": "Nobody matches.",
+    "membersHint": "Members get the \"ticket in my team\" notification."
+  },
+  "settings": {
+    "title": "Settings",
+    "intro": "Everything that sets up how your workspace works.",
+    "search": "Search settings…",
+    "noMatch": "No setting matches.",
+    "descriptions": {
+      "emailChannels": "Mailboxes that turn email into tickets and send your replies.",
+      "customerEmails": "Language, logo, signature and wording of what customers receive.",
+      "customerPortal": "A page where customers follow and reply to their own requests.",
+      "telegram": "Take requests through a Telegram bot.",
+      "monitoringIntegrations": "Turn alerts from Zabbix, Grafana and others into tickets.",
+      "webhooks": "Tell other systems, Slack or Teams when something happens.",
+      "apiKeys": "Keys for scripts and integrations that create tickets.",
+      "ticketStatuses": "The steps a ticket goes through, with your own names.",
+      "slaPolicies": "How fast to answer and resolve, per priority.",
+      "businessHours": "Your working hours, for SLAs that pause outside them.",
+      "macros": "Saved replies and actions, applied in one click.",
+      "customFields": "Extra fields on tickets, like location or cost center.",
+      "serviceCatalog": "Requestable services with their own form.",
+      "processTemplates": "Reusable checklists: onboarding, changes, releases.",
+      "onCall": "Who's on call, and how an unanswered ticket escalates.",
+      "users": "Accounts, invitations and roles of the people who work tickets.",
+      "teams": "Groups of agents; a ticket can go to a team.",
+      "roles": "What each role is allowed to do.",
+      "notificationSettings": "What you're told about, and the workspace defaults.",
+      "sso": "Sign in with your company's identity provider.",
+      "auditLog": "Who changed what, and when.",
+      "aiSettings": "The AI model, your key and what the AI may do.",
+      "aiUsage": "AI calls and their cost.",
+      "aiAgentActivity": "What the AI agent did on its own, for review.",
+      "appearance": "The console's look.",
+      "branding": "Your name, logo and colors on public pages.",
+      "dataExport": "Download your workspace's data.",
+      "setup": "The five-step wizard: organization, email, kind of support, team."
+    }
+  },
+  "setup": {
+    "kicker": "Initial setup",
+    "title": "Get your help desk ready",
+    "intro": "Five short steps. Skip any of them and change everything later in Settings.",
+    "skipAll": "Skip setup",
+    "progress": "Setup steps",
+    "loadFailed": "Couldn't load setup.",
+    "saveFailed": "Couldn't save.",
+    "saveAndContinue": "Save and continue",
+    "continue": "Continue",
+    "later": "I'll do it later",
+    "steps": {
+      "organization": {
+        "short": "Organization",
+        "title": "Your organization",
+        "body": "The name your customers see, the language you write to them in, and your working hours."
+      },
+      "email": {
+        "short": "Email",
+        "title": "Connect your support mailbox",
+        "body": "Email arriving in this mailbox becomes tickets, and your replies go out from it."
+      },
+      "template": {
+        "short": "Kind of support",
+        "title": "What kind of support do you do?",
+        "body": "Pick a starting point and we'll create teams, categories, SLA targets, saved replies and a request catalog."
+      },
+      "team": {
+        "short": "Team",
+        "title": "Invite your team",
+        "body": "Each person gets an email to choose their password."
+      },
+      "done": {
+        "short": "Done",
+        "title": "All set!",
+        "body": "Here's what's set up. You can come back to any step from Settings."
+      }
+    },
+    "organization": {
+      "name": "Organization name",
+      "language": "Language",
+      "languageHint": "For emails to your customers and the default names of statuses and categories. Everyone can use the console in their own language.",
+      "hours": "Working hours",
+      "timezone": "Time zone"
+    },
+    "schedules": {
+      "office": {
+        "title": "Office",
+        "body": "Monday to Friday, 9:00 to 18:00"
+      },
+      "early": {
+        "title": "Early day",
+        "body": "Monday to Friday, 8:00 to 17:30"
+      },
+      "shifts": {
+        "title": "Shifts",
+        "body": "Monday to Saturday, around the clock"
+      },
+      "always": {
+        "title": "24/7",
+        "body": "Every day, around the clock"
+      },
+      "none": {
+        "title": "Decide later",
+        "body": "SLA targets count every hour"
+      },
+      "keep": "Keep the hours you already have"
+    },
+    "email": {
+      "other": "Another provider",
+      "oauthHint": "You sign in with your account; no password is stored.",
+      "passwordHint": "With a username and password (IMAP/SMTP).",
+      "why": "Without a mailbox, no requests arrive by email, your replies don't reach customers, and invitations and email notifications can't be sent.",
+      "connected_one": "You have {{count}} mailbox connected.",
+      "connected_other": "You have {{count}} mailboxes connected.",
+      "manage": "Manage"
+    },
+    "templates": {
+      "it_internal": {
+        "title": "Internal IT / help desk",
+        "body": "Support for your company's employees: computers, accounts, access and network.",
+        "includes": [
+          "Level 1, Level 2 and Networks",
+          "Categories: hardware, software, access…",
+          "Catalog: new computer, access, new employee",
+          "Office-hours SLAs"
+        ]
+      },
+      "customer_support": {
+        "title": "Customer support",
+        "body": "You handle your customers' questions, complaints and problems.",
+        "includes": [
+          "Customer service, Technical support and Billing",
+          "Categories: question, complaint, billing…",
+          "Catalog: report a problem, billing, changes",
+          "Replies: \"We're looking into it\", ask for details…"
+        ]
+      },
+      "manufacturing": {
+        "title": "Plant / manufacturing",
+        "body": "Machine faults, maintenance, quality and plant systems.",
+        "includes": [
+          "Maintenance, Plant IT and Quality",
+          "Categories: machine down, electrical fault…",
+          "\"Line or area\" field",
+          "10-minute urgent SLA"
+        ]
+      }
+    },
+    "template": {
+      "note": "Everything created can be renamed or deleted. Anything you already have with the same name is left alone.",
+      "apply": "Create with this template",
+      "created": "Created {{teams}} teams, {{slaPolicies}} SLA targets, {{macros}} saved replies, {{customFields}} fields and {{catalogItems}} catalog items."
+    },
+    "team": {
+      "needsMailbox": "To send invitations, connect a mailbox first. You can also create accounts with an initial password under",
+      "usersPage": "Settings → Users",
+      "people": "People (one per line)",
+      "peopleHint_one": "{{count}} person",
+      "peopleHint_other": "{{count}} people",
+      "role": "Role",
+      "team": "Team",
+      "noTeam": "None",
+      "invite_one": "Invite {{count}} person",
+      "invite_other": "Invite {{count}} people"
+    },
+    "done": {
+      "checks": {
+        "organization": "Name and language",
+        "hours": "Working hours",
+        "email": "Mailbox",
+        "template": "Teams, categories, SLAs and catalog",
+        "team": "Your team"
+      },
+      "nextTitle": "Next steps",
+      "next": {
+        "agent": {
+          "title": "Install the agent on computers",
+          "body": "Automatic hardware and software inventory."
+        },
+        "portal": {
+          "title": "Turn on the customer portal",
+          "body": "So customers can follow their requests themselves."
+        },
+        "emails": {
+          "title": "Customize emails",
+          "body": "Your logo, signature and wording."
+        },
+        "appearance": {
+          "title": "Choose the appearance",
+          "body": "The console's theme."
+        }
+      },
+      "finish": "Go to the dashboard"
+    },
+    "banner": {
+      "title": "Finish setting up your organization",
+      "body": "Connect your email, pick your kind of support and invite your team in a few minutes.",
+      "continue": "Continue",
+      "dismiss": "It's already set up"
+    }
   }
 }

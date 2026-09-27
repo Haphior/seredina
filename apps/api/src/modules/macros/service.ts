@@ -115,7 +115,7 @@ export async function applyMacro(
       priority: actions.setPriority,
       teamId: actions.setTeamId,
       assigneeId: actions.setAssigneeId,
-    });
+    }, authorUserId);
   }
 
   if (actions.addReply) {

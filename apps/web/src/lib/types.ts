@@ -25,6 +25,9 @@ export interface TicketStatus {
 export interface Team {
   id: string;
   name: string;
+  /** Present on GET /teams; absent where a team is embedded in another resource. */
+  memberIds?: string[];
+  ticketCount?: number;
 }
 
 export interface Contact {
@@ -694,7 +697,15 @@ export interface SavedView {
   createdAt: string;
 }
 
-export type NotificationEventType = 'TICKET_ASSIGNED' | 'NEW_REPLY' | 'CONTRACT_EXPIRING';
+export type NotificationEventType =
+  | 'TICKET_ASSIGNED'
+  | 'NEW_REPLY'
+  | 'TEAM_TICKET'
+  | 'TICKET_REOPENED'
+  | 'MENTIONED'
+  | 'SLA_WARNING'
+  | 'SLA_BREACHED'
+  | 'CONTRACT_EXPIRING';
 
 export interface AppNotification {
   id: string;
@@ -710,6 +721,8 @@ export interface NotificationPreference {
   label: string;
   inApp: boolean;
   email: boolean;
+  /** Where the value comes from: the user's own choice, the workspace default, or the built-in one. */
+  source: 'user' | 'workspace' | 'builtin';
 }
 
 export interface AiUsageLog {

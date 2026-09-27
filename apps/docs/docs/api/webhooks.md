@@ -2,7 +2,7 @@
 
 The reverse direction of the REST API: instead of you calling Seredina,
 Seredina notifies you when something happens. Configured from
-**Operations → Webhooks** in the console.
+**Settings → Webhooks** in the console.
 
 ## Webhook kinds
 
