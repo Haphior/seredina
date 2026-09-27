@@ -42,6 +42,12 @@ git -C /opt/seredina describe --tags            # v0.2.0
 4. **Verifica:** `/api/health` muestra la versión nueva, y puedes iniciar
    sesión.
 
+Cada versión se comprueba antes de publicarse actualizando la versión
+anterior con datos: ninguna fila existente puede cambiar, y los datos
+antiguos tienen que leerse bien con la versión nueva. Saltarse versiones
+(0.2 → 0.4) no es problema: las migraciones de cada versión intermedia se
+aplican en orden.
+
 Si instalaste desde `main` antes de que existieran las versiones,
 `git checkout v0.2.0` te pasa a la primera. Desde ahí, sigue los pasos
 de arriba.

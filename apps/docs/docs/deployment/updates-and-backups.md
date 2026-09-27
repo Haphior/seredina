@@ -40,6 +40,11 @@ git -C /opt/seredina describe --tags            # v0.2.0
    outside working hours.
 4. **Check:** `/api/health` shows the new version, and you can sign in.
 
+Every release is checked, before it's published, by upgrading the previous
+release with data in it: no existing row may change, and the old data has
+to read back through the new version. Skipping releases (0.2 → 0.4) is
+fine: the migrations of each release in between run in order.
+
 If you installed from `main` before releases existed, `git checkout v0.2.0`
 moves you onto the first release. From then on, follow the steps above.
 

@@ -51,6 +51,11 @@ it.
 
 ## Next release checklist
 
+0. CI is green on `main`, including **upgrade-check**: the previous release,
+   filled with data, upgrades to this code without any existing row changing
+   (`docs/adr/0074-upgrade-check.md`). If this release changes data on
+   purpose, the tables are listed in `scripts/upgrade-check/allow-data-changes.txt`
+   with the reason, and the CHANGELOG says so.
 1. Move `[Unreleased]` entries in `CHANGELOG.md` under a new `## [X.Y.Z] -
    YYYY-MM-DD` heading (add an `[Unreleased]` link diff and a version link at
    the bottom, matching the existing entries).
@@ -58,6 +63,8 @@ it.
 3. Commit both (`chore: release vX.Y.Z`), push.
 4. `git tag -a vX.Y.Z -m "vX.Y.Z"`, `git push --tags`.
 5. `gh release create vX.Y.Z --title vX.Y.Z --notes-file <path> [--prerelease]`.
+6. Empty `scripts/upgrade-check/allow-data-changes.txt` (keep its header), so
+   the next release's upgrade check starts from this one with no exceptions.
 
 ## Consequences
 
