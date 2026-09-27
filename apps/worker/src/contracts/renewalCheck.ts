@@ -1,5 +1,7 @@
 import { prisma, withTenantTx } from '@seredina/db';
 import { notifyUser } from '../notifications/notify';
+import { emailString } from '@seredina/shared';
+import { tenantLanguage } from '../lib/language';
 
 /**
  * Renewal reminders for contracts, warranties and licenses
@@ -37,9 +39,12 @@ export async function sendDueContractReminders(): Promise<number> {
       const end = contract.endDate!.toISOString().slice(0, 10);
       const assets = contract.assets.map((a) => a.asset.name);
       const assetNote = assets.length ? ` (${assets.join(', ')}${contract.assets.length === 5 ? ', …' : ''})` : '';
-      const body = `${contract.name}${contract.supplier ? ` — ${contract.supplier}` : ''} ends on ${end}${assetNote}.`;
+      const language = await tenantLanguage(tenantId);
+      const name = `${contract.name}${contract.supplier ? ` — ${contract.supplier}` : ''}`;
+      const body = emailString(language, 'contractEndingBody', { name, end, assets: assetNote });
+      const subject = emailString(language, 'contractEndingSubject', { name: contract.name, end });
       for (const user of recipients) {
-        await notifyUser(tenantId, user.id, 'CONTRACT_EXPIRING', { body, subject: `Contract ending ${end}: ${contract.name}` });
+        await notifyUser(tenantId, user.id, 'CONTRACT_EXPIRING', { body, subject });
       }
       sent++;
     } catch (err) {

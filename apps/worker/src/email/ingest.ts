@@ -1,5 +1,5 @@
 import { prisma, withTenantTx } from '@seredina/db';
-import { MAX_ATTACHMENTS_PER_MESSAGE, MAX_ATTACHMENT_SIZE_BYTES } from '@seredina/shared';
+import { MAX_ATTACHMENTS_PER_MESSAGE, MAX_ATTACHMENT_SIZE_BYTES, emailString, parseEmailSettings, type EmailLanguage } from '@seredina/shared';
 import { publishLive } from '../lib/live';
 import { ticketFollowupQueue } from '../lib/queue';
 
@@ -23,6 +23,8 @@ export interface InboundEmail {
   /** The mailbox it arrived on -- replies go back out through the same one. */
   emailChannelId?: string | null;
   attachments?: InboundAttachment[];
+  /** Sent by a machine (an out-of-office, a bounce, a list): no acknowledgement goes back. */
+  automatic?: boolean;
 }
 
 export interface AssigneeNotice {
@@ -50,7 +52,6 @@ export interface IngestResult {
  */
 export async function ingestInboundEmail(email: InboundEmail): Promise<IngestResult> {
   let createdTicket = false;
-  const { kept, skippedNote } = selectInboundAttachments(email.attachments ?? []);
   let duplicate = false;
   const result = await withTenantTx(prisma, email.tenantId, async (tx) => {
     // Idempotent on Message-ID: a replica that dies after ingesting but before
@@ -63,6 +64,12 @@ export async function ingestInboundEmail(email: InboundEmail): Promise<IngestRes
       duplicate = true;
       return { ticketId: alreadyIngested.ticketId, assigneeToNotify: null };
     }
+
+    // Notes written into the ticket are in the tenant's language, like
+    // everything a customer can see (docs/adr/0070-customer-email-templates.md).
+    const { emailSettings } = await tx.tenant.findUniqueOrThrow({ where: { id: email.tenantId }, select: { emailSettings: true } });
+    const language = parseEmailSettings(emailSettings).language;
+    const { kept, skippedNote } = selectInboundAttachments(email.attachments ?? [], language);
 
     const candidateIds = [email.inReplyTo, ...email.references].filter((v): v is string => Boolean(v));
 
@@ -117,7 +124,7 @@ export async function ingestInboundEmail(email: InboundEmail): Promise<IngestRes
         data: {
           tenantId: email.tenantId,
           number: tenant.lastTicketNumber,
-          subject: email.subject || '(no subject)',
+          subject: email.subject.trim() || emailString(language, 'noSubject'),
           statusId: openStatus.id,
           contactId: contact.id,
           channel: 'email',
@@ -166,7 +173,7 @@ export async function ingestInboundEmail(email: InboundEmail): Promise<IngestRes
     await ticketFollowupQueue
       .add(
         'followup',
-        { tenantId: email.tenantId, ticketId: result.ticketId, finalize: true },
+        { tenantId: email.tenantId, ticketId: result.ticketId, finalize: true, acknowledge: !email.automatic },
         { attempts: 5, backoff: { type: 'exponential', delay: 10_000 }, removeOnComplete: 1000 },
       )
       .catch((err) => console.error(`[worker] could not queue follow-up for ticket ${result.ticketId}:`, err));
@@ -181,7 +188,10 @@ export async function ingestInboundEmail(email: InboundEmail): Promise<IngestRes
  * note on the message instead of disappearing silently -- see
  * docs/adr/0058-inbound-email-attachments.md.
  */
-export function selectInboundAttachments(attachments: InboundAttachment[]): {
+export function selectInboundAttachments(
+  attachments: InboundAttachment[],
+  language: EmailLanguage = 'es',
+): {
   kept: InboundAttachment[];
   skippedNote: string | null;
 } {
@@ -189,19 +199,48 @@ export function selectInboundAttachments(attachments: InboundAttachment[]): {
   const kept: InboundAttachment[] = [];
   const skipped: string[] = [];
 
+  const es = language === 'es';
+  const limitMb = MAX_ATTACHMENT_SIZE_BYTES / (1024 * 1024);
   for (const a of ordered) {
     if (a.data.byteLength > MAX_ATTACHMENT_SIZE_BYTES) {
-      skipped.push(`${a.filename} (${(a.data.byteLength / (1024 * 1024)).toFixed(1)} MB, over the ${MAX_ATTACHMENT_SIZE_BYTES / (1024 * 1024)} MB limit)`);
+      const mb = (a.data.byteLength / (1024 * 1024)).toFixed(1);
+      skipped.push(es ? `${a.filename} (${mb} MB, supera el límite de ${limitMb} MB)` : `${a.filename} (${mb} MB, over the ${limitMb} MB limit)`);
     } else if (kept.length >= MAX_ATTACHMENTS_PER_MESSAGE) {
       // Inline images past the cap are almost always signature logos -- not worth a note.
-      if (!a.inline) skipped.push(`${a.filename} (more than ${MAX_ATTACHMENTS_PER_MESSAGE} attachments)`);
+      if (!a.inline) {
+        skipped.push(es ? `${a.filename} (más de ${MAX_ATTACHMENTS_PER_MESSAGE} adjuntos)` : `${a.filename} (more than ${MAX_ATTACHMENTS_PER_MESSAGE} attachments)`);
+      }
     } else {
       kept.push(a);
     }
   }
 
+  const label = es ? 'Adjuntos no guardados' : 'Attachments not saved';
   return {
     kept,
-    skippedNote: skipped.length > 0 ? `[Attachments not saved: ${skipped.join('; ')}]` : null,
+    skippedNote: skipped.length > 0 ? `[${label}: ${skipped.join('; ')}]` : null,
   };
+}
+
+/**
+ * Whether an inbound email was sent by a machine rather than a person: an
+ * out-of-office or other autoresponder (RFC 3834 Auto-Submitted, Exchange's
+ * X-Auto-Response-Suppress, X-Autoreply), a bulk or list mailing, or a
+ * bounce. It still becomes a ticket or a reply, but gets no automatic
+ * acknowledgement, which could otherwise loop between two autoresponders.
+ */
+export function isAutomaticEmail(headers: Map<string, unknown>, fromAddress: string): boolean {
+  const header = (name: string) => {
+    const v = headers.get(name);
+    if (v === undefined || v === null) return '';
+    if (typeof v === 'string') return v.toLowerCase();
+    if (typeof v === 'object' && 'value' in (v as object)) return String((v as { value: unknown }).value).toLowerCase();
+    return String(v).toLowerCase();
+  };
+  const autoSubmitted = header('auto-submitted');
+  if (autoSubmitted && autoSubmitted !== 'no') return true;
+  if (['bulk', 'junk', 'list', 'auto_reply'].includes(header('precedence'))) return true;
+  if (headers.has('x-autoreply') || headers.has('x-autorespond') || headers.has('list-id')) return true;
+  if (/(^|,)\s*(all|oof|autoreply)\s*(,|$)/.test(header('x-auto-response-suppress'))) return true;
+  return /^(mailer-daemon|postmaster|no-?reply|do-?not-?reply)@/i.test(fromAddress);
 }

@@ -1,7 +1,9 @@
 import { ImapFlow } from 'imapflow';
 import { simpleParser } from 'mailparser';
 import { prisma, withTenantTx, type EmailChannel } from '@seredina/db';
-import { ingestInboundEmail } from './ingest';
+import { emailString } from '@seredina/shared';
+import { ingestInboundEmail, isAutomaticEmail } from './ingest';
+import { tenantLanguage } from '../lib/language';
 import { EmailChannelNeedsReconnectError, resolveMailAuth } from './credentials';
 import { notifyUser } from '../notifications/notify';
 import { redisLock, type Lock } from '../lib/lock';
@@ -51,6 +53,7 @@ async function pollEmailChannel(channel: EmailChannel): Promise<void> {
           inReplyTo: parsed.inReplyTo ?? null,
           references,
           emailChannelId: channel.id,
+          automatic: isAutomaticEmail(parsed.headers as Map<string, unknown>, fromAddress),
           attachments: parsed.attachments.map((a, i) => ({
             filename: a.filename || `attachment-${i + 1}${a.contentType === 'message/rfc822' ? '.eml' : ''}`,
             mimeType: a.contentType || 'application/octet-stream',
@@ -60,9 +63,11 @@ async function pollEmailChannel(channel: EmailChannel): Promise<void> {
         });
 
         if (assigneeToNotify) {
+          const language = await tenantLanguage(channel.tenantId);
+          const values = { n: assigneeToNotify.ticketNumber, subject: assigneeToNotify.ticketSubject };
           await notifyUser(channel.tenantId, assigneeToNotify.userId, 'NEW_REPLY', {
-            body: `New reply on #${assigneeToNotify.ticketNumber}: ${assigneeToNotify.ticketSubject}`,
-            subject: `[#${assigneeToNotify.ticketNumber}] New reply: ${assigneeToNotify.ticketSubject}`,
+            body: emailString(language, 'notifyReplyBody', values),
+            subject: emailString(language, 'notifyReplySubject', values),
           });
         }
 

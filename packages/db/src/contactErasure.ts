@@ -53,7 +53,8 @@ export async function anonymizeContactInTx(
     messages = (
       await tx.message.updateMany({
         where: { ticketId: { in: ticketIds } },
-        data: { body: ANONYMIZED_MESSAGE_BODY, externalId: null },
+        // emailMeta holds a rendered copy of automatic emails (name, subject).
+        data: { body: ANONYMIZED_MESSAGE_BODY, externalId: null, emailMeta: Prisma.DbNull },
       })
     ).count;
     await tx.ticket.updateMany({

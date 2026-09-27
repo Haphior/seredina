@@ -28,6 +28,7 @@ const CustomerPortal = lazy(() => import('./pages/CustomerPortal').then((m) => (
 const CustomerPortalAuth = lazy(() => import('./pages/CustomerPortal').then((m) => ({ default: m.CustomerPortalAuth })));
 const CustomerPortalTicket = lazy(() => import('./pages/CustomerPortal').then((m) => ({ default: m.CustomerPortalTicket })));
 const PortalSettings = lazy(() => import('./pages/PortalSettings').then((m) => ({ default: m.PortalSettings })));
+const CustomerEmails = lazy(() => import('./pages/CustomerEmails').then((m) => ({ default: m.CustomerEmails })));
 const Contracts = lazy(() => import('./pages/Contracts').then((m) => ({ default: m.Contracts })));
 const Contacts = lazy(() => import('./pages/Contacts').then((m) => ({ default: m.Contacts })));
 const ContactDetail = lazy(() => import('./pages/ContactDetail').then((m) => ({ default: m.ContactDetail })));
@@ -116,6 +117,7 @@ export function App() {
               <Route path="/account/security" element={<AccountSecurity />} />
               <Route path="/sso" element={<SsoSettings />} />
               <Route path="/customer-portal" element={<PortalSettings />} />
+              <Route path="/customer-emails" element={<CustomerEmails />} />
               <Route path="/custom-fields" element={<CustomFields />} />
               <Route path="/equipment-catalog" element={<EquipmentCatalog />} />
               <Route path="/processes" element={<Processes />} />

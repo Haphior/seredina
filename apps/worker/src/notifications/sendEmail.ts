@@ -1,5 +1,5 @@
 import { prisma, withTenantTx } from '@seredina/db';
-import type { NotificationEmailJobPayload } from '@seredina/shared';
+import { emailContextFor, renderBrandedEmail, type NotificationEmailJobPayload } from '@seredina/shared';
 import { createTransportForChannel, pickSendChannel } from '../email/transport';
 
 /**
@@ -16,15 +16,25 @@ export async function sendNotificationEmail(payload: NotificationEmailJobPayload
     if (!user) return null;
     const channel = pickSendChannel(await tx.emailChannel.findMany({ orderBy: { createdAt: 'asc' } }), null);
     if (!channel) return null;
-    return { user, channel };
+    const tenant = await tx.tenant.findUniqueOrThrow({
+      where: { id: payload.tenantId },
+      select: { name: true, slug: true, branding: true, emailSettings: true, customerPortalEnabled: true },
+    });
+    return { user, channel, tenant };
   });
   if (!data) return;
 
+  // Same layout and sender name as the tenant's customer email
+  // (docs/adr/0070-customer-email-templates.md), minus the customer-only bits.
+  const { brand, from } = emailContextFor(data.tenant, process.env.WEB_ORIGIN, data.channel.fromAddress);
+  const { html, text } = renderBrandedEmail({ ...brand, signature: '', portalLink: null, bannerUrl: null }, { body: payload.body });
   const transport = await createTransportForChannel(data.channel);
   await transport.sendMail({
-    from: data.channel.fromAddress,
+    from,
     to: data.user.email,
     subject: payload.subject,
-    text: payload.body,
+    text,
+    html,
+    headers: { 'Auto-Submitted': 'auto-generated' },
   });
 }

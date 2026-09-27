@@ -33,6 +33,10 @@ model Tenant {
   lastTicketNumber Int      @default(0) @map("last_ticket_number")
   lastProblemNumber Int     @default(0) @map("last_problem_number")
   branding         Json? // { logoUrl?: string, accentColor?: string } -- see modules/branding; null = no white-label set, Seredina's own look applies
+  // Email to customers: language, sender name, company signature, quoting and
+  // the survey -- @seredina/shared's EmailSettings; null = the defaults (Spanish).
+  // See docs/adr/0070-customer-email-templates.md.
+  emailSettings    Json?    @map("email_settings")
   createdAt        DateTime @default(now()) @map("created_at")
 
   users           User[]
@@ -84,6 +88,8 @@ model Tenant {
   kbSettings            TenantKbSettings?
   telegramChannel       TelegramChannel?
   csatResponses         CsatResponse[]
+  emailTemplates        EmailTemplate[]
+  emailImages           EmailImage[]
 
   @@map("tenants")
   auditLogs AuditLog[]
@@ -193,6 +199,9 @@ model User {
   // Set while an emailed invitation hasn't been accepted yet; cleared when
   // the person chooses their password.
   invitedAt DateTime? @map("invited_at")
+  // Closing lines under this agent's replies to customers ("María Pérez\n
+  // Mesa de ayuda · anexo 214"); null = just their name.
+  emailSignature String? @map("email_signature")
 
   assignedTickets      Ticket[]              @relation("TicketAssignee")
   authoredMessages     Message[]             @relation("MessageAuthorUser")
@@ -465,6 +474,11 @@ model Message {
   // only -- a reply's In-Reply-To/References is matched against this to thread it
   // onto the right ticket. See docs/adr/0004-email-channel.md.
   externalId    String?           @map("external_id")
+  // Set on the automatic messages of ticket events (acknowledgement, resolved,
+  // closed): { event, subject, body, button? } -- what the worker lays out as
+  // the branded email. Null on people's messages. See
+  // docs/adr/0070-customer-email-templates.md.
+  emailMeta     Json?             @map("email_meta")
   createdAt     DateTime          @default(now()) @map("created_at")
 
   attachments Attachment[]
@@ -601,6 +615,42 @@ model CsatResponse {
   respondedAt DateTime? @map("responded_at")
 
   @@map("csat_responses")
+}
+
+// A tenant's own wording for one customer email event (ticket_created,
+// agent_reply, ticket_resolved, ticket_closed). No row = the default text in
+// the tenant's language from @seredina/shared's emailTemplates.
+// See docs/adr/0070-customer-email-templates.md.
+model EmailTemplate {
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  event     String
+  enabled   Boolean  @default(true)
+  subject   String
+  body      String
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([tenantId, event])
+  @@map("email_templates")
+}
+
+// The logo and banner a tenant uploaded for its customer emails, served
+// publicly (GET /public/:tenantSlug/email-images/:kind) so mail clients can
+// load them. Bytes in Postgres, same reasoning as Attachment: no object
+// storage in this stack. See docs/adr/0070-customer-email-templates.md.
+model EmailImage {
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  kind      String // 'logo' | 'banner'
+  mimeType  String   @map("mime_type")
+  data      Bytes
+  sha256    String
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([tenantId, kind])
+  @@map("email_images")
 }
 
 // ---------------------------------------------------------------------------

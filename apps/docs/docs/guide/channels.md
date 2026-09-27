@@ -74,6 +74,60 @@ each — anything that doesn't fit is named in a note on the message), and
 replies go out from the same mailbox the customer wrote to. A mailbox that fails to log in shows the error on the Email
 Channels page.
 
+### Emails to your customers
+
+Everything a customer gets by email uses your logo and accent color from
+**Branding**. That includes agent replies, the "we received your request"
+acknowledgement, the "request resolved" email with its satisfaction survey,
+and portal sign-in links. It is written in your company's language, and a
+small "Powered by Seredina" line sits under the message.
+
+Set it up in **Administration → Customer Emails**:
+
+- **Email language**: Spanish (the default) or English. Everything Seredina
+  writes for you is in this language: the default texts, buttons, the
+  footer, sign-in and password emails, and notifications to your agents.
+- **Sender name**: shown on the From line, for example
+  *IT Support &lt;support@yourcompany.com&gt;*. Empty means your company name.
+- **Logo** and **banner**: upload a PNG, JPG or GIF (up to 2 MB), or paste
+  the address of an image hosted elsewhere. The logo goes at the top of
+  every email; without one, the Branding logo is used. The banner is a wide
+  image under it: 1200 × 400 px recommended, shown 600 px wide, and it can
+  link somewhere.
+- **Company signature**: goes under every email: team name, phone, hours.
+- **Quote the customer's last message** under each reply, and add the
+  **satisfaction survey** to the "resolved" email.
+
+Each automatic email has its own card:
+
+| Email | Sent when | On by default |
+| --- | --- | --- |
+| Acknowledgement | A customer opens a request by email, in the portal or the catalog | Yes |
+| Agent reply | An agent replies publicly | Always |
+| Request resolved | The request moves to a resolved status | Yes |
+| Request closed | The request is closed | No |
+
+::: v-pre
+Edit a card's subject and message with variables such as
+`{{contact.name}}`, `{{ticket.number}}` or `{{ticket.subject}}`; click one to
+insert it. **Preview** shows the email with sample data, and **Send me a
+test** sends it to your own address. **Restore default** undoes your
+changes.
+:::
+
+Each agent adds their own signature under **Account security**.
+
+::: tip Images need an address your customers can reach
+Mail clients load the logo and banner from your server's `WEB_ORIGIN`. If
+Seredina is only reachable inside your company network, customers outside
+it won't see uploaded images. Use a public address, or paste the URL of an
+image hosted on your website.
+:::
+
+Out-of-office replies, bounces and mailing lists still become tickets, but
+never get an acknowledgement, so two autoresponders can't answer each other
+forever.
+
 ## API
 
 For your own integrations — your site, a script, any system that can make

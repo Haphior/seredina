@@ -7,6 +7,42 @@ contain breaking changes).
 
 ## [Unreleased]
 
+### Added
+
+- **Branded customer emails in your company's language**
+  (`docs/adr/0070-customer-email-templates.md`).
+  - Every email to a customer uses your logo, an optional banner and your
+    color, a signature, the customer's last message quoted, and "Powered by
+    Seredina" under the message. The logo and banner can be uploaded or
+    linked; the banner can link somewhere.
+  - Administration → Customer Emails sets:
+    - the language (Spanish by default, or English);
+    - the sender name;
+    - the company signature;
+    - the wording of each automatic email, with a live preview and a test
+      send.
+  - New automatic emails: an acknowledgement when a request arrives, never
+    sent to autoresponders, and an optional "request closed" email.
+  - "Request resolved" now tells the customer, in your words, with the
+    survey as a button.
+  - Each agent sets their own signature under Account security.
+
+### Changed
+
+- **Nothing customer-facing is in English anymore for a Spanish-language
+  company.** These now follow the email language:
+  - portal sign-in, password reset and invitation emails;
+  - agent notifications;
+  - merge notices;
+  - "(no subject)";
+  - the attachments-not-saved note.
+- **Existing workspaces switch to Spanish emails on upgrade**; set the
+  language to English in Customer Emails to keep English.
+- Agent replies are now emailed for service catalog requests too, not only
+  for email and portal ones.
+- The worker needs `WEB_ORIGIN` (already set for `api`) for the portal link
+  in emails; `infra/docker-compose.yml` passes it.
+
 ## [0.2.0] - 2026-09-27
 
 The first release meant for production use on a company server. See

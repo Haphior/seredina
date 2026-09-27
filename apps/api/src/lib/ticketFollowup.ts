@@ -1,7 +1,7 @@
 import { Worker } from 'bullmq';
 import { TICKET_FOLLOWUP_QUEUE_NAME, type TicketFollowupJobPayload } from '@seredina/shared';
 import { connection } from './queue';
-import { finalizeWorkerCreatedTicket } from '../modules/tickets/service';
+import { finalizeWorkerCreatedTicket, sendTicketEvent } from '../modules/tickets/service';
 import { triageTicket } from '../modules/ai/triage';
 
 /**
@@ -13,6 +13,9 @@ import { triageTicket } from '../modules/ai/triage';
  */
 export async function processTicketFollowup(payload: TicketFollowupJobPayload): Promise<void> {
   if (payload.finalize) await finalizeWorkerCreatedTicket(payload.tenantId, payload.ticketId);
+  // "We received your request" (docs/adr/0070-customer-email-templates.md).
+  // Idempotent, so a retried job doesn't send it twice.
+  if (payload.acknowledge) await sendTicketEvent(payload.tenantId, payload.ticketId, 'ticket_created');
   try {
     await triageTicket(payload.tenantId, payload.ticketId);
   } catch (err) {
