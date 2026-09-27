@@ -7,6 +7,10 @@ were already talking on — email, Telegram, or the widget conversation —
 with no extra configuration on your part. It's requested **at most once
 per ticket**, never re-sent.
 
+By email, it's a **Rate our service** button in the "request resolved"
+email, in your company's language and wording. Turn it off, or change that
+email, in [Customer Emails](/guide/channels#emails-to-your-customers).
+
 ::: tip Requires `WEB_ORIGIN` to be set
 Without that environment variable, the survey simply doesn't get
 generated — it degrades silently, it doesn't break the rest of the ticket

@@ -1,3 +1,4 @@
+import { parseEmailSettings } from '@seredina/shared';
 import { prisma, withTenantTx } from '@seredina/db';
 import { createTicketFromApi } from '../tickets/service';
 
@@ -84,12 +85,18 @@ export interface RequestFromCatalogInput {
  * See docs/adr/0016-service-catalog.md.
  */
 export async function createTicketFromCatalogItem(tenantId: string, itemId: string, input: RequestFromCatalogInput) {
-  const item = await withTenantTx(prisma, tenantId, (tx) => tx.serviceCatalogItem.findUnique({ where: { id: itemId } }));
+  const { item, emailSettings } = await withTenantTx(prisma, tenantId, async (tx) => ({
+    item: await tx.serviceCatalogItem.findUnique({ where: { id: itemId } }),
+    emailSettings: (await tx.tenant.findUniqueOrThrow({ where: { id: tenantId }, select: { emailSettings: true } })).emailSettings,
+  }));
   if (!item) throw new Error('service catalog item not found');
 
+  // The customer sees this first message in the portal and quoted in replies,
+  // so it's in the tenant's language (docs/adr/0070-customer-email-templates.md).
+  const requested = parseEmailSettings(emailSettings).language === 'es' ? 'Solicitado' : 'Requested';
   return createTicketFromApi(tenantId, {
     subject: input.subject?.trim() || item.name,
-    body: item.description ? `Requested: ${item.name}\n\n${item.description}` : `Requested: ${item.name}`,
+    body: item.description ? `${requested}: ${item.name}\n\n${item.description}` : `${requested}: ${item.name}`,
     contactEmail: input.contactEmail,
     contactName: input.contactName,
     channel: 'catalog',

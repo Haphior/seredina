@@ -1,6 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import { prisma, withTenantTx } from '@seredina/db';
-import { sha256Hex } from '@seredina/shared';
+import { emailString, sha256Hex } from '@seredina/shared';
 import { signPurposeToken, verifyPurposeToken } from '../../lib/purposeToken';
 import { contactEmailQueue } from '../../lib/queue';
 import { rateLimitRedis } from '../../lib/rateLimitRedis';
@@ -10,6 +10,7 @@ import { addMessage, createTicketFromApi } from '../tickets/service';
 import { createTicketFromCatalogItem } from '../servicecatalog/service';
 import { createAttachment, getAttachment } from '../attachments/service';
 import { notifyUser } from '../notifications/service';
+import { brandedNotice, tenantLanguage } from '../emailtemplates/service';
 
 /**
  * The customer portal -- docs/adr/0065-customer-portal.md. Contacts never
@@ -83,20 +84,19 @@ export async function requestPortalLink(tenantSlug: string, rawEmail: string): P
   if (count === 1) await rateLimitRedis.pexpire(key, 60 * 60 * 1000);
   if (count > LINKS_PER_EMAIL_PER_HOUR) return;
 
-  const tenant = await withTenantTx(prisma, tenantId, (tx) =>
-    tx.tenant.findUniqueOrThrow({ where: { id: tenantId }, select: { name: true } }),
-  );
   const token = signPurposeToken(LOGIN_PURPOSE, { t: tenantId, e: email, n: randomBytes(8).toString('hex') }, LOGIN_TTL_MS);
   // A fragment, so the token never reaches a server log or a Referer header.
   const link = `${webOrigin()}/portal/${tenantSlug}/auth#${token}`;
+  // In the tenant's language and layout (docs/adr/0070-customer-email-templates.md).
+  const { subject, text, html } = await brandedNotice(
+    tenantId,
+    { subject: 'portalSignInSubject', body: 'portalSignInBody', button: 'portalSignInButton' },
+    {},
+    link,
+  );
   await contactEmailQueue.add(
     'send',
-    {
-      tenantId,
-      to: email,
-      subject: `Your sign-in link for ${tenant.name}`,
-      text: `Use this link to see and reply to your requests with ${tenant.name}:\n\n${link}\n\nIt works once and expires in 20 minutes. If you didn't ask for it, you can ignore this email.`,
-    },
+    { tenantId, to: email, subject, text, html },
     { attempts: 3, backoff: { type: 'exponential', delay: 5_000 } },
   );
 }
@@ -229,10 +229,12 @@ export async function replyToMyTicket(session: PortalSession, ticketId: string, 
     });
   }
   if (ticket.assigneeId) {
+    const language = await tenantLanguage(session.tenantId);
+    const values = { n: ticket.number, subject: ticket.subject };
     await notifyUser(session.tenantId, ticket.assigneeId, 'NEW_REPLY', {
       ticketId,
-      body: `New reply on #${ticket.number}: ${ticket.subject}`,
-      subject: `[#${ticket.number}] New reply: ${ticket.subject}`,
+      body: emailString(language, 'notifyReplyBody', values),
+      subject: emailString(language, 'notifyReplySubject', values),
     });
   }
   return { id: message.id };

@@ -82,6 +82,50 @@ correspondiente. Los adjuntos se guardan en el ticket (hasta 5 por correo,
 respuestas salen desde el mismo buzón al que escribió el cliente. Si un buzón no logra iniciar sesión, el error aparece en
 la página de canales de correo.
 
+### Correos a tus clientes
+
+Todo lo que un cliente recibe por correo usa el logo y el color de
+**Marca**. Eso incluye las respuestas de los agentes, el acuse de recibo, el
+aviso de solicitud resuelta con su encuesta de satisfacción y los enlaces de
+acceso al portal. Va escrito en el idioma de tu empresa, con una línea chica
+"Powered by Seredina" debajo del mensaje.
+
+Configuralo en **Administración → Correos al cliente**:
+
+- **Idioma de los correos**: español (por defecto) o inglés. Todo lo que
+  Seredina escribe por vos sale en ese idioma: los textos predeterminados,
+  los botones, el pie, los correos de acceso y contraseña, y los avisos a
+  tus agentes.
+- **Nombre del remitente**: el que aparece en el De, por ejemplo
+  *Soporte TI &lt;soporte@tuempresa.cl&gt;*. Vacío usa el nombre de tu empresa.
+- **Firma de la empresa**: va debajo de cada correo: equipo, teléfono,
+  horario.
+- **Citar el último mensaje del cliente** bajo cada respuesta, y sumar la
+  **encuesta de satisfacción** al correo de solicitud resuelta.
+
+Cada correo automático tiene su propia tarjeta:
+
+| Correo | Se envía cuando | Activado por defecto |
+| --- | --- | --- |
+| Acuse de recibo | Un cliente abre una solicitud por correo, en el portal o en el catálogo | Sí |
+| Respuesta de un agente | Un agente responde en forma pública | Siempre |
+| Solicitud resuelta | La solicitud pasa a un estado resuelto | Sí |
+| Solicitud cerrada | La solicitud se cierra | No |
+
+::: v-pre
+Editá el asunto y el mensaje de cada tarjeta con variables como
+`{{contact.name}}`, `{{ticket.number}}` o `{{ticket.subject}}`; con un clic
+se insertan. **Vista previa** muestra el correo con datos de ejemplo, y
+**Enviarme una prueba** lo manda a tu propia dirección. **Restaurar
+predeterminada** deshace tus cambios.
+:::
+
+Cada agente pone su propia firma en **Seguridad de la cuenta**.
+
+Las respuestas de fuera de oficina, los rebotes y las listas de correo
+igual crean tickets, pero nunca reciben acuse de recibo, así dos respuestas
+automáticas no se contestan entre sí para siempre.
+
 ## API
 
 Para integraciones propias — tu sitio, un script, cualquier sistema que

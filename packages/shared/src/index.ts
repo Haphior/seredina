@@ -15,3 +15,4 @@ export * from './liveEvents';
 export * from './emailOAuth';
 export * from './attachments';
 export * from './totp';
+export * from './emailTemplates';

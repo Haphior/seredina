@@ -118,7 +118,8 @@
       "sso": "Single Sign-On",
       "contracts": "Contracts",
       "customerPortal": "Customer Portal",
-      "contacts": "Contacts"
+      "contacts": "Contacts",
+      "customerEmails": "Customer Emails"
     }
   },
   "layout": {
@@ -557,7 +558,10 @@
       "sso.settings_updated": "Single sign-on settings changed",
       "sso.settings_deleted": "Single sign-on removed",
       "ai_settings.triage_mode_changed": "AI triage mode changed",
-      "portal.settings_updated": "Customer portal turned on/off"
+      "portal.settings_updated": "Customer portal turned on/off",
+      "email_settings.updated": "Customer email settings changed",
+      "email_template.updated": "Email template changed",
+      "email_template.reset": "Email template restored"
     }
   },
   "mfa": {
@@ -621,7 +625,16 @@
     },
     "disable": "Turn off",
     "regenerateExplain": "Enter a code from your app. Your old recovery codes stop working.",
-    "regenerate": "Create new codes"
+    "regenerate": "Create new codes",
+    "signature": {
+      "title": "Email signature",
+      "intro": "Goes under your replies to customers. Leave it empty to use your name ({{name}}).",
+      "label": "Your signature",
+      "placeholder": "{{name}}\nService desk · ext. 214",
+      "save": "Save signature",
+      "saved": "Signature saved",
+      "failed": "Could not save the signature"
+    }
   },
   "users": {
     "mfa": {
@@ -1967,6 +1980,68 @@
       "savedOn": "Saved. Contacts inactive for {{days}} days will be anonymized.",
       "savedOff": "Automatic retention is off.",
       "failed": "Failed to save the retention policy"
+    }
+  },
+  "customerEmails": {
+    "title": "Customer emails",
+    "intro": "What your customers get by email: your logo and color (from Branding), your company's language and your own words. Every reply, acknowledgement and closing goes out in this design.",
+    "loadFailed": "Could not load customer emails",
+    "needsEmail": "Connect a mailbox so these emails can go out:",
+    "settingsTitle": "General settings",
+    "language": "Email language",
+    "languageHint": "Everything Seredina writes to your customers is in this language: default texts, buttons, the footer and notices.",
+    "senderName": "Sender name",
+    "senderNamePlaceholder": "For example: Acme IT Support",
+    "companySignature": "Company signature",
+    "companySignaturePlaceholder": "Acme Service Desk\n+1 555 0100 · Monday to Friday, 8:30 to 18:00",
+    "quoteHistory": "Quote the customer's last message",
+    "quoteHistoryHint": "Under each reply goes what the customer wrote, for context.",
+    "survey": "Satisfaction survey on resolve",
+    "surveyHint": "The \"request resolved\" email includes a button to rate the service.",
+    "save": "Save",
+    "saved": "Saved",
+    "saveFailed": "Could not save",
+    "custom": "Custom",
+    "default": "Default",
+    "enabled": "Send this email",
+    "subject": "Subject",
+    "body": "Message",
+    "variables": "Variables (click to insert)",
+    "preview": "Preview",
+    "hidePreview": "Hide preview",
+    "sendTest": "Send me a test",
+    "restore": "Restore default",
+    "testSent": "Test sent to {{to}}",
+    "unknownVariables": "Unknown variables: {{list}}",
+    "signatureHint": "Each agent can put their own signature under their replies in",
+    "signatureLink": "Account security",
+    "events": {
+      "ticket_created": {
+        "title": "Acknowledgement",
+        "when": "When a customer opens a request by email, the portal or the catalog. Not sent to automatic replies (out of office, bounces)."
+      },
+      "agent_reply": {
+        "title": "Agent reply",
+        "when": "Every public reply by an agent. {{message}} is what the agent wrote."
+      },
+      "ticket_resolved": {
+        "title": "Request resolved",
+        "when": "When the request moves to a resolved status. Carries the satisfaction survey if it's on."
+      },
+      "ticket_closed": {
+        "title": "Request closed",
+        "when": "When the request is closed. If it's off and the request is closed without being resolved first, the \"resolved\" email is sent."
+      }
+    },
+    "vars": {
+      "company": "Your company name",
+      "contact_name": "Customer name",
+      "contact_email": "Customer email",
+      "ticket_number": "Request number",
+      "ticket_subject": "Request subject",
+      "agent_name": "Agent name",
+      "message": "Text of the agent's reply",
+      "portal_link": "Link to the customer portal (if on)"
     }
   }
 }

@@ -118,7 +118,8 @@
       "sso": "Inicio de sesión único",
       "contracts": "Contratos",
       "customerPortal": "Portal de clientes",
-      "contacts": "Contactos"
+      "contacts": "Contactos",
+      "customerEmails": "Correos al cliente"
     }
   },
   "layout": {
@@ -557,7 +558,10 @@
       "sso.settings_updated": "Configuración de inicio de sesión único modificada",
       "sso.settings_deleted": "Inicio de sesión único quitado",
       "ai_settings.triage_mode_changed": "Modo de clasificación por IA modificado",
-      "portal.settings_updated": "Portal de clientes activado/desactivado"
+      "portal.settings_updated": "Portal de clientes activado/desactivado",
+      "email_settings.updated": "Ajustes de correo al cliente modificados",
+      "email_template.updated": "Plantilla de correo modificada",
+      "email_template.reset": "Plantilla de correo restaurada"
     }
   },
   "mfa": {
@@ -621,7 +625,16 @@
     },
     "disable": "Desactivar",
     "regenerateExplain": "Escribe un código de tu app. Tus códigos de recuperación anteriores dejarán de funcionar.",
-    "regenerate": "Crear códigos nuevos"
+    "regenerate": "Crear códigos nuevos",
+    "signature": {
+      "title": "Firma de correo",
+      "intro": "Va al final de tus respuestas a clientes. Si la dejas vacía, se usa tu nombre ({{name}}).",
+      "label": "Tu firma",
+      "placeholder": "{{name}}\nMesa de ayuda · Anexo 214",
+      "save": "Guardar firma",
+      "saved": "Firma guardada",
+      "failed": "No se pudo guardar la firma"
+    }
   },
   "users": {
     "mfa": {
@@ -1967,6 +1980,68 @@
       "savedOn": "Guardado. Los contactos inactivos durante {{days}} días se anonimizarán.",
       "savedOff": "La retención automática está desactivada.",
       "failed": "No se pudo guardar la política de retención"
+    }
+  },
+  "customerEmails": {
+    "title": "Correos al cliente",
+    "intro": "Así se ven los correos que reciben tus clientes: con tu logo y color (de Marca), en el idioma de tu empresa y con tus propias palabras. Cada respuesta, acuse de recibo y cierre sale con este diseño.",
+    "loadFailed": "No se pudieron cargar los correos al cliente",
+    "needsEmail": "Conecta un buzón para que estos correos puedan salir:",
+    "settingsTitle": "Ajustes generales",
+    "language": "Idioma de los correos",
+    "languageHint": "Todo lo que Seredina escribe a tus clientes sale en este idioma: textos predeterminados, botones, pie del correo y avisos.",
+    "senderName": "Nombre del remitente",
+    "senderNamePlaceholder": "Por ejemplo: Soporte TI Acme",
+    "companySignature": "Firma de la empresa",
+    "companySignaturePlaceholder": "Mesa de ayuda Acme\n+56 2 2345 6789 · lunes a viernes, 8:30 a 18:00",
+    "quoteHistory": "Citar el último mensaje del cliente",
+    "quoteHistoryHint": "Debajo de cada respuesta va lo que el cliente escribió, para que tenga el contexto.",
+    "survey": "Encuesta de satisfacción al resolver",
+    "surveyHint": "El correo de solicitud resuelta incluye un botón para calificar la atención.",
+    "save": "Guardar",
+    "saved": "Guardado",
+    "saveFailed": "No se pudo guardar",
+    "custom": "Personalizada",
+    "default": "Predeterminada",
+    "enabled": "Enviar este correo",
+    "subject": "Asunto",
+    "body": "Mensaje",
+    "variables": "Variables (clic para insertar)",
+    "preview": "Vista previa",
+    "hidePreview": "Ocultar vista previa",
+    "sendTest": "Enviarme una prueba",
+    "restore": "Restaurar predeterminada",
+    "testSent": "Prueba enviada a {{to}}",
+    "unknownVariables": "Variables desconocidas: {{list}}",
+    "signatureHint": "Cada agente puede poner su propia firma bajo sus respuestas en",
+    "signatureLink": "Seguridad de la cuenta",
+    "events": {
+      "ticket_created": {
+        "title": "Acuse de recibo",
+        "when": "Cuando un cliente abre una solicitud por correo, el portal o el catálogo. No se envía a respuestas automáticas (fuera de oficina, rebotes)."
+      },
+      "agent_reply": {
+        "title": "Respuesta de un agente",
+        "when": "Cada respuesta pública de un agente. {{message}} es el texto que escribió el agente."
+      },
+      "ticket_resolved": {
+        "title": "Solicitud resuelta",
+        "when": "Cuando la solicitud pasa a un estado resuelto. Lleva la encuesta de satisfacción si está activada."
+      },
+      "ticket_closed": {
+        "title": "Solicitud cerrada",
+        "when": "Cuando la solicitud se cierra. Si está desactivado y se cierra sin haberse resuelto antes, se envía el de solicitud resuelta."
+      }
+    },
+    "vars": {
+      "company": "Nombre de tu empresa",
+      "contact_name": "Nombre del cliente",
+      "contact_email": "Correo del cliente",
+      "ticket_number": "Número de la solicitud",
+      "ticket_subject": "Asunto de la solicitud",
+      "agent_name": "Nombre del agente",
+      "message": "Texto de la respuesta del agente",
+      "portal_link": "Enlace al portal de clientes (si está activado)"
     }
   }
 }

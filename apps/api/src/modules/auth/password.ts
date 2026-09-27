@@ -1,12 +1,13 @@
 import { randomBytes } from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import { prisma, withTenantTx } from '@seredina/db';
-import { sha256Hex } from '@seredina/shared';
+import { emailString, parseEmailSettings, sha256Hex } from '@seredina/shared';
 import { signPurposeToken, verifyPurposeToken } from '../../lib/purposeToken';
 import { contactEmailQueue } from '../../lib/queue';
 import { rateLimitRedis } from '../../lib/rateLimitRedis';
 import { webOrigin } from '../../lib/publicUrl';
 import { resolveTenantIdBySlug } from '../tenants/service';
+import { brandedNotice } from '../emailtemplates/service';
 import { LOCKOUT_DURATION_MS, MAX_FAILED_LOGIN_ATTEMPTS } from './service';
 
 /**
@@ -136,19 +137,14 @@ export async function requestPasswordReset(tenantSlug: string, rawEmail: string)
   );
   // A fragment, so the token never reaches a server log or a Referer header.
   const link = `${webOrigin()}/reset-password#${token}`;
-  await contactEmailQueue.add(
-    'send',
-    {
-      tenantId,
-      to: found.user.email,
-      subject: `Reset your ${found.tenantName} password`,
-      text:
-        `Someone asked to reset the password for ${found.user.email} on ${found.tenantName}.\n\n` +
-        `Choose a new password here:\n\n${link}\n\n` +
-        `The link works once and expires in 30 minutes. If it wasn't you, ignore this email: your password hasn't changed.`,
-    },
-    { removeOnComplete: 100, removeOnFail: 100 },
+  // In the tenant's language and layout (docs/adr/0070-customer-email-templates.md).
+  const { subject, text, html } = await brandedNotice(
+    tenantId,
+    { subject: 'resetSubject', body: 'resetBody', button: 'resetButton' },
+    { name: found.user.name, email: found.user.email },
+    link,
   );
+  await contactEmailQueue.add('send', { tenantId, to: found.user.email, subject, text, html }, { removeOnComplete: 100, removeOnFail: 100 });
 }
 
 // ---------------------------------------------------------------------------
@@ -168,7 +164,7 @@ export async function sendInvitation(tenantId: string, userId: string, invitedBy
     const user = await tx.user.findUnique({ where: { id: userId } });
     if (!user) throw new PasswordError('user not found', 404);
     if (!user.invitedAt) throw new PasswordError('This person has already set their password.', 409);
-    const tenant = await tx.tenant.findUniqueOrThrow({ where: { id: tenantId }, select: { name: true, slug: true } });
+    const tenant = await tx.tenant.findUniqueOrThrow({ where: { id: tenantId }, select: { name: true, slug: true, emailSettings: true } });
     return { user, tenant };
   });
 
@@ -178,20 +174,15 @@ export async function sendInvitation(tenantId: string, userId: string, invitedBy
     INVITE_TTL_MS,
   );
   const link = `${webOrigin()}/accept-invite#${token}`;
-  const by = invitedByName ? `${invitedByName} invited you` : 'You were invited';
-  await contactEmailQueue.add(
-    'send',
-    {
-      tenantId: tenantId,
-      to: found.user.email,
-      subject: `You're invited to ${found.tenant.name} on Seredina`,
-      text:
-        `Hi ${found.user.name},\n\n${by} to join ${found.tenant.name}'s helpdesk.\n\n` +
-        `Choose your password here:\n\n${link}\n\n` +
-        `The link expires in 7 days. Afterwards, sign in at ${webOrigin()}/login with the organization "${found.tenant.slug}" and ${found.user.email}.`,
-    },
-    { removeOnComplete: 100, removeOnFail: 100 },
+  const language = parseEmailSettings(found.tenant.emailSettings).language;
+  const by = invitedByName ? emailString(language, 'inviteBy', { inviter: invitedByName }) : emailString(language, 'inviteByUnknown');
+  const { subject, text, html } = await brandedNotice(
+    tenantId,
+    { subject: 'inviteSubject', body: 'inviteBody', button: 'inviteButton' },
+    { name: found.user.name, email: found.user.email, by, slug: found.tenant.slug, login: `${webOrigin()}/login` },
+    link,
   );
+  await contactEmailQueue.add('send', { tenantId, to: found.user.email, subject, text, html }, { removeOnComplete: 100, removeOnFail: 100 });
 }
 
 // ---------------------------------------------------------------------------

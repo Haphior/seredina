@@ -6,6 +6,8 @@ import { computeSlaDueAts, scheduleSlaBreachChecks } from '../sla/service';
 import { getActiveEscalationForTicket } from '../oncall/service';
 import { notifyUser } from '../notifications/service';
 import { createCsatSurveyLink } from '../csat/service';
+import { loadEmailContext, templateFor, tenantLanguage } from '../emailtemplates/service';
+import { emailString, parseEmailSettings, renderTemplate, surveyButton, type EmailMeta } from '@seredina/shared';
 
 const DEFAULT_TICKET_STATUSES: { key: string; label: string; category: TicketStatusCategory; sortOrder: number }[] = [
   { key: 'open', label: 'Open', category: 'OPEN', sortOrder: 0 },
@@ -101,14 +103,16 @@ export async function createTicketFromApi(tenantId: string, input: CreateTicketF
 
   await dispatchWebhookEvent(tenantId, 'ticket.created', { ticketId: ticket.id, number: ticket.number, subject: ticket.subject, channel: ticket.channel });
   await scheduleSlaBreachChecks(tenantId, ticket.id, { firstResponseDueAt: ticket.firstResponseDueAt, resolutionDueAt: ticket.resolutionDueAt });
-  if (triageOn) await enqueueTicketTriage(tenantId, ticket.id);
+  // A customer who opened a request themselves (portal, service catalog) gets
+  // the "we received your request" email -- docs/adr/0070-customer-email-templates.md.
+  const acknowledge = CUSTOMER_EMAIL_CHANNELS.has(ticket.channel) && ticket.channel !== 'email';
+  if (triageOn || acknowledge) await enqueueTicketTriage(tenantId, ticket.id, acknowledge);
   // Same "only a genuine new assignee notifies" reasoning as updateTicket --
   // trivially true here since a brand-new ticket has no prior assignee to match.
   if (input.assigneeId) {
     await notifyUser(tenantId, input.assigneeId, 'TICKET_ASSIGNED', {
       ticketId: ticket.id,
-      body: `You were assigned to #${ticket.number}: ${ticket.subject}`,
-      subject: `[#${ticket.number}] Assigned to you: ${ticket.subject}`,
+      ...(await assignedNotice(tenantId, ticket.number, ticket.subject)),
     });
   }
   return ticket;
@@ -402,6 +406,14 @@ export async function getTicket(tenantId: string, ticketId: string) {
   return { ...ticket, escalation };
 }
 
+/**
+ * Tickets whose customer hears back by email: mail itself, and requests the
+ * customer opened in the portal or the service catalog, so they don't have
+ * to keep checking a page (docs/adr/0065-customer-portal.md,
+ * docs/adr/0070-customer-email-templates.md).
+ */
+const CUSTOMER_EMAIL_CHANNELS = new Set(['email', 'portal', 'catalog']);
+
 export interface AddMessageInput {
   // Required when authorType is 'AGENT' (the default) -- a human agent's reply
   // always has one. Omitted for authorType: 'AI' (see modules/ai-tools/catalog.ts's
@@ -412,6 +424,8 @@ export interface AddMessageInput {
   authorType?: MessageAuthorType;
   body: string;
   isPrivateNote: boolean;
+  // The layout data of an automatic ticket-event email (docs/adr/0070-customer-email-templates.md).
+  emailMeta?: EmailMeta;
 }
 
 export async function addMessage(tenantId: string, ticketId: string, input: AddMessageInput) {
@@ -436,6 +450,7 @@ export async function addMessage(tenantId: string, ticketId: string, input: AddM
         authorUserId: input.authorUserId,
         body: input.body,
         isPrivateNote: input.isPrivateNote,
+        emailMeta: input.emailMeta ? (input.emailMeta as unknown as Prisma.InputJsonValue) : undefined,
       },
     });
 
@@ -463,9 +478,9 @@ export async function addMessage(tenantId: string, ticketId: string, input: AddM
     const shouldNotifyCustomer = authorType !== 'CONTACT' && !input.isPrivateNote;
     return {
       message,
-      // Portal tickets (docs/adr/0065-customer-portal.md) get agent replies by
-      // email too, so the customer doesn't have to keep checking the portal.
-      shouldEmail: (ticket.channel === 'email' || ticket.channel === 'portal') && shouldNotifyCustomer,
+      // Portal and catalog tickets get agent replies by email too -- see
+      // CUSTOMER_EMAIL_CHANNELS.
+      shouldEmail: CUSTOMER_EMAIL_CHANNELS.has(ticket.channel) && shouldNotifyCustomer,
       shouldTelegram: ticket.channel === 'telegram' && shouldNotifyCustomer,
     };
   });
@@ -508,9 +523,10 @@ export async function updateTicket(tenantId: string, ticketId: string, input: Up
   let priorityChanged = false;
   let newAssigneeId: string | null = null;
   let justResolved = false;
+  let justClosed = false;
 
   const updated = await withTenantTx(prisma, tenantId, async (tx) => {
-    const ticket = await tx.ticket.findUnique({ where: { id: ticketId } });
+    const ticket = await tx.ticket.findUnique({ where: { id: ticketId }, include: { status: { select: { category: true } } } });
     if (!ticket) throw new Error('ticket not found');
 
     // Captured here, acted on after the transaction closes -- notifyUser does
@@ -559,6 +575,7 @@ export async function updateTicket(tenantId: string, ticketId: string, input: Up
       }
       if (newStatus.category === 'CLOSED') {
         data.closedAt = new Date();
+        justClosed = ticket.status.category !== 'CLOSED';
         if (!ticket.resolvedAt) {
           data.resolvedAt = new Date();
           justResolved = true;
@@ -582,27 +599,91 @@ export async function updateTicket(tenantId: string, ticketId: string, input: Up
   if (newAssigneeId) {
     await notifyUser(tenantId, newAssigneeId, 'TICKET_ASSIGNED', {
       ticketId: updated.id,
-      body: `You were assigned to #${updated.number}: ${updated.subject}`,
-      subject: `[#${updated.number}] Assigned to you: ${updated.subject}`,
+      ...(await assignedNotice(tenantId, updated.number, updated.subject)),
     });
   }
-  if (justResolved) {
-    // A SYSTEM message, not a direct tx.message.create like every other
-    // SYSTEM message in this codebase so far -- going through addMessage is
-    // what makes the survey link actually reach the customer for free,
-    // through whichever outbound mechanism the ticket's own channel already
-    // has (shouldEmail/shouldTelegram) or the widget's polled conversation
-    // view. See docs/adr/0045-csat-surveys.md.
-    const link = await createCsatSurveyLink(tenantId, updated.id);
-    if (link) {
-      await addMessage(tenantId, updated.id, {
-        authorType: 'SYSTEM',
-        isPrivateNote: false,
-        body: `How did we do? Rate your experience: ${link}`,
-      });
-    }
+  if (justResolved || justClosed) {
+    // Tell the customer, in the tenant's words and language: "resolved" when
+    // a ticket lands on RESOLVED; on CLOSED, the "closed" email if the tenant
+    // turned it on, else "resolved" for a ticket that skipped straight to
+    // closed. The satisfaction survey rides on whichever goes out. See
+    // docs/adr/0070-customer-email-templates.md and docs/adr/0045-csat-surveys.md.
+    const closedEnabled = justClosed && (await ticketEventEnabled(tenantId, 'ticket_closed'));
+    const event = closedEnabled ? 'ticket_closed' : justResolved ? 'ticket_resolved' : null;
+    if (event) await sendTicketEvent(tenantId, updated.id, event, { survey: justResolved });
   }
-  return updated;
+    return updated;
+}
+
+/** "Assigned to you", in the tenant's language. */
+async function assignedNotice(tenantId: string, n: number, subject: string) {
+  const language = await tenantLanguage(tenantId);
+  return {
+    body: emailString(language, 'notifyAssignedBody', { n, subject }),
+    subject: emailString(language, 'notifyAssignedSubject', { n, subject }),
+  };
+}
+
+async function ticketEventEnabled(tenantId: string, event: 'ticket_closed' | 'ticket_resolved'): Promise<boolean> {
+  return withTenantTx(prisma, tenantId, async (tx) => {
+    const { settings } = await loadEmailContext(tx, tenantId);
+    return (await templateFor(tx, tenantId, event, settings.language)).enabled;
+  });
+}
+
+/**
+ * The automatic message of a ticket event -- the acknowledgement of a new
+ * request, or "resolved"/"closed" -- in the tenant's template and language
+ * (docs/adr/0070-customer-email-templates.md). A SYSTEM message through
+ * addMessage, so it reaches the customer the way the ticket's channel does
+ * (branded email, telegram, the widget and portal) and shows in the
+ * timeline; its emailMeta is what the worker lays out as the email. Returns
+ * false when the tenant turned the event off, or the acknowledgement was
+ * already sent (a retried job).
+ */
+export async function sendTicketEvent(
+  tenantId: string,
+  ticketId: string,
+  event: 'ticket_created' | 'ticket_resolved' | 'ticket_closed',
+  options: { survey?: boolean } = {},
+): Promise<boolean> {
+  const prepared = await withTenantTx(prisma, tenantId, async (tx) => {
+    const ticket = await tx.ticket.findUnique({
+      where: { id: ticketId },
+      include: { contact: true, assignee: { select: { name: true } } },
+    });
+    if (!ticket) return null;
+    if (event === 'ticket_created') {
+      const already = await tx.message.findFirst({ where: { ticketId, emailMeta: { path: ['event'], equals: 'ticket_created' } }, select: { id: true } });
+      if (already) return null;
+    }
+    const ctx = await loadEmailContext(tx, tenantId);
+    const template = await templateFor(tx, tenantId, event, ctx.settings.language);
+    if (!template.enabled) return null;
+    const rendered = renderTemplate(template, {
+      company: ctx.tenant.name,
+      contactName: ticket.contact.name ?? '',
+      contactEmail: ticket.contact.email ?? '',
+      ticketNumber: ticket.number,
+      ticketSubject: ticket.subject,
+      agentName: ticket.assignee?.name ?? '',
+      portalLink: ctx.portalLink ?? '',
+    });
+    return { rendered, settings: ctx.settings };
+  });
+  if (!prepared) return false;
+
+  const { rendered, settings } = prepared;
+  const link = options.survey && settings.surveyOnResolve ? await createCsatSurveyLink(tenantId, ticketId) : null;
+  const button = link ? surveyButton(settings.language, link) : undefined;
+  await addMessage(tenantId, ticketId, {
+    authorType: 'SYSTEM',
+    isPrivateNote: false,
+    // The timeline, telegram and the widget get the link spelled out.
+    body: button ? `${rendered.body}\n\n${button.title} ${button.label}: ${button.url}` : rendered.body,
+    emailMeta: { event, subject: rendered.subject, body: rendered.body, button },
+  });
+  return true;
 }
 
 /**
@@ -628,6 +709,9 @@ export async function mergeTicket(tenantId: string, sourceTicketId: string, into
     if (!target) throw new Error('target ticket not found');
     if (source.mergedIntoId) throw new Error('this ticket has already been merged into another one');
     if (target.mergedIntoId) throw new Error('cannot merge into a ticket that has itself been merged elsewhere');
+    // The customer can see these in the portal: the tenant's language.
+    const { emailSettings } = await tx.tenant.findUniqueOrThrow({ where: { id: tenantId }, select: { emailSettings: true } });
+    const language = parseEmailSettings(emailSettings).language;
 
     const closedStatus = await tx.ticketStatus.findFirst({ where: { category: 'CLOSED' }, orderBy: { sortOrder: 'asc' } });
     if (!closedStatus) throw new Error('tenant has no "closed" ticket status configured');
@@ -639,7 +723,7 @@ export async function mergeTicket(tenantId: string, sourceTicketId: string, into
         tenantId,
         ticketId: intoTicketId,
         authorType: 'SYSTEM',
-        body: `Merged ticket #${source.number} ("${source.subject}") into this ticket.`,
+        body: emailString(language, 'mergedFrom', { n: source.number, subject: source.subject }),
         isPrivateNote: false,
       },
     });
@@ -648,7 +732,7 @@ export async function mergeTicket(tenantId: string, sourceTicketId: string, into
         tenantId,
         ticketId: sourceTicketId,
         authorType: 'SYSTEM',
-        body: `This ticket was merged into #${target.number} ("${target.subject}").`,
+        body: emailString(language, 'mergedInto', { n: target.number, subject: target.subject }),
         isPrivateNote: false,
       },
     });
@@ -688,9 +772,9 @@ export async function mergeTicket(tenantId: string, sourceTicketId: string, into
  * call must never hold up creating a ticket. Best-effort -- a Redis hiccup
  * costs a suggestion, never the ticket.
  */
-async function enqueueTicketTriage(tenantId: string, ticketId: string): Promise<void> {
+async function enqueueTicketTriage(tenantId: string, ticketId: string, acknowledge = false): Promise<void> {
   await ticketFollowupQueue
-    .add('followup', { tenantId, ticketId, finalize: false }, { attempts: 3, backoff: { type: 'exponential', delay: 10_000 }, removeOnComplete: 1000 })
+    .add('followup', { tenantId, ticketId, finalize: false, acknowledge }, { attempts: 3, backoff: { type: 'exponential', delay: 10_000 }, removeOnComplete: 1000 })
     .catch((err) => console.error(`[tickets] could not queue follow-up for ${ticketId}:`, err));
 }
 

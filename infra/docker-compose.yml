@@ -122,6 +122,8 @@ services:
       REDIS_URL: redis://localhost:${REDIS_PORT:-6379}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:?set ENCRYPTION_KEY in .env}
       EMAIL_POLL_INTERVAL_MS: ${EMAIL_POLL_INTERVAL_MS:-30000}
+      # Links in customer emails (the portal) -- same value as `api`'s.
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:8080}
       SENTRY_DSN: ${SENTRY_DSN:-}
       # Must match `api`'s -- the worker refuses to run network scans outside
       # self_hosted mode (docs/adr/0055-agent-based-discovery.md).

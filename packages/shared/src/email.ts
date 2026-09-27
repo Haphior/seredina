@@ -26,6 +26,13 @@ export interface TicketFollowupJobPayload {
   tenantId: string;
   ticketId: string;
   finalize: boolean;
+  /**
+   * Email the contact the "we received your request" acknowledgement. False
+   * for mail that is itself automatic (an out-of-office, a bounce), which
+   * would otherwise ping-pong (docs/adr/0070-customer-email-templates.md).
+   * Set by the worker for inbound email; absent = no acknowledgement.
+   */
+  acknowledge?: boolean;
 }
 
 /**
@@ -40,4 +47,6 @@ export interface ContactEmailJobPayload {
   to: string;
   subject: string;
   text: string;
+  /** The branded HTML part (docs/adr/0070-customer-email-templates.md); text-only when absent. */
+  html?: string;
 }

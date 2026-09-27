@@ -1,9 +1,10 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { apiGet, apiPost, ApiError } from '../lib/api';
+import { apiGet, apiPost, apiPut, ApiError } from '../lib/api';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
+import { Textarea } from '../components/Textarea';
 import { Badge } from '../components/Badge';
 import { CodeInput, MfaEnroll, RecoveryCodes, type MfaSetupData } from '../components/MfaSetup';
 import { formatDateTime } from '../lib/format';
@@ -186,7 +187,65 @@ export function AccountSecurity() {
       )}
 
       <ChangePassword />
+      <EmailSignature />
     </div>
+  );
+}
+
+/** The lines under this agent's replies to customers -- docs/adr/0070-customer-email-templates.md. */
+function EmailSignature() {
+  const { t } = useTranslation();
+  const [signature, setSignature] = useState<string | null>(null);
+  const [name, setName] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
+
+  useEffect(() => {
+    apiGet<{ signature: string; name: string }>('/me/email-signature')
+      .then((r) => {
+        setSignature(r.signature);
+        setName(r.name);
+      })
+      .catch(() => setSignature(''));
+  }, []);
+
+  async function save(e: FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setMessage(null);
+    try {
+      const r = await apiPut<{ signature: string }>('/me/email-signature', { signature: signature ?? '' });
+      setSignature(r.signature);
+      setMessage({ ok: true, text: t('accountSecurity.signature.saved') });
+    } catch (err) {
+      setMessage({ ok: false, text: err instanceof ApiError ? err.message : t('accountSecurity.signature.failed') });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (signature === null) return null;
+  return (
+    <Card className="mt-6 p-5">
+      <h2 className="mb-1 text-[15px] font-bold text-slate-800">{t('accountSecurity.signature.title')}</h2>
+      <p className="mb-4 text-[13px] text-slate-500">{t('accountSecurity.signature.intro', { name })}</p>
+      <form onSubmit={save} className="space-y-3">
+        <Textarea
+          label={t('accountSecurity.signature.label')}
+          rows={3}
+          maxLength={2000}
+          value={signature}
+          placeholder={t('accountSecurity.signature.placeholder', { name })}
+          onChange={(e) => setSignature(e.target.value)}
+        />
+        <div className="flex items-center gap-3">
+          <Button type="submit" isLoading={saving}>
+            {t('accountSecurity.signature.save')}
+          </Button>
+          {message && <span className={`text-[13px] ${message.ok ? 'text-emerald-600' : 'text-rose-600'}`}>{message.text}</span>}
+        </div>
+      </form>
+    </Card>
   );
 }
 

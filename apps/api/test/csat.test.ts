@@ -79,8 +79,11 @@ describe.skipIf(!hasDb)('CSAT surveys', () => {
 
     const csat = await withTenantTx(prisma, tenantId, (tx) => tx.csatResponse.findUnique({ where: { ticketId: ticket.id } }));
     expect(csat).toBeNull();
+    // The "resolved" email still goes out (docs/adr/0070-customer-email-templates.md), just without a survey.
     const full = await getTicket(tenantId, ticket.id);
-    expect(full.messages.filter((m) => m.authorType === 'SYSTEM')).toHaveLength(0);
+    const system = full.messages.filter((m) => m.authorType === 'SYSTEM');
+    expect(system).toHaveLength(1);
+    expect(system[0].body).not.toContain('/csat/');
   });
 
   // Regression: the SYSTEM survey message must never be mistaken for a real

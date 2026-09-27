@@ -114,6 +114,7 @@ const navGroups: {
       { to: '/audit-log', itemKey: 'auditLog', icon: ChecklistIcon, permission: 'audit:read' },
       { to: '/api-keys', itemKey: 'apiKeys', icon: KeyIcon },
       { to: '/email-channels', itemKey: 'emailChannels', icon: MailIcon, permission: 'channels:manage' },
+      { to: '/customer-emails', itemKey: 'customerEmails', icon: MailIcon, permission: 'channels:manage' },
       { to: '/telegram', itemKey: 'telegram', icon: PaperPlaneIcon, permission: 'channels:manage' },
       { to: '/monitoring-integrations', itemKey: 'monitoringIntegrations', icon: WarningIcon, permission: 'channels:manage' },
       { to: '/customer-portal', itemKey: 'customerPortal', icon: UsersIcon, permission: 'tickets:manage_all' },
