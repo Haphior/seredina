@@ -974,7 +974,21 @@
     "saveFailed": "No se pudo guardar el tema — se revirtió",
     "title": "Apariencia",
     "intro": "Elige cómo se ve Seredina para todos en este espacio de trabajo. Se aplica al instante para cualquiera que tenga la aplicación abierta.",
-    "active": "Activo"
+    "active": "Activo",
+    "options": {
+      "aero": {
+        "name": "Frutiger Aero",
+        "description": "Brillante y luminoso: un cielo degradado, paneles de vidrio esmerilado, un acento aqua y botones con brillo."
+      },
+      "middle": {
+        "name": "Meet in the Middle",
+        "description": "El predeterminado, cálido y fiel a la marca: neutros en tonos piedra y un ícono en cada ticket que muestra cómo llegó."
+      },
+      "refined": {
+        "name": "Refined",
+        "description": "El aspecto original: neutros grises fríos, sin el ícono de canal."
+      }
+    }
   },
   "aiUsage": {
     "loadFailed": "No se pudo cargar el uso de IA",

@@ -115,13 +115,18 @@ so different kinds of requests ask for different data.
 
 ## Appearance
 
-**Settings → Appearance** — two visual themes for the whole
+**Settings → Appearance** — three visual themes for the whole
 console, with immediate effect for anyone who has it open:
 
 - **Meet in the Middle** (default) — a warm stone palette, with a
   three-circle glyph on each ticket showing which channel it arrived
   through.
 - **Refined** — the original look, a cool slate palette, no glyph.
+- **Frutiger Aero** — glossy and bright, in the style of mid-2000s
+  interfaces: a sky-to-grass gradient with bubbles behind everything,
+  frosted-glass panels, an aqua accent and glossy buttons. It uses Segoe UI
+  where available (Windows). If the operating system asks for reduced
+  transparency, panels turn solid white.
 
 It's a per-tenant preference, not per person — every agent at the same
 organization sees the same theme.

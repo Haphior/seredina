@@ -125,12 +125,17 @@ así distintos tipos de solicitud piden datos distintos.
 
 ## Apariencia
 
-**Ajustes → Apariencia** — dos temas visuales para toda la
+**Ajustes → Apariencia** — tres temas visuales para toda la
 consola, con efecto inmediato para cualquiera que la tenga abierta:
 
 - **Meet in the Middle** (por defecto) — paleta piedra cálida, con un
   glifo de tres círculos en cada ticket indicando por qué canal llegó.
 - **Refined** — el look original, paleta slate fría, sin el glifo.
+- **Frutiger Aero** — brillante y luminoso, al estilo de las interfaces de
+  mediados de los 2000: un degradado de cielo a pasto con burbujas de
+  fondo, paneles de vidrio esmerilado, un acento aqua y botones con brillo.
+  Usa Segoe UI donde está disponible (Windows). Si el sistema operativo
+  pide reducir la transparencia, los paneles se vuelven blancos sólidos.
 
 Es una preferencia por tenant, no por persona — todos los agentes de una
 misma organización ven el mismo tema.

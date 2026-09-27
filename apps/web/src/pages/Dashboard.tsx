@@ -427,7 +427,7 @@ function TicketVolumeWidget({ points }: { points: TicketVolumePoint[] }) {
               width={barW * 0.64}
               height={Math.max(h, 1)}
               rx={0.6}
-              fill="#6366f1"
+              fill="var(--a-500)"
             />
           );
         })}

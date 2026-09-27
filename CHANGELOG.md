@@ -9,6 +9,9 @@ contain breaking changes).
 
 ### Added
 
+- **Frutiger Aero theme** (`docs/adr/0073-frutiger-aero-theme.md`), under
+  Settings → Appearance: a sky gradient with bubbles, frosted-glass panels,
+  an aqua accent and glossy buttons.
 - **First-run setup** (`docs/adr/0072-first-run-setup.md`): after
   registering, five skippable steps take a workspace from empty to usable:
   - organization name, language and working hours (presets and time zone);

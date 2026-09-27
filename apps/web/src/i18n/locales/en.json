@@ -974,7 +974,21 @@
     "saveFailed": "Failed to save theme — reverted",
     "title": "Appearance",
     "intro": "Pick how Seredina looks for everyone in this workspace. Takes effect immediately for anyone with the app open.",
-    "active": "Active"
+    "active": "Active",
+    "options": {
+      "aero": {
+        "name": "Frutiger Aero",
+        "description": "Glossy and bright: a sky gradient, frosted-glass panels, an aqua accent and glossy buttons."
+      },
+      "middle": {
+        "name": "Meet in the Middle",
+        "description": "Warm, on-brand default. A stone-warm neutral palette and a channel glyph on each ticket showing how it arrived."
+      },
+      "refined": {
+        "name": "Refined",
+        "description": "The original look: a cool slate neutral palette, no channel glyph."
+      }
+    }
   },
   "aiUsage": {
     "loadFailed": "Failed to load AI usage",
