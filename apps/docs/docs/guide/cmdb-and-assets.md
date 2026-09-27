@@ -62,8 +62,9 @@ then download from there.
 
 `seredina-agent status` shows whether a device is enrolled and whether the
 service is running. `seredina-agent uninstall --purge` removes the agent.
-To update the agent, run a new enrollment command: the device keeps its
-record.
+To update the agent, run `seredina-agent update` as administrator: no
+token needed, and the device keeps its record. See
+[Updating the agents](/deployment/updates-and-backups#updating-the-agents).
 
 ### What the agent reports
 

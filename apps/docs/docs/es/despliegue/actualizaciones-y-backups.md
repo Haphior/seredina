@@ -2,26 +2,86 @@
 
 ## Actualizar tu instancia
 
-No hay un mecanismo de auto-actualización — es un `git pull` y volver a
-levantar los contenedores:
+Seredina no se actualiza sola: vos elegís cuándo. Cada versión es un tag
+de git (`v0.2.0`, `v0.3.0`...), con sus notas en la
+[página de versiones](https://github.com/Haphior/helpdesk-seredina/releases).
+Un servidor en producción debería correr una versión, no lo que tenga
+`main` hoy.
+
+### Qué versión está corriendo
 
 ```bash
-git pull origin main
+curl -s https://<tu dirección>/api/health     # {"status":"ok","version":"0.2.0"}
+git -C /opt/seredina describe --tags            # v0.2.0
+```
+
+### Actualizar a una versión nueva
+
+1. **Leé las notas de la versión.** Dicen qué cambió y si hay algo que
+   hacer a mano. Leé también las de cada versión que te saltes.
+2. **Hacé un backup** de la base de datos, y tené a mano tu copia del
+   `.env` (ver [Backups](#backups)):
+
+   ```bash
+   docker compose -f infra/docker-compose.yml exec -T postgres \
+     pg_dump -U app_migrator -Fc seredina > antes-de-v0.3.0.dump
+   ```
+
+3. **Cambiá a la versión y reconstruí:**
+
+   ```bash
+   git fetch --tags
+   git checkout v0.3.0
+   docker compose -f infra/docker-compose.yml up -d --build
+   ```
+
+   El servicio `migrate` corre primero y aplica las migraciones nuevas
+   antes de que `api` reciba tráfico. No hay un paso de migración aparte.
+   Contá con uno o dos minutos sin servicio mientras se reinician los
+   contenedores: hacelo fuera del horario de trabajo.
+4. **Verificá:** `/api/health` muestra la versión nueva, y podés iniciar
+   sesión.
+
+Si instalaste desde `main` antes de que existieran las versiones,
+`git checkout v0.2.0` te pasa a la primera. Desde ahí, seguí los pasos
+de arriba.
+
+### Volver atrás
+
+Las migraciones solo avanzan, así que volver a una versión anterior
+significa volver también a la base de datos de antes de actualizar:
+
+```bash
+git checkout v0.2.0
+docker compose -f infra/docker-compose.yml down
+docker volume rm infra_postgres_data        # el nombre que muestra `docker volume ls`
+docker compose -f infra/docker-compose.yml up -d postgres
+docker compose -f infra/docker-compose.yml exec -T postgres \
+  pg_restore -U app_migrator -d seredina --no-owner --no-privileges < antes-de-v0.3.0.dump
 docker compose -f infra/docker-compose.yml up -d --build
 ```
 
-El servicio `migrate` corre de nuevo automáticamente como parte del
-arranque y aplica cualquier migración de esquema nueva antes de que `api`
-empiece a recibir tráfico. No hay un paso manual de "correr las
-migraciones" aparte.
+Lo que se haya registrado después del backup se pierde. Por eso el
+backup va justo antes de actualizar.
 
-::: tip Antes de actualizar en producción
-Mirá el changelog de commits desde tu última actualización
-(`git log <tu-commit-actual>..origin/main --oneline`) y, si te preocupa
-algo específico, revisá el ADR correspondiente en `docs/adr/` — cada
-decisión de arquitectura no trivial tiene una entrada ahí explicando el
-porqué, no solo el qué.
-:::
+### Actualizar los agentes
+
+Los agentes tienen sus propias versiones
+([Haphior/seredina-agent](https://github.com/Haphior/seredina-agent/releases)),
+y las versiones del agente y del servidor no tienen que coincidir. En un
+equipo, como administrador/root:
+
+```bash
+seredina-agent update --check    # ¿hay un agente más nuevo?
+seredina-agent update            # instalarlo; no hace falta token de inscripción
+```
+
+En Windows el agente está en `C:\Program Files\Seredina Agent\seredina-agent.exe`.
+
+`update` conserva la inscripción del equipo y su intervalo de reporte.
+Verifica el SHA-256 de la descarga, y no hace nada si el agente ya está
+al día. Así que podés correrlo en todos tus equipos desde Intune, un
+script de inicio por GPO, Jamf o Ansible.
 
 ## Backups
 
@@ -57,8 +117,9 @@ a aplicar las políticas de seguridad por fila y los permisos, que no
 forman parte de un volcado de tablas.
 
 ```bash
-# 1. Detené todo y levantá solo Postgres, con un volumen vacío.
-docker compose -f infra/docker-compose.yml down -v
+# 1. Detené todo, vaciá solo el volumen de la base de datos, levantá solo Postgres.
+docker compose -f infra/docker-compose.yml down
+docker volume rm infra_postgres_data        # el nombre que muestra `docker volume ls`
 docker compose -f infra/docker-compose.yml up -d postgres
 
 # 2. Cargá el volcado.
@@ -69,8 +130,11 @@ docker compose -f infra/docker-compose.yml exec -T postgres \
 docker compose -f infra/docker-compose.yml up -d
 ```
 
-`down -v` borra el volumen de la base de datos actual — corrélo solo
-cuando de verdad quieras reemplazar esos datos. Probá restaurar en una
+`docker volume rm` borra la base de datos actual. Correlo solo cuando de
+verdad quieras reemplazar esos datos. No uses `down -v` en su lugar:
+también borra `caddy_data`, y con el modo TLS `internal` se generaría una
+CA nueva, así que los navegadores y todos los agentes dejarían de confiar
+en el servidor. Probá restaurar en una
 máquina de prueba de vez en cuando: un backup que nunca restauraste es una
 suposición, no un backup.
 

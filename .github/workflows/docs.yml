@@ -31,6 +31,8 @@ jobs:
       - run: npm ci
 
       - run: npm run build --workspace=@seredina/docs
+        env:
+          DOCS_BASE: /${{ github.event.repository.name }}/
 
       # enablement: true -- turns Pages on with source=GitHub Actions the first
       # time this runs, instead of requiring a manual Settings -> Pages click

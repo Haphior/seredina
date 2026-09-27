@@ -7,6 +7,7 @@ import helmet from '@fastify/helmet';
 import multipart from '@fastify/multipart';
 import rateLimit from '@fastify/rate-limit';
 import { MAX_ATTACHMENT_SIZE_BYTES } from './modules/attachments/service';
+import { SEREDINA_VERSION } from './lib/version';
 import { attachErrorTracking, initErrorTracking } from './lib/errorTracking';
 import { rateLimitRedis } from './lib/rateLimitRedis';
 import jwtPlugin from './plugins/jwt';
@@ -155,7 +156,7 @@ export function buildApp() {
   app.register(deviceRoutes);
   app.register(liveRoutes);
 
-  app.get('/health', async () => ({ status: 'ok' }));
+  app.get('/health', async () => ({ status: 'ok', version: SEREDINA_VERSION }));
 
   // Fastify's default handler echoes a thrown Error's .message as the response body,
   // which leaks internal detail (e.g. "user not found", stray Prisma errors) straight

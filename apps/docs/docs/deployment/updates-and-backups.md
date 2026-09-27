@@ -2,25 +2,83 @@
 
 ## Updating your instance
 
-There's no auto-update mechanism — it's a `git pull` and bringing the
-containers back up:
+Seredina doesn't update itself: you choose when. Each release is a git tag
+(`v0.2.0`, `v0.3.0`...) with its notes on the
+[releases page](https://github.com/Haphior/helpdesk-seredina/releases). A
+production server should run a release, not whatever `main` holds today.
+
+### Which version is running
 
 ```bash
-git pull origin main
+curl -s https://<your address>/api/health     # {"status":"ok","version":"0.2.0"}
+git -C /opt/seredina describe --tags            # v0.2.0
+```
+
+### Updating to a new release
+
+1. **Read the release notes.** They list what changed and anything to do
+   by hand. Check them for every release you skip over, too.
+2. **Back up** the database, and have your `.env` copy at hand (see
+   [Backups](#backups)):
+
+   ```bash
+   docker compose -f infra/docker-compose.yml exec -T postgres \
+     pg_dump -U app_migrator -Fc seredina > before-v0.3.0.dump
+   ```
+
+3. **Switch to the release and rebuild:**
+
+   ```bash
+   git fetch --tags
+   git checkout v0.3.0
+   docker compose -f infra/docker-compose.yml up -d --build
+   ```
+
+   The `migrate` service runs first and applies any new schema migration
+   before `api` takes traffic. There's no separate migration step. Expect
+   a minute or two of downtime while the containers restart, so do it
+   outside working hours.
+4. **Check:** `/api/health` shows the new version, and you can sign in.
+
+If you installed from `main` before releases existed, `git checkout v0.2.0`
+moves you onto the first release. From then on, follow the steps above.
+
+### Rolling back
+
+Migrations only go forward, so going back to an older release means going
+back to the database from before the update as well:
+
+```bash
+git checkout v0.2.0
+docker compose -f infra/docker-compose.yml down
+docker volume rm infra_postgres_data        # the name `docker volume ls` shows
+docker compose -f infra/docker-compose.yml up -d postgres
+docker compose -f infra/docker-compose.yml exec -T postgres \
+  pg_restore -U app_migrator -d seredina --no-owner --no-privileges < before-v0.3.0.dump
 docker compose -f infra/docker-compose.yml up -d --build
 ```
 
-The `migrate` service runs again automatically as part of startup and
-applies any new schema migration before `api` starts taking traffic.
-There's no separate manual "run the migrations" step.
+Anything recorded after the backup is lost. That's why the backup comes
+right before the update.
 
-::: tip Before updating in production
-Check the commit log since your last update
-(`git log <your-current-commit>..origin/main --oneline`) and, if anything
-worries you specifically, check the matching ADR in `docs/adr/` — every
-non-trivial architecture decision has an entry there explaining the why,
-not just the what.
-:::
+### Updating the agents
+
+Agents are released separately
+([Haphior/seredina-agent](https://github.com/Haphior/seredina-agent/releases)),
+and agent and server versions don't have to match. On a computer, as
+administrator/root:
+
+```bash
+seredina-agent update --check    # is there a newer agent?
+seredina-agent update            # install it; no enrollment token needed
+```
+
+On Windows the agent lives in `C:\Program Files\Seredina Agent\seredina-agent.exe`.
+
+`update` keeps the computer's enrollment and check-in interval. It
+verifies the download's SHA-256, and does nothing if the agent is
+already current. So you can run it on all your computers from Intune, a
+GPO startup script, Jamf or Ansible.
 
 ## Backups
 
@@ -54,8 +112,9 @@ re-applies the row-level security policies and grants, all of which live
 outside a plain table dump.
 
 ```bash
-# 1. Stop everything and start only Postgres, on an empty volume.
-docker compose -f infra/docker-compose.yml down -v
+# 1. Stop everything, empty only the database volume, start only Postgres.
+docker compose -f infra/docker-compose.yml down
+docker volume rm infra_postgres_data        # the name `docker volume ls` shows
 docker compose -f infra/docker-compose.yml up -d postgres
 
 # 2. Load the dump.
@@ -66,8 +125,10 @@ docker compose -f infra/docker-compose.yml exec -T postgres \
 docker compose -f infra/docker-compose.yml up -d
 ```
 
-`down -v` deletes the current database volume — only run it when you
-really mean to replace that data. Restore into a test machine now and
+`docker volume rm` deletes the current database. Only run it when you
+really mean to replace that data. Don't use `down -v` instead: it also
+deletes `caddy_data`, and with the `internal` TLS mode a new CA would be
+generated, so browsers and every agent would stop trusting the server. Restore into a test machine now and
 then: a backup you've never restored is a guess, not a backup.
 
 Backups also keep personal data that was later

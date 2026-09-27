@@ -24,7 +24,7 @@ distinction.
 ## Install in three commands
 
 ```bash
-git clone https://github.com/Haphior/helpdesk-seredina.git
+git clone --branch v0.2.0 https://github.com/Haphior/helpdesk-seredina.git   # the latest release
 cd helpdesk-seredina
 ./scripts/setup.sh                                # generates .env with random secrets
 docker compose -f infra/docker-compose.yml up -d

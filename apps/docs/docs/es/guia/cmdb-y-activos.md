@@ -62,8 +62,9 @@ servidor web interno. Poné la dirección de esa carpeta en
 
 `seredina-agent status` muestra si el equipo está inscrito y si el servicio
 corre. `seredina-agent uninstall --purge` quita el agente. Para
-actualizarlo, ejecutá un comando de inscripción nuevo: el equipo conserva
-su registro.
+actualizarlo, ejecutá `seredina-agent update` como administrador: no hace
+falta token y el equipo conserva su registro. Ver
+[Actualizar los agentes](/es/despliegue/actualizaciones-y-backups#actualizar-los-agentes).
 
 ### Qué reporta el agente
 

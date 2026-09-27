@@ -39,7 +39,7 @@ los navegadores de tus usuarios.
 
 ```bash
 sudo mkdir -p /opt/seredina && sudo chown "$USER" /opt/seredina
-git clone https://github.com/Haphior/helpdesk-seredina.git /opt/seredina
+git clone --branch v0.2.0 https://github.com/Haphior/helpdesk-seredina.git /opt/seredina
 cd /opt/seredina
 ./scripts/setup.sh
 ```
@@ -176,8 +176,23 @@ e iniciá sesión en ella.
 
 ## 9. Actualizaciones
 
-Seguí [Actualizar tu instancia](/es/despliegue/actualizaciones-y-backups#actualizar-tu-instancia).
-Hacé un backup justo antes, y actualizá fuera del horario de trabajo.
+Instalá y actualizá por versión (tag), nunca desde `main`: cada versión
+lista sus cambios en la
+[página de versiones](https://github.com/Haphior/helpdesk-seredina/releases).
+Seguí [Actualizar tu instancia](/es/despliegue/actualizaciones-y-backups#actualizar-tu-instancia):
+
+1. Leé las notas.
+2. Hacé un backup.
+3. Corré `git checkout <versión nueva>` y `docker compose ... up -d --build`.
+4. Verificá que `/api/health` muestre la versión nueva.
+
+Actualizá fuera del horario de trabajo. La misma página explica cómo
+volver atrás.
+
+Los agentes se actualizan aparte, sin tokens de inscripción: corré
+`seredina-agent update` en cada equipo, desde tu herramienta de gestión
+si tenés muchos. Ver
+[Actualizar los agentes](/es/despliegue/actualizaciones-y-backups#actualizar-los-agentes).
 
 ## Lista de salida a producción
 
