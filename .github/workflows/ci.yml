@@ -120,6 +120,21 @@ jobs:
       - name: Build and smoke-test the compose stack
         run: bash scripts/compose-smoke.sh
 
+  # The same smoke test with infra/docker-compose.desktop.yml on top: the
+  # layout Docker Desktop (Windows Server, macOS) uses, where the worker is
+  # on the compose network instead of host networking.
+  # See docs/adr/0075-windows-docker-desktop.md.
+  compose-smoke-desktop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build and smoke-test the compose stack, Docker Desktop layout
+        run: bash scripts/compose-smoke.sh
+        env:
+          SMOKE_EXTRA_COMPOSE: infra/docker-compose.desktop.yml
+
   # Installs the previous release, fills it with data through its API,
   # upgrades it with this code's migrations, and fails if any existing row
   # changed or if the old data can't be read back through the new API.
