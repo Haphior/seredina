@@ -12,7 +12,9 @@ despliegue y agrega lo que cambia en una red interna:
 ## 1. El servidor
 
 - **Sistema operativo.** Cualquier Linux con Docker Engine y el plugin
-  `docker compose`. Los ejemplos usan Ubuntu Server 24.04 LTS.
+  `docker compose`. Los ejemplos usan Ubuntu Server 24.04 LTS. En Windows Server con Docker Desktop, sigue
+  [Windows Server con Docker Desktop](/es/despliegue/windows-server) para
+  las diferencias.
 - **Tamaño.** Para un equipo chico o mediano, empieza con 2 vCPU, 4 GB de
   RAM y 40 GB de disco. Suma más si tienes mucho historial de tickets o
   muchos adjuntos. Con la opción de IA local (Ollama), suma la memoria que
@@ -39,7 +41,7 @@ los navegadores de tus usuarios.
 
 ```bash
 sudo mkdir -p /opt/seredina && sudo chown "$USER" /opt/seredina
-git clone --branch v0.2.0 https://github.com/Haphior/helpdesk-seredina.git /opt/seredina
+git clone --branch v0.3.1 https://github.com/Haphior/seredina.git /opt/seredina
 cd /opt/seredina
 ./scripts/setup.sh
 ```

@@ -1,0 +1,15 @@
+# Everything is checked out with LF line endings, on every OS. The server
+# runs these files inside Linux containers (shell entrypoints, nginx and Caddy
+# config) and the setup scripts under bash, where a CRLF breaks them: Git for
+# Windows' default (core.autocrlf=true) would otherwise convert on clone.
+# See docs/adr/0075-windows-docker-desktop.md.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.onnx binary

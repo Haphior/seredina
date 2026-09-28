@@ -1,0 +1,22 @@
+# Docker Desktop (Windows Server, Windows, macOS) -- add it after the main file:
+#
+#   docker compose --env-file .env -f infra/docker-compose.yml -f infra/docker-compose.desktop.yml up -d --build
+#
+# or set COMPOSE_FILE in .env (see docs/adr/0075-windows-docker-desktop.md).
+#
+# The one difference from the main file: the worker joins the compose network
+# like every other service, instead of `network_mode: host`. On Docker Desktop
+# "host" is Docker's own Linux VM, not the machine you installed on, so host
+# networking buys nothing there (it can't reach your LAN for agentless scans
+# anyway) and only makes reaching Postgres and Redis depend on how Desktop
+# forwards ports. Network discovery is done by the endpoint agents
+# (docs/adr/0055-agent-based-discovery.md), which works the same on Desktop.
+services:
+  worker:
+    network_mode: !reset null
+    environment:
+      DATABASE_URL: postgresql://app_tenant:${APP_TENANT_DB_PASSWORD}@postgres:5432/${POSTGRES_DB:-seredina}
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy

@@ -12,7 +12,9 @@ adds what an internal network changes:
 ## 1. The server
 
 - **Operating system.** Any Linux with Docker Engine and the
-  `docker compose` plugin. The examples below use Ubuntu Server 24.04 LTS.
+  `docker compose` plugin. The examples below use Ubuntu Server 24.04 LTS. On Windows Server with Docker Desktop, follow
+  [Windows Server with Docker Desktop](/deployment/windows-server) for the
+  differences.
 - **Size.** For a small or medium team, start with 2 vCPUs, 4 GB of RAM
   and 40 GB of disk. Add more for a large ticket history or many
   attachments. With the local AI option (Ollama), add the memory your
@@ -39,7 +41,7 @@ browsers visit it.
 
 ```bash
 sudo mkdir -p /opt/seredina && sudo chown "$USER" /opt/seredina
-git clone --branch v0.2.0 https://github.com/Haphior/helpdesk-seredina.git /opt/seredina
+git clone --branch v0.3.1 https://github.com/Haphior/seredina.git /opt/seredina
 cd /opt/seredina
 ./scripts/setup.sh
 ```

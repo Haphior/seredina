@@ -29,8 +29,13 @@ WEB_PORT=${WEB_PORT}
 WEB_ORIGIN=http://localhost:${WEB_PORT}
 EOF
 
+# SMOKE_EXTRA_COMPOSE: another compose file layered on top, e.g.
+# infra/docker-compose.desktop.yml to check the Docker Desktop setup.
+EXTRA=()
+if [ -n "${SMOKE_EXTRA_COMPOSE:-}" ]; then EXTRA=(-f "$SMOKE_EXTRA_COMPOSE"); fi
+
 compose() {
-  docker compose -p "$PROJECT" --env-file "$ENV_FILE" -f infra/docker-compose.yml "$@"
+  docker compose -p "$PROJECT" --env-file "$ENV_FILE" -f infra/docker-compose.yml "${EXTRA[@]}" "$@"
 }
 
 cleanup() {
@@ -87,5 +92,21 @@ echo "==> Worker stays up"
 sleep 10
 worker_state=$(docker inspect -f '{{.State.Status}}' "$(compose ps -a -q worker)")
 [ "$worker_state" = "running" ] || fail "worker is $worker_state"
+
+# Running isn't enough: a worker that can't reach Postgres or Redis keeps
+# retrying without exiting. Connect from inside it, with its own URLs.
+echo "==> Worker reaches Postgres and Redis"
+compose exec -T worker node -e '
+  const { prisma } = require("@seredina/db");
+  const Redis = require("ioredis");
+  (async () => {
+    await prisma.$queryRawUnsafe("select 1");
+    const redis = new Redis(process.env.REDIS_URL, { maxRetriesPerRequest: 1, lazyConnect: true });
+    await redis.connect();
+    await redis.ping();
+    redis.disconnect();
+    await prisma.$disconnect();
+  })().catch((err) => { console.error(err.message); process.exit(1); });
+' || fail "the worker can't reach Postgres or Redis"
 
 echo "Smoke test passed."
