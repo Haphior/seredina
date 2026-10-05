@@ -90,6 +90,9 @@ model Tenant {
   csatResponses         CsatResponse[]
   emailTemplates        EmailTemplate[]
   emailImages           EmailImage[]
+  organizations         Organization[]
+  directoryContacts     DirectoryContact[]
+  contractPayments      ContractPayment[]
 
   @@map("tenants")
   auditLogs AuditLog[]
@@ -281,6 +284,8 @@ model Contact {
   anonymizedAt DateTime? @map("anonymized_at")
 
   tickets Ticket[]
+  // Equipment handed to this person (docs/adr/0076-directory-payments-inventory.md).
+  assignedAssets Asset[] @relation("AssetAssignee")
 
   @@unique([tenantId, email])
   @@map("contacts")
@@ -685,6 +690,8 @@ model EmailImage {
 // CMDB / asset management (agentless discovery) -- see docs/adr/0002-agentless-discovery.md
 // ---------------------------------------------------------------------------
 
+// Grouped for the console in packages/shared/src/assetTypes.ts; the later
+// values were added for full IT inventory (docs/adr/0076-directory-payments-inventory.md).
 enum AssetType {
   SERVER
   WORKSTATION
@@ -692,6 +699,21 @@ enum AssetType {
   PRINTER
   MOBILE_DEVICE
   OTHER
+  LAPTOP
+  TABLET
+  SWITCH
+  ROUTER
+  FIREWALL
+  ACCESS_POINT
+  STORAGE
+  UPS
+  MONITOR
+  PERIPHERAL
+  DOCKING_STATION
+  SCANNER
+  PROJECTOR
+  IP_PHONE
+  CAMERA
 }
 
 enum AssetStatus {
@@ -762,6 +784,25 @@ model Asset {
   // avoid colliding with the existing free-text column.
   modelId      String?     @map("model_id") @db.Uuid
   catalogModel AssetModel? @relation(fields: [modelId], references: [id])
+
+  // Inventory details, mostly for equipment no agent or scan reports on
+  // (monitors, peripherals, network gear) -- docs/adr/0076-directory-payments-inventory.md.
+  assetTag          String?       @map("asset_tag")
+  location          String?
+  // Who uses it: one of the people who write in (an employee).
+  assignedContactId String?       @map("assigned_contact_id") @db.Uuid
+  assignedContact   Contact?      @relation("AssetAssignee", fields: [assignedContactId], references: [id], onDelete: SetNull)
+  // What it's plugged into: a monitor or dock to its computer, a switch to its rack's router.
+  parentAssetId     String?       @map("parent_asset_id") @db.Uuid
+  parentAsset       Asset?        @relation("AssetConnections", fields: [parentAssetId], references: [id], onDelete: SetNull)
+  connectedAssets   Asset[]       @relation("AssetConnections")
+  purchaseDate      DateTime?     @map("purchase_date") @db.Date
+  purchaseCost      Decimal?      @map("purchase_cost") @db.Decimal(14, 2)
+  purchaseCurrency  String?       @map("purchase_currency")
+  supplierId        String?       @map("supplier_id") @db.Uuid
+  supplier          Organization? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  warrantyEndDate   DateTime?     @map("warranty_end_date") @db.Date
+  notes             String?
 
   tickets  TicketAsset[]
   services ServiceAsset[]
@@ -1432,6 +1473,8 @@ enum NotificationEventType {
   TICKET_ASSIGNED
   NEW_REPLY
   CONTRACT_EXPIRING
+  // docs/adr/0076-directory-payments-inventory.md
+  CONTRACT_PAYMENT_DUE
   // docs/adr/0071-teams-and-notification-events.md
   TEAM_TICKET
   SLA_WARNING
@@ -1742,10 +1785,122 @@ model Contract {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  assets ContractAsset[]
+  // The supplier from the directory, and the person to call there. The
+  // free-text `supplier` above stays for contracts entered before the
+  // directory existed. docs/adr/0076-directory-payments-inventory.md.
+  organizationId String?           @map("organization_id") @db.Uuid
+  organization   Organization?     @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  contactId      String?           @map("contact_id") @db.Uuid
+  contact        DirectoryContact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+
+  // Payment schedule: null frequency = no payments tracked. Reminders go out
+  // `paymentReminderDays` before `nextPaymentDate`, and once more if it passes
+  // unpaid; recording a payment moves the date to the next period. The two
+  // *SentFor dates are the due date each reminder was last sent for, so each
+  // goes out once per due date.
+  paymentFrequency       String?   @map("payment_frequency") // one_time | monthly | bimonthly | quarterly | semiannual | yearly
+  nextPaymentDate        DateTime? @map("next_payment_date") @db.Date
+  paymentAmount          Decimal?  @map("payment_amount") @db.Decimal(14, 2)
+  paymentReminderDays    Int       @default(5) @map("payment_reminder_days")
+  paymentReminderEmails  String[]  @default([]) @map("payment_reminder_emails")
+  paymentReminderSentFor DateTime? @map("payment_reminder_sent_for") @db.Date
+  paymentOverdueSentFor  DateTime? @map("payment_overdue_sent_for") @db.Date
+
+  assets   ContractAsset[]
+  payments ContractPayment[]
 
   @@index([tenantId, endDate])
   @@map("contracts")
+}
+
+// A payment made on a contract -- the history behind "next payment due".
+model ContractPayment {
+  id         String   @id @default(uuid()) @db.Uuid
+  tenantId   String   @map("tenant_id") @db.Uuid
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  contractId String   @map("contract_id") @db.Uuid
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  // The due date this payment settles (null for an extra payment).
+  dueDate    DateTime? @map("due_date") @db.Date
+  paidOn     DateTime  @map("paid_on") @db.Date
+  amount     Decimal?  @db.Decimal(14, 2)
+  currency   String?
+  reference  String? // invoice or transfer number
+  notes      String?
+  recordedById String? @map("recorded_by_id") @db.Uuid
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  @@index([tenantId, contractId, paidOn])
+  @@map("contract_payments")
+}
+
+enum OrganizationType {
+  SUPPLIER
+  CUSTOMER
+  PARTNER
+  INTERNAL
+  OTHER
+}
+
+// A company in the directory: a supplier, a customer, a partner, an internal
+// area. docs/adr/0076-directory-payments-inventory.md.
+model Organization {
+  id        String           @id @default(uuid()) @db.Uuid
+  tenantId  String           @map("tenant_id") @db.Uuid
+  tenant    Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name      String
+  type      OrganizationType @default(SUPPLIER)
+  taxId     String?          @map("tax_id") // RUT, CUIT, VAT number...
+  website   String?
+  email     String?
+  phone     String?
+  address   String?
+  notes     String?
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  contacts  DirectoryContact[]
+  contracts Contract[]
+  assets    Asset[]
+
+  @@unique([tenantId, name])
+  @@map("organizations")
+}
+
+enum DirectoryContactRole {
+  EXECUTIVE
+  MANAGEMENT
+  SALES
+  TECHNICAL
+  SUPPORT
+  BILLING
+  OTHER
+}
+
+// A person in the directory: a supplier's account executive, a partner's
+// engineer, a manager. Not the people who write in (Contact): no email is
+// required, they don't open tickets, and contact retention never erases
+// them. docs/adr/0076-directory-payments-inventory.md.
+model DirectoryContact {
+  id             String               @id @default(uuid()) @db.Uuid
+  tenantId       String               @map("tenant_id") @db.Uuid
+  tenant         Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  organizationId String?              @map("organization_id") @db.Uuid
+  organization   Organization?        @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  name           String
+  jobTitle       String?              @map("job_title")
+  role           DirectoryContactRole @default(OTHER)
+  email          String?
+  phone          String?
+  mobile         String?
+  notes          String?
+  createdAt      DateTime             @default(now()) @map("created_at")
+  updatedAt      DateTime             @updatedAt @map("updated_at")
+
+  contracts Contract[]
+
+  @@index([tenantId, organizationId])
+  @@map("directory_contacts")
 }
 
 model ContractAsset {

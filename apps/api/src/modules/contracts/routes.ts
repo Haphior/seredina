@@ -1,7 +1,17 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { requirePermission } from '../rbac/permissions';
-import { createContract, contractSummary, deleteContract, getContract, listContracts, updateContract } from './service';
+import {
+  PAYMENT_FREQUENCIES,
+  createContract,
+  contractSummary,
+  deleteContract,
+  deletePayment,
+  getContract,
+  listContracts,
+  recordPayment,
+  updateContract,
+} from './service';
 
 const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'use YYYY-MM-DD');
 
@@ -19,17 +29,32 @@ const baseSchema = z.object({
   seats: z.number().int().min(0).max(1_000_000).nullish(),
   notes: z.string().max(5000).nullish(),
   assetIds: z.array(z.string().uuid()).max(1000).optional(),
+  organizationId: z.string().uuid().nullish(),
+  contactId: z.string().uuid().nullish(),
+  paymentFrequency: z.enum(PAYMENT_FREQUENCIES).nullish(),
+  nextPaymentDate: date.nullish(),
+  paymentAmount: z.number().min(0).max(1e12).nullish(),
+  paymentReminderDays: z.number().int().min(0).max(90).optional(),
+  paymentReminderEmails: z.array(z.string().trim().email().max(320)).max(20).optional(),
 });
 
 const refineDates = <T extends { startDate?: string | null; endDate?: string | null }>(v: T) =>
   !v.startDate || !v.endDate || v.startDate <= v.endDate;
 
-const createSchema = baseSchema.refine(refineDates, { message: 'the end date is before the start date', path: ['endDate'] });
+// A schedule needs its first due date.
+const refineSchedule = <T extends { paymentFrequency?: string | null; nextPaymentDate?: string | null }>(v: T) =>
+  !v.paymentFrequency || Boolean(v.nextPaymentDate);
+
+const createSchema = baseSchema
+  .refine(refineDates, { message: 'the end date is before the start date', path: ['endDate'] })
+  .refine(refineSchedule, { message: 'set the next payment date', path: ['nextPaymentDate'] });
 const updateSchema = baseSchema.partial().refine(refineDates, { message: 'the end date is before the start date', path: ['endDate'] });
 
 const listQuery = z.object({
   status: z.enum(['active', 'expiring', 'expired', 'no_end_date']).optional(),
+  paymentStatus: z.enum(['none', 'scheduled', 'due_soon', 'overdue']).optional(),
   assetId: z.string().uuid().optional(),
+  organizationId: z.string().uuid().optional(),
   search: z.string().max(200).optional(),
 });
 
@@ -74,6 +99,34 @@ export default async function contractRoutes(app: FastifyInstance) {
     } catch (err) {
       const message = (err as Error).message;
       return reply.code(message === 'contract not found' ? 404 : 400).send({ error: message });
+    }
+  });
+
+  app.post('/contracts/:id/payments', { preHandler: [app.authenticate, requirePermission('assets:manage')] }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const parsed = z
+      .object({
+        paidOn: date,
+        amount: z.number().min(0).max(1e12).nullish(),
+        reference: z.string().max(200).nullish(),
+        notes: z.string().max(2000).nullish(),
+      })
+      .safeParse(request.body);
+    if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
+    try {
+      return reply.code(201).send(await recordPayment(request.user.tenantId, id, parsed.data, request.user.sub));
+    } catch (err) {
+      const message = (err as Error).message;
+      return reply.code(message === 'contract not found' ? 404 : 400).send({ error: message });
+    }
+  });
+
+  app.delete('/contracts/:id/payments/:paymentId', { preHandler: [app.authenticate, requirePermission('assets:manage')] }, async (request, reply) => {
+    const { id, paymentId } = request.params as { id: string; paymentId: string };
+    try {
+      return reply.send(await deletePayment(request.user.tenantId, id, paymentId));
+    } catch {
+      return reply.code(404).send({ error: 'payment not found' });
     }
   });
 

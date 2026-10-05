@@ -36,7 +36,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON
   autonomy_policies, ai_agent_runs, tenant_ai_settings, tenant_ui_settings, tenant_kb_settings, telegram_channels,
   csat_responses, device_enrollment_tokens, devices, tenant_sso_settings,
   contracts, contract_assets, email_templates, email_images, team_members,
-  tenant_notification_defaults
+  tenant_notification_defaults, organizations, directory_contacts, contract_payments
   TO app_tenant;
 
 -- Append-only: the app can write and read audit entries, never change or delete
@@ -77,7 +77,7 @@ BEGIN
     'autonomy_policies', 'ai_agent_runs', 'tenant_ai_settings', 'tenant_ui_settings', 'tenant_kb_settings', 'telegram_channels',
     'csat_responses', 'device_enrollment_tokens', 'devices', 'audit_logs', 'tenant_sso_settings',
     'contracts', 'contract_assets', 'email_templates', 'email_images', 'team_members',
-    'tenant_notification_defaults'
+    'tenant_notification_defaults', 'organizations', 'directory_contacts', 'contract_payments'
   ]
   LOOP
     EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', tbl);
@@ -253,6 +253,33 @@ $$;
 
 REVOKE ALL ON FUNCTION public.list_contracts_due_for_renewal_notice() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.list_contracts_due_for_renewal_notice() TO app_tenant;
+
+-- Contract payment reminders (docs/adr/0076-directory-payments-inventory.md):
+-- contracts whose next payment is inside its reminder window, or already
+-- past, and whose reminder for that due date hasn't gone out. Same escape
+-- hatch as above: (id, tenant_id) only.
+CREATE OR REPLACE FUNCTION public.list_contract_payments_due()
+RETURNS TABLE (id uuid, tenant_id uuid)
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT id, tenant_id FROM contracts
+  WHERE payment_frequency IS NOT NULL
+    AND next_payment_date IS NOT NULL
+    AND (
+      (next_payment_date >= CURRENT_DATE
+        AND next_payment_date - payment_reminder_days <= CURRENT_DATE
+        AND payment_reminder_sent_for IS DISTINCT FROM next_payment_date)
+      OR
+      (next_payment_date < CURRENT_DATE
+        AND payment_overdue_sent_for IS DISTINCT FROM next_payment_date)
+    )
+  LIMIT 1000;
+$$;
+
+REVOKE ALL ON FUNCTION public.list_contract_payments_due() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.list_contract_payments_due() TO app_tenant;
 
 -- Contact retention (docs/adr/0066-contact-data-rights.md): the worker's
 -- periodic sweep has no tenant context and needs the contacts, across every

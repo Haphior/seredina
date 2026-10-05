@@ -242,13 +242,22 @@ export async function checkIn(hashedCredential: string, input: CheckInInput): Pr
     // workstation) only when that role changes, so a type an admin set by
     // hand sticks. The first report only moves the enrollment default.
     const role = input.inventory?.system?.role;
-    let assetType: 'SERVER' | 'WORKSTATION' | undefined;
+    // A workstation's form factor says which kind it is: a laptop or tablet
+    // (docs/adr/0076-directory-payments-inventory.md).
+    const formFactor = input.inventory?.system?.formFactor;
+    const workstationType = formFactor === 'laptop' ? 'LAPTOP' : formFactor === 'tablet' ? 'TABLET' : 'WORKSTATION';
+    let assetType: 'SERVER' | 'WORKSTATION' | 'LAPTOP' | 'TABLET' | undefined;
     if (role && role !== device.reportedRole) {
       const current = await tx.asset.findUnique({ where: { id: device.assetId }, select: { assetType: true } });
       if (device.reportedRole !== null || current?.assetType === 'WORKSTATION') {
-        assetType = role === 'server' ? 'SERVER' : 'WORKSTATION';
+        assetType = role === 'server' ? 'SERVER' : workstationType;
       }
       await tx.device.update({ where: { id: device.id }, data: { reportedRole: role } });
+    } else if (role === 'workstation' && workstationType !== 'WORKSTATION') {
+      // Agents enrolled before this was known left laptops as plain
+      // workstations; refine that default, never a type an admin picked.
+      const current = await tx.asset.findUnique({ where: { id: device.assetId }, select: { assetType: true } });
+      if (current?.assetType === 'WORKSTATION') assetType = workstationType;
     }
 
     await tx.asset.update({
@@ -274,6 +283,58 @@ export async function checkIn(hashedCredential: string, input: CheckInInput): Pr
       },
     });
 
+    if (input.inventory?.monitors) await syncAgentMonitors(tx, tenantId, device.assetId, input.inventory.monitors);
+
     return ingestNeighbors(tx, tenantId, input.neighbors ?? []);
   });
+}
+
+/** A serial a monitor's EDID reports that actually identifies it (many send 0, 1 or blanks). */
+function usableMonitorSerial(serial: string | undefined): string | null {
+  const s = serial?.trim();
+  if (!s || s.length < 4 || /^[0\s]+$/.test(s) || /^0x0+$/i.test(s)) return null;
+  return s;
+}
+
+/**
+ * The monitors the agent sees on a computer become Monitor assets connected
+ * to it, matched by serial number -- so a monitor moved to another desk
+ * follows its new computer, and nobody types serials in by hand
+ * (docs/adr/0076-directory-payments-inventory.md). Monitors without a usable
+ * serial are skipped: there'd be no telling them apart next time. Only ever
+ * adds and re-links; a monitor that's unplugged stays in the inventory.
+ */
+async function syncAgentMonitors(
+  tx: Prisma.TransactionClient,
+  tenantId: string,
+  computerId: string,
+  monitors: NonNullable<AgentInventory['monitors']>,
+) {
+  for (const m of monitors.slice(0, 8)) {
+    const serialNumber = usableMonitorSerial(m.serialNumber);
+    if (!serialNumber) continue;
+    const existing = await tx.asset.findFirst({ where: { assetType: 'MONITOR', serialNumber }, select: { id: true, parentAssetId: true } });
+    if (existing) {
+      if (existing.parentAssetId !== computerId) {
+        await tx.asset.update({ where: { id: existing.id }, data: { parentAssetId: computerId, lastSeenAt: new Date() } });
+      } else {
+        await tx.asset.update({ where: { id: existing.id }, data: { lastSeenAt: new Date() } });
+      }
+      continue;
+    }
+    const label = [m.manufacturer, m.model].filter(Boolean).join(' ').trim();
+    await tx.asset.create({
+      data: {
+        tenantId,
+        name: label || `Monitor ${serialNumber}`,
+        assetType: 'MONITOR',
+        serialNumber,
+        manufacturer: m.manufacturer || null,
+        model: m.model || null,
+        discoverySource: 'AGENT',
+        parentAssetId: computerId,
+        lastSeenAt: new Date(),
+      },
+    });
+  }
 }

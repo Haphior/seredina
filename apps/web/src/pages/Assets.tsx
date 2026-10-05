@@ -11,6 +11,9 @@ import { Card } from '../components/Card';
 import { AssetFormModal, type AssetFormValues } from '../components/AssetFormModal';
 import { SearchIcon } from '../components/icons';
 import { formatDateTime } from '../lib/format';
+import { ASSET_TYPE_GROUPS } from '../lib/assetTypes';
+
+type GroupKey = (typeof ASSET_TYPE_GROUPS)[number]['key'];
 
 const JOB_STATUS_TONE = {
   PENDING: 'slate',
@@ -25,7 +28,6 @@ const ASSET_STATUS_TONE: Record<AssetStatus, 'emerald' | 'slate' | 'amber'> = {
   INACTIVE: 'amber',
 };
 
-const ASSET_TYPES: AssetType[] = ['SERVER', 'WORKSTATION', 'NETWORK_DEVICE', 'PRINTER', 'MOBILE_DEVICE', 'OTHER'];
 const ASSET_STATUSES: AssetStatus[] = ['ACTIVE', 'INACTIVE', 'RETIRED'];
 const PAGE_SIZE = 50;
 
@@ -42,6 +44,8 @@ export function Assets() {
   const [q, setQ] = useState('');
   const [debouncedQ, setDebouncedQ] = useState('');
   const [typeFilter, setTypeFilter] = useState<AssetType | ''>('');
+  // Computers, network, peripherals... -- docs/adr/0076-directory-payments-inventory.md.
+  const [groupFilter, setGroupFilter] = useState<GroupKey | ''>('');
   const [statusFilter, setStatusFilter] = useState<AssetStatus | ''>('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -56,6 +60,7 @@ export function Assets() {
     if (offset > 0) setLoadingMore(true);
     const params = new URLSearchParams();
     if (typeFilter) params.set('assetType', typeFilter);
+    else if (groupFilter) params.set('group', groupFilter);
     if (statusFilter) params.set('status', statusFilter);
     if (debouncedQ) params.set('q', debouncedQ);
     params.set('limit', String(PAGE_SIZE));
@@ -78,7 +83,7 @@ export function Assets() {
   useEffect(() => {
     load(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [typeFilter, statusFilter, debouncedQ]);
+  }, [typeFilter, groupFilter, statusFilter, debouncedQ]);
 
   // Poll while any job is still running/pending -- discovery is async, the queue
   // does the real work, so this is the simplest way to reflect its progress without
@@ -184,7 +189,24 @@ export function Assets() {
         </div>
       )}
 
-      <div className="mb-4 flex items-center gap-2">
+      <div className="mb-3 flex flex-wrap gap-1.5">
+        {(['', ...ASSET_TYPE_GROUPS.map((g) => g.key)] as (GroupKey | '')[]).map((g) => (
+          <button
+            key={g || 'all'}
+            onClick={() => {
+              setGroupFilter(g);
+              setTypeFilter('');
+            }}
+            className={`rounded-full px-3 py-1 text-[12.5px] font-semibold ${
+              groupFilter === g ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            {g ? t(`assetGroup.${g}`) : t('assets.allGroups')}
+          </button>
+        ))}
+      </div>
+
+      <div className="mb-4 flex flex-wrap items-center gap-2">
         <div className="w-[260px]">
           <Input
             hideLabel
@@ -195,7 +217,7 @@ export function Assets() {
             placeholder={t('assets.searchPlaceholder')}
           />
         </div>
-        <div className="w-[140px]">
+        <div className="w-[170px]">
           <Select
             hideLabel
             aria-label={t('assets.filterType')}
@@ -203,10 +225,14 @@ export function Assets() {
             onChange={(e) => setTypeFilter(e.target.value as AssetType | '')}
           >
             <option value="">{t('assets.anyType')}</option>
-            {ASSET_TYPES.map((ty) => (
-              <option key={ty} value={ty}>
-                {t(`assetType.${ty}`)}
-              </option>
+            {ASSET_TYPE_GROUPS.filter((g) => !groupFilter || g.key === groupFilter).map((g) => (
+              <optgroup key={g.key} label={t(`assetGroup.${g.key}`)}>
+                {g.types.map((ty) => (
+                  <option key={ty} value={ty}>
+                    {t(`assetType.${ty}`)}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </Select>
         </div>
@@ -237,13 +263,12 @@ export function Assets() {
 
       {assets && assets.length > 0 && (
         <Card className="overflow-hidden p-0">
-          <div className="grid grid-cols-[2fr_100px_90px_110px_120px_90px_110px_60px] items-center gap-3 border-b border-slate-200 bg-slate-50 px-5 py-2.5 text-[11.5px] font-bold uppercase tracking-wide text-slate-400">
+          <div className="grid grid-cols-[2fr_120px_90px_110px_1.3fr_110px_60px] items-center gap-3 border-b border-slate-200 bg-slate-50 px-5 py-2.5 text-[11.5px] font-bold uppercase tracking-wide text-slate-400">
             <span>{t('assets.col.name')}</span>
             <span>{t('assets.col.type')}</span>
             <span>{t('assets.col.status')}</span>
             <span>IP</span>
-            <span>{t('assets.col.hostname')}</span>
-            <span>{t('assets.col.source')}</span>
+            <span>{t('assets.col.assignedLocation')}</span>
             <span>{t('assets.col.lastSeen')}</span>
             <span></span>
           </div>
@@ -251,10 +276,17 @@ export function Assets() {
             {assets.map((asset) => (
               <div
                 key={asset.id}
-                className="grid grid-cols-[2fr_100px_90px_110px_120px_90px_110px_60px] items-center gap-3 px-5 py-3 hover:bg-slate-50"
+                className="grid grid-cols-[2fr_120px_90px_110px_1.3fr_110px_60px] items-center gap-3 px-5 py-3 hover:bg-slate-50"
               >
                 <Link to={`/assets/${asset.id}`} className="contents">
-                  <span className="truncate text-[13.5px] font-semibold text-slate-800">{asset.name}</span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-[13.5px] font-semibold text-slate-800">{asset.name}</span>
+                    {(asset.assetTag || asset.hostname || asset.parentAsset) && (
+                      <span className="block truncate text-[11.5px] text-slate-400">
+                        {[asset.assetTag, asset.hostname, asset.parentAsset ? `↳ ${asset.parentAsset.name}` : null].filter(Boolean).join(' · ')}
+                      </span>
+                    )}
+                  </span>
                   <span className="w-fit">
                     <Badge tone="slate">{t(`assetType.${asset.assetType}`)}</Badge>
                   </span>
@@ -264,8 +296,10 @@ export function Assets() {
                     </Badge>
                   </span>
                   <span className="truncate text-[12.5px] text-slate-500">{asset.ipAddress ?? '—'}</span>
-                  <span className="truncate text-[12.5px] text-slate-500">{asset.hostname ?? '—'}</span>
-                  <span className="truncate text-[12px] text-slate-400">{asset.discoverySource}</span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-[12.5px] text-slate-600">{asset.assignedContact?.name ?? '—'}</span>
+                    {asset.location && <span className="block truncate text-[11.5px] text-slate-400">{asset.location}</span>}
+                  </span>
                   <span className="truncate text-[12px] text-slate-400">
                     {asset.lastSeenAt ? formatDateTime(asset.lastSeenAt) : '—'}
                   </span>

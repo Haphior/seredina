@@ -1,5 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import { ASSET_TYPES, type AssetTypeName } from '@seredina/shared';
 import { requirePermission } from '../rbac/permissions';
 import {
   createAssetModel,
@@ -10,7 +11,7 @@ import {
   listManufacturers,
 } from './service';
 
-const ASSET_TYPE = z.enum(['SERVER', 'WORKSTATION', 'NETWORK_DEVICE', 'PRINTER', 'MOBILE_DEVICE', 'OTHER']);
+const ASSET_TYPE = z.enum(ASSET_TYPES as [AssetTypeName, ...AssetTypeName[]]);
 
 const createManufacturerSchema = z.object({ name: z.string().min(1).max(100) });
 

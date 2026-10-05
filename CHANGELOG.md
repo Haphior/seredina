@@ -7,6 +7,35 @@ contain breaking changes).
 
 ## [Unreleased]
 
+### Added
+
+- **Directory of companies and people**
+  (`docs/adr/0076-directory-payments-inventory.md`).
+  - Suppliers, customers, partners and internal areas, with tax ID and
+    contact details.
+  - Their people (account executives, technical, billing...), with phone
+    and mobile.
+  - Separate from the contacts who write in: email is optional and
+    retention never erases them.
+- **Contract payments with email reminders.**
+  - Link a contract to a supplier and a person from the directory.
+  - Set a payment schedule (monthly to yearly, or one-time) and who to
+    remind.
+  - Seredina emails a branded reminder before each due date and again if it
+    passes unpaid.
+  - "Record payment" keeps a history and moves to the next due date.
+  - New *Contract payment due* notification.
+- **Full IT inventory.**
+  - New equipment types: laptops, tablets, switches, routers, firewalls,
+    access points, storage, UPS, monitors, peripherals, docks, scanners,
+    projectors, IP phones and cameras. The asset list is grouped by
+    computers, network, peripherals and infrastructure.
+  - Assets record an asset tag, a location, who uses them, what they plug
+    into, the supplier, purchase date and cost, and warranty end.
+  - The agent files laptops as laptops and registers a computer's monitors
+    by serial number.
+  - The network scan recognizes more kinds of devices.
+
 ## [0.3.1] - 2026-09-28
 
 ### Added

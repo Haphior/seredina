@@ -34,6 +34,7 @@ import { advanceEscalation } from './oncall/escalate';
 import { sendNotificationEmail } from './notifications/sendEmail';
 import { embedKbArticle } from './kb/embed';
 import { sendDueContractReminders } from './contracts/renewalCheck';
+import { sendDuePaymentReminders } from './contracts/paymentReminders';
 import { anonymizeContactsPastRetention } from './contacts/retention';
 import { redisLock } from './lib/lock';
 import { captureError, initErrorTracking } from './lib/errorTracking';
@@ -206,6 +207,9 @@ async function contractReminderLoop() {
     await redisLock.runExclusive('seredina:contract-reminders', 10 * 60 * 1000, async () => {
       const sent = await sendDueContractReminders();
       if (sent > 0) console.log(`[worker] sent ${sent} contract renewal reminder(s)`);
+      // Payment reminders (docs/adr/0076-directory-payments-inventory.md): same cadence and lock.
+      const payments = await sendDuePaymentReminders();
+      if (payments > 0) console.log(`[worker] sent ${payments} contract payment reminder(s)`);
     });
   } catch (err) {
     console.error('[worker] contract reminder run failed:', err);

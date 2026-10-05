@@ -165,7 +165,28 @@ export interface CustomFieldDefinition {
   sortOrder: number;
 }
 
-export type AssetType = 'SERVER' | 'WORKSTATION' | 'NETWORK_DEVICE' | 'PRINTER' | 'MOBILE_DEVICE' | 'OTHER';
+export type AssetType =
+  | 'SERVER'
+  | 'WORKSTATION'
+  | 'LAPTOP'
+  | 'TABLET'
+  | 'MOBILE_DEVICE'
+  | 'NETWORK_DEVICE'
+  | 'SWITCH'
+  | 'ROUTER'
+  | 'FIREWALL'
+  | 'ACCESS_POINT'
+  | 'MONITOR'
+  | 'PERIPHERAL'
+  | 'DOCKING_STATION'
+  | 'PRINTER'
+  | 'SCANNER'
+  | 'PROJECTOR'
+  | 'IP_PHONE'
+  | 'CAMERA'
+  | 'STORAGE'
+  | 'UPS'
+  | 'OTHER';
 export type AssetStatus = 'ACTIVE' | 'INACTIVE' | 'RETIRED';
 export type AssetDiscoverySource = 'MANUAL' | 'AGENTLESS_SCAN' | 'AGENT' | 'AGENT_NEIGHBOR';
 
@@ -309,6 +330,20 @@ export interface Asset {
   updatedAt: string;
   modelId: string | null;
   catalogModel: AssetModel | null;
+  // Inventory details -- docs/adr/0076-directory-payments-inventory.md.
+  assetTag: string | null;
+  location: string | null;
+  assignedContactId: string | null;
+  assignedContact?: { id: string; name: string; email?: string } | null;
+  parentAssetId: string | null;
+  parentAsset?: { id: string; name: string; assetType?: AssetType } | null;
+  purchaseDate: string | null;
+  purchaseCost: number | null;
+  purchaseCurrency: string | null;
+  supplierId: string | null;
+  supplier?: { id: string; name: string } | null;
+  warrantyEndDate: string | null;
+  notes: string | null;
 }
 
 export interface Manufacturer {
@@ -334,6 +369,7 @@ export interface AssetSummary {
 export interface AssetDetail extends Asset {
   tickets: { ticket: { id: string; number: number; subject: string } }[];
   services: { id: string; name: string }[];
+  connectedAssets: { id: string; name: string; assetType: AssetType; assetTag: string | null }[];
 }
 
 export interface DeviceListItem {
@@ -705,7 +741,8 @@ export type NotificationEventType =
   | 'MENTIONED'
   | 'SLA_WARNING'
   | 'SLA_BREACHED'
-  | 'CONTRACT_EXPIRING';
+  | 'CONTRACT_EXPIRING'
+  | 'CONTRACT_PAYMENT_DUE';
 
 export interface AppNotification {
   id: string;
@@ -832,4 +869,63 @@ export interface Contract {
   status: ContractStatus;
   daysUntilEnd: number | null;
   assets: { id: string; name: string; assetType: AssetType }[];
+  // Directory links and payments -- docs/adr/0076-directory-payments-inventory.md.
+  organizationId: string | null;
+  organization: { id: string; name: string; type: OrganizationType } | null;
+  contactId: string | null;
+  contact: { id: string; name: string; jobTitle: string | null; email: string | null; phone: string | null; mobile: string | null } | null;
+  supplierName: string | null;
+  paymentFrequency: PaymentFrequency | null;
+  nextPaymentDate: string | null;
+  paymentAmount: number | null;
+  paymentReminderDays: number;
+  paymentReminderEmails: string[];
+  paymentStatus: PaymentStatus;
+  daysUntilPayment: number | null;
+  payments?: ContractPayment[];
+}
+
+export type PaymentFrequency = 'one_time' | 'monthly' | 'bimonthly' | 'quarterly' | 'semiannual' | 'yearly';
+export type PaymentStatus = 'none' | 'scheduled' | 'due_soon' | 'overdue';
+
+export interface ContractPayment {
+  id: string;
+  dueDate: string | null;
+  paidOn: string;
+  amount: number | null;
+  currency: string | null;
+  reference: string | null;
+  notes: string | null;
+  createdAt: string;
+}
+
+export type OrganizationType = 'SUPPLIER' | 'CUSTOMER' | 'PARTNER' | 'INTERNAL' | 'OTHER';
+export type DirectoryRole = 'EXECUTIVE' | 'MANAGEMENT' | 'SALES' | 'TECHNICAL' | 'SUPPORT' | 'BILLING' | 'OTHER';
+
+export interface Organization {
+  id: string;
+  name: string;
+  type: OrganizationType;
+  taxId: string | null;
+  website: string | null;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  notes: string | null;
+  contactCount?: number;
+  contractCount?: number;
+  assetCount?: number;
+}
+
+export interface DirectoryPerson {
+  id: string;
+  name: string;
+  organizationId: string | null;
+  organization: { id: string; name: string; type: OrganizationType } | null;
+  jobTitle: string | null;
+  role: DirectoryRole;
+  email: string | null;
+  phone: string | null;
+  mobile: string | null;
+  notes: string | null;
 }

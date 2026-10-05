@@ -7,12 +7,40 @@ assign to an asset).
 
 ## Assets
 
-Each row is a server, workstation, network device, printer, or mobile
-device — with type, status, IP, hostname, serial number,
-manufacturer/model, and operating system. An asset can be linked to the
-tickets that affect it (from the ticket itself, see
-[Tickets](/guide/tickets#the-properties-panel)), building up a history of
-what problems each piece of equipment had.
+Each row is a piece of IT equipment, with its type, status, IP, hostname,
+serial number, manufacturer/model and operating system. The tabs above the
+list group the types:
+
+| Group | Types |
+| --- | --- |
+| Computers | Workstation, laptop, server, tablet, mobile device |
+| Network | Switch, router, firewall, Wi-Fi access point, other network device |
+| Peripherals | Monitor, peripheral (keyboard, mouse, headset), docking station, printer, scanner, projector, IP phone, IP camera |
+| Infrastructure | Storage (NAS/SAN), UPS |
+
+An asset can be linked to the tickets that affect it (from the ticket
+itself, see [Tickets](/guide/tickets#the-properties-panel)). That builds up
+a history of what problems each piece of equipment had.
+
+### Inventory details
+
+Besides the technical data, each asset can record:
+- **Asset tag**: your own inventory number, such as *TI-00042*. Searchable.
+- **Assigned to**: the person who uses it, one of your
+  [contacts](/guide/contacts-and-personal-data). Their page lists the
+  equipment they have.
+- **Location**: floor, office or rack.
+- **Connected to**: the equipment it plugs into, such as a monitor or dock
+  to its computer, or a switch to its router. A computer's page lists what's
+  connected to it, and **+ Add** registers a new peripheral already
+  connected.
+- **Purchase**: supplier (from the [directory](/guide/directory)), date,
+  cost and currency, and when the warranty ends. An expired warranty is
+  shown in red.
+- **Notes**.
+
+Monitors, peripherals and docks don't show network or operating system
+fields.
 
 ### How an asset reaches the inventory
 
@@ -25,6 +53,13 @@ what problems each piece of equipment had.
 - **Agent** — see [Devices](#devices) below. Brings more detail than
   agentless discovery because it runs *inside* the machine, not from the
   outside.
+
+The network scan recognizes switches, routers, firewalls, access points,
+storage, UPS, printers, IP phones and cameras from what each device reports
+over SNMP. The agent files laptops and tablets as such. It also registers
+the monitors it sees on a computer, matched by serial number, as Monitor
+assets connected to it. When a monitor moves to another computer, it
+follows; nobody has to type serial numbers in.
 
 ## Devices
 
@@ -122,10 +157,42 @@ off its future check-ins without deleting its already-saved history.
 ## Contracts, warranties and licenses
 
 **CMDB → Contracts** tracks support contracts, warranties, software
-licenses, leases and subscriptions: supplier, contract or order number,
-start and end dates, cost (one-time, monthly or yearly, in any currency),
-seats for licenses, and the assets each one covers. An asset's page lists
-the contracts that cover it.
+licenses, leases and subscriptions. Each one has:
+- the supplier, picked from the [directory](/guide/directory) along with
+  the person to call there, or typed in;
+- the contract or order number;
+- start and end dates;
+- the cost (one-time, monthly or yearly, in any currency);
+- seats, for licenses;
+- the assets it covers.
+
+An asset's page lists the contracts that cover it.
+
+### Payments and reminders
+
+To be reminded of a contract's payments, set its **Payments** section:
+- the **frequency**: monthly, every two months, quarterly, every six
+  months, yearly or one-time;
+- the **next due date**;
+- the **amount**, if it isn't the contract's cost;
+- **how many days before** to remind (5 by default);
+- **the addresses to remind**, such as finance or IT.
+
+Seredina emails those addresses a reminder when a payment enters that
+window. If the due date passes with no payment recorded, it emails them once
+more. Each reminder is in your company's language and look, set in
+[Customer emails](/guide/channels#emails-to-your-customers). People whose
+role manages assets also get a *Contract payment due* notification, in-app
+and by email if they turned it on.
+
+When a payment is made, click **Record payment**. Enter the date, the amount
+and an invoice or transfer number. The contract moves to the next due date,
+keeping the day of the month: a contract paid on the 31st is due on
+February 28, then March 31. Each contract keeps its payment history, and a
+mistaken entry can be undone.
+
+The page header counts payments due soon and overdue ones. The *Payments
+due soon* and *Overdue payments* filters list them.
 
 Each contract shows whether it's active, ending soon, or expired. The page
 header totals what's ending soon, what has expired, and the recurring cost

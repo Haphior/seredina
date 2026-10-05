@@ -61,6 +61,7 @@ describe.skipIf(!hasDb)('Notification events and workspace defaults', () => {
         'SLA_WARNING',
         'SLA_BREACHED',
         'CONTRACT_EXPIRING',
+        'CONTRACT_PAYMENT_DUE',
       ]);
       expect(defaults.every((d) => d.inApp && !d.email)).toBe(true);
     });

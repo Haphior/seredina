@@ -81,6 +81,9 @@ const TENANT_SCOPE_FIELD: Record<string, string> = {
   ContractAsset: 'tenantId',
   EmailTemplate: 'tenantId',
   EmailImage: 'tenantId',
+  Organization: 'tenantId',
+  DirectoryContact: 'tenantId',
+  ContractPayment: 'tenantId',
 };
 
 const WRITE_OPERATIONS = new Set(['create']);

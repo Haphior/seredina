@@ -10,7 +10,7 @@ type Row = Pick<NotificationPreference, 'eventType' | 'label' | 'inApp' | 'email
 const GROUPS: { key: string; events: NotificationEventType[] }[] = [
   { key: 'tickets', events: ['TICKET_ASSIGNED', 'NEW_REPLY', 'TEAM_TICKET', 'TICKET_REOPENED', 'MENTIONED'] },
   { key: 'sla', events: ['SLA_WARNING', 'SLA_BREACHED'] },
-  { key: 'assets', events: ['CONTRACT_EXPIRING'] },
+  { key: 'assets', events: ['CONTRACT_EXPIRING', 'CONTRACT_PAYMENT_DUE'] },
 ];
 
 export function NotificationSettings() {

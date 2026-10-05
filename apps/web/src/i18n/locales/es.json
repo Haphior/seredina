@@ -130,7 +130,8 @@
       "teams": "Equipos",
       "settings": "Ajustes",
       "notificationSettings": "Notificaciones",
-      "setup": "Configuración inicial"
+      "setup": "Configuración inicial",
+      "directory": "Directorio"
     }
   },
   "layout": {
@@ -229,7 +230,8 @@
     "unassigned": "Sin asignar",
     "copied": "Copiado",
     "copy": "Copiar",
-    "someone": "Alguien"
+    "someone": "Alguien",
+    "typeToSearch": "Escribe para buscar…"
   },
   "tickets": {
     "title": "Tickets",
@@ -592,7 +594,13 @@
       "portal.settings_updated": "Portal de clientes activado/desactivado",
       "email_settings.updated": "Ajustes de correo al cliente modificados",
       "email_template.updated": "Plantilla de correo modificada",
-      "email_template.reset": "Plantilla de correo restaurada"
+      "email_template.reset": "Plantilla de correo restaurada",
+      "organization.created": "Empresa agregada al directorio",
+      "organization.updated": "Empresa del directorio modificada",
+      "organization.deleted": "Empresa del directorio eliminada",
+      "directory_contact.created": "Persona agregada al directorio",
+      "directory_contact.updated": "Persona del directorio modificada",
+      "directory_contact.deleted": "Persona del directorio eliminada"
     }
   },
   "mfa": {
@@ -796,14 +804,18 @@
     "summary": {
       "expiring": "Por vencer",
       "expired": "Vencidos",
-      "yearlyCost": "Costo recurrente anual"
+      "yearlyCost": "Costo recurrente anual",
+      "paymentsDueSoon": "Pagos por vencer",
+      "paymentsOverdue": "Pagos vencidos"
     },
     "filter": {
       "all": "Todos",
       "expiring": "Por vencer",
       "expired": "Vencidos",
       "active": "Vigentes",
-      "no_end_date": "Sin fecha de término"
+      "no_end_date": "Sin fecha de término",
+      "payments_due_soon": "Pagos por vencer",
+      "payments_overdue": "Pagos vencidos"
     },
     "status": {
       "expired": "Vencido",
@@ -838,7 +850,51 @@
       "billing": "Facturación",
       "seats": "Puestos / instalaciones",
       "assets": "Activos",
-      "notes": "Notas"
+      "notes": "Notas",
+      "nextPayment": "Próximo pago",
+      "supplierContact": "Contacto en el proveedor",
+      "supplierText": "Proveedor (texto)"
+    },
+    "noOrganization": "Sin vincular al directorio",
+    "supplierTextHint": "O elige una empresa del directorio arriba",
+    "payment": {
+      "section": "Pagos",
+      "sectionHint": "Seredina te avisa por correo antes de cada vencimiento y, si pasa sin registrarse, otra vez.",
+      "frequency": "Frecuencia",
+      "none": "Sin pagos programados",
+      "nextDate": "Próximo vencimiento",
+      "amount": "Monto",
+      "reminderDays": "Avisar días antes",
+      "reminderEmails": "Enviar recordatorios a",
+      "reminderHint": "Separa los correos con comas. Además, quienes gestionan activos reciben un aviso en Seredina.",
+      "freq": {
+        "monthly": "Mensual",
+        "bimonthly": "Bimestral",
+        "quarterly": "Trimestral",
+        "semiannual": "Semestral",
+        "yearly": "Anual",
+        "one_time": "Pago único"
+      },
+      "record": "Registrar pago",
+      "history": "Ver pagos",
+      "title": "Pagos de {{name}}",
+      "nextDue": "Próximo vencimiento: {{date}}",
+      "noneDue": "No hay un próximo pago pendiente.",
+      "paidOn": "Pagado el",
+      "reference": "Referencia",
+      "referenceHint": "N.º de factura o transferencia",
+      "recordHint": "Al registrarlo, el vencimiento pasa al siguiente período.",
+      "historyTitle": "Historial",
+      "noHistory": "Todavía no hay pagos registrados.",
+      "forDue": "vencimiento del {{date}}",
+      "extra": "pago adicional",
+      "undo": "deshacer",
+      "confirmUndo": "¿Borrar este pago del historial? El próximo vencimiento no cambia; edítalo en el contrato si hace falta.",
+      "dueToday": "Vence hoy",
+      "dueIn_one": "Vence en {{count}} día",
+      "dueIn_other": "Vence en {{count}} días",
+      "overdueBy_one": "Vencido hace {{count}} día",
+      "overdueBy_other": "Vencido hace {{count}} días"
     }
   },
   "portal": {
@@ -902,7 +958,8 @@
       "TICKET_REOPENED": "Un cliente reabre un ticket mío o de mi equipo",
       "MENTIONED": "Alguien me menciona en una nota interna",
       "SLA_WARNING": "Un plazo de SLA de mi ticket está por vencer (80 % del tiempo usado)",
-      "SLA_BREACHED": "Se venció un plazo de SLA de mi ticket"
+      "SLA_BREACHED": "Se venció un plazo de SLA de mi ticket",
+      "CONTRACT_PAYMENT_DUE": "Un pago de contrato está por vencer o vencido (usuarios que gestionan activos)"
     },
     "useDefault": "Usar el valor de la organización",
     "fromWorkspace": "Valor de la organización",
@@ -1132,7 +1189,22 @@
     "NETWORK_DEVICE": "Dispositivo de red",
     "PRINTER": "Impresora",
     "MOBILE_DEVICE": "Dispositivo móvil",
-    "OTHER": "Otro"
+    "OTHER": "Otro",
+    "LAPTOP": "Notebook",
+    "TABLET": "Tablet",
+    "SWITCH": "Switch",
+    "ROUTER": "Router",
+    "FIREWALL": "Firewall",
+    "ACCESS_POINT": "Punto de acceso Wi-Fi",
+    "STORAGE": "Almacenamiento (NAS/SAN)",
+    "UPS": "UPS",
+    "MONITOR": "Monitor",
+    "PERIPHERAL": "Periférico (teclado, mouse, audífonos)",
+    "DOCKING_STATION": "Docking station",
+    "SCANNER": "Escáner",
+    "PROJECTOR": "Proyector",
+    "IP_PHONE": "Teléfono IP",
+    "CAMERA": "Cámara IP"
   },
   "priority": {
     "LOW": "Baja",
@@ -1191,7 +1263,21 @@
     "manufacturer": "Fabricante",
     "model": "Modelo",
     "serial": "Número de serie",
-    "os": "Sistema operativo"
+    "os": "Sistema operativo",
+    "assetTag": "N.º de inventario",
+    "inventorySection": "Asignación",
+    "assignedTo": "Asignado a",
+    "location": "Ubicación",
+    "locationPlaceholder": "Piso 2, contabilidad",
+    "connectedTo": "Conectado a",
+    "connectedToPlaceholder": "Busca el equipo al que se conecta",
+    "purchaseSection": "Compra y garantía",
+    "supplier": "Proveedor",
+    "purchaseDate": "Fecha de compra",
+    "purchaseCost": "Costo de compra",
+    "currency": "Moneda",
+    "warrantyEnd": "Fin de garantía",
+    "notes": "Notas"
   },
   "monitoring": {
     "title": "Integraciones de monitoreo",
@@ -1741,14 +1827,16 @@
       "status": "Estado",
       "hostname": "Host",
       "source": "Origen",
-      "lastSeen": "Visto por última vez"
+      "lastSeen": "Visto por última vez",
+      "assignedLocation": "Asignado a / ubicación"
     },
     "jobStatus": {
       "PENDING": "Pendiente",
       "RUNNING": "En curso",
       "COMPLETED": "Completado",
       "FAILED": "Falló"
-    }
+    },
+    "allGroups": "Todos"
   },
   "onCall": {
     "loadFailed": "No se pudo cargar la configuración de guardias",
@@ -1852,7 +1940,13 @@
     "linkedTickets": "Tickets vinculados ({{count}})",
     "noTickets": "Ningún ticket hace referencia a este activo todavía.",
     "services": "Servicios que sostiene ({{count}})",
-    "noServices": "Todavía no está vinculado a ningún servicio de negocio — adminístralo desde la página Servicios."
+    "noServices": "Todavía no está vinculado a ningún servicio de negocio — adminístralo desde la página Servicios.",
+    "connected_one": "{{count}} equipo conectado",
+    "connected_other": "{{count}} equipos conectados",
+    "addConnected": "+ Agregar",
+    "connectedToLabel": "Conectado a",
+    "noConnected": "Monitores, docks o periféricos conectados a este equipo.",
+    "warrantyExpired": "vencida"
   },
   "inventory": {
     "collectedAt": "Recopilado {{date}}",
@@ -2062,7 +2156,9 @@
       "savedOn": "Guardado. Los contactos inactivos durante {{days}} días se anonimizarán.",
       "savedOff": "La retención automática está desactivada.",
       "failed": "No se pudo guardar la política de retención"
-    }
+    },
+    "equipmentHeading_one": "{{count}} equipo asignado",
+    "equipmentHeading_other": "{{count}} equipos asignados"
   },
   "customerEmails": {
     "title": "Correos al cliente",
@@ -2366,6 +2462,80 @@
       "body": "Conecta tu correo, elige tu tipo de soporte e invita a tu equipo en pocos minutos.",
       "continue": "Continuar",
       "dismiss": "Ya está configurado"
+    }
+  },
+  "assetGroup": {
+    "computers": "Computadores",
+    "network": "Red",
+    "peripherals": "Periféricos",
+    "infrastructure": "Infraestructura",
+    "other": "Otros"
+  },
+  "directory": {
+    "title": "Directorio",
+    "intro": "Las empresas con las que trabajas (proveedores, clientes, partners, áreas internas) y su gente: ejecutivos de cuenta, soporte técnico, facturación. Se usan en contratos y en el inventario.",
+    "tabs": {
+      "organizations": "Empresas",
+      "people": "Personas"
+    },
+    "searchOrgs": "Buscar por nombre, RUT o correo",
+    "searchPeople": "Buscar por nombre, cargo, empresa o correo",
+    "anyType": "Todos los tipos",
+    "anyRole": "Todas las áreas",
+    "anyOrg": "Todas las empresas",
+    "newOrg": "Nueva empresa",
+    "editOrg": "Editar empresa",
+    "newPerson": "Nueva persona",
+    "editPerson": "Editar persona",
+    "edit": "editar",
+    "delete": "eliminar",
+    "noOrgs": "Todavía no hay empresas en el directorio.",
+    "noPeople": "Todavía no hay personas en el directorio.",
+    "loadFailed": "No se pudo cargar el directorio",
+    "saveFailed": "No se pudo guardar",
+    "confirmDeleteOrg": "¿Eliminar {{name}}? Sus personas quedan en el directorio sin empresa, y sus contratos y equipos se conservan.",
+    "confirmDeletePerson": "¿Eliminar a {{name}} del directorio?",
+    "counts": "{{people}} personas · {{contracts}} contratos · {{assets}} equipos",
+    "peopleAt_one": "{{count}} persona",
+    "peopleAt_other": "{{count}} personas",
+    "contractsWith_one": "{{count}} contrato",
+    "contractsWith_other": "{{count}} contratos",
+    "assetsFrom_one": "{{count}} equipo comprado aquí",
+    "assetsFrom_other": "{{count}} equipos comprados aquí",
+    "nextPayment": "próximo pago {{date}}",
+    "jobTitlePlaceholder": "Ejecutiva de cuentas",
+    "fields": {
+      "name": "Nombre",
+      "type": "Tipo",
+      "taxId": "RUT",
+      "website": "Sitio web",
+      "email": "Correo",
+      "phone": "Teléfono",
+      "mobile": "Celular",
+      "phones": "Teléfonos",
+      "address": "Dirección",
+      "notes": "Notas",
+      "contactInfo": "Contacto",
+      "linked": "Vinculado",
+      "organization": "Empresa",
+      "role": "Área",
+      "jobTitle": "Cargo"
+    },
+    "orgType": {
+      "SUPPLIER": "Proveedor",
+      "CUSTOMER": "Cliente",
+      "PARTNER": "Partner",
+      "INTERNAL": "Área interna",
+      "OTHER": "Otro"
+    },
+    "role": {
+      "EXECUTIVE": "Ejecutivo de cuenta",
+      "MANAGEMENT": "Gerencia",
+      "SALES": "Ventas",
+      "TECHNICAL": "Técnico",
+      "SUPPORT": "Soporte",
+      "BILLING": "Facturación y cobranza",
+      "OTHER": "Otro"
     }
   }
 }

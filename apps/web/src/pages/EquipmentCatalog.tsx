@@ -1,3 +1,4 @@
+import { ASSET_TYPES } from '../lib/assetTypes';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { apiDelete, apiGet, apiPost, ApiError } from '../lib/api';
@@ -9,7 +10,7 @@ import { Input } from '../components/Input';
 import { Select } from '../components/Select';
 import { Card } from '../components/Card';
 
-const ASSET_TYPES: AssetType[] = ['SERVER', 'WORKSTATION', 'NETWORK_DEVICE', 'PRINTER', 'MOBILE_DEVICE', 'OTHER'];
+
 
 export function EquipmentCatalog() {
   const { t } = useTranslation();
