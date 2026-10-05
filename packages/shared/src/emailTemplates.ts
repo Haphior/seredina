@@ -192,6 +192,14 @@ const STRINGS = {
     notifyReopenedSubject: '[#{n}] Reabierta: {subject}',
     contractEndingBody: '{name} vence el {end}{assets}.',
     contractEndingSubject: 'Contrato por vencer el {end}: {name}',
+    paymentDueSubject: 'Recordatorio de pago: {name}, vence el {date}',
+    paymentDueBody:
+      'El pago de {name}{supplier} por {amount} vence el {date}.\n\nCuando lo pagues, regístralo en el contrato en Seredina: así el próximo recordatorio llega a tiempo.',
+    paymentOverdueSubject: 'Pago vencido: {name}, venció el {date}',
+    paymentOverdueBody:
+      'El pago de {name}{supplier} por {amount} venció el {date} y todavía no está registrado.\n\nSi ya lo pagaste, regístralo en el contrato en Seredina.',
+    paymentButton: 'Ver los contratos',
+    paymentAgreedAmount: 'el monto acordado',
     mergedInto: 'Esta solicitud se unió a la #{n} («{subject}»).',
     mergedFrom: 'La solicitud #{n} («{subject}») se unió a esta.',
   },
@@ -238,6 +246,14 @@ const STRINGS = {
     notifyReopenedSubject: '[#{n}] Reopened: {subject}',
     contractEndingBody: '{name} ends on {end}{assets}.',
     contractEndingSubject: 'Contract ending {end}: {name}',
+    paymentDueSubject: 'Payment reminder: {name}, due {date}',
+    paymentDueBody:
+      'The payment of {amount} for {name}{supplier} is due on {date}.\n\nOnce it is paid, record it on the contract in Seredina, so the next reminder arrives on time.',
+    paymentOverdueSubject: 'Payment overdue: {name}, was due {date}',
+    paymentOverdueBody:
+      'The payment of {amount} for {name}{supplier} was due on {date} and is not recorded yet.\n\nIf it has been paid, record it on the contract in Seredina.',
+    paymentButton: 'View contracts',
+    paymentAgreedAmount: 'the agreed amount',
     mergedInto: 'This ticket was merged into #{n} ("{subject}").',
     mergedFrom: 'Merged ticket #{n} ("{subject}") into this ticket.',
   },
@@ -561,4 +577,20 @@ export function emailContextFor(tenant: EmailTenant, webOrigin: string | undefin
     portalLink,
     from: fromAddress ? formatFrom(settings.senderName || tenant.name, fromAddress) : undefined,
   };
+}
+
+/** A date as people write it in the tenant's language: "5 de octubre de 2026". */
+export function formatEmailDate(language: EmailLanguage, date: Date): string {
+  return date.toLocaleDateString(language === 'es' ? 'es-CL' : 'en-US', { timeZone: 'UTC', day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+/** An amount with its currency, as people write it in the tenant's language. */
+export function formatEmailAmount(language: EmailLanguage, amount: number, currency: string | null): string {
+  const locale = language === 'es' ? 'es-CL' : 'en-US';
+  if (!currency) return amount.toLocaleString(locale, { maximumFractionDigits: 2 });
+  try {
+    return amount.toLocaleString(locale, { style: 'currency', currency, maximumFractionDigits: 2 });
+  } catch {
+    return `${amount.toLocaleString(locale, { maximumFractionDigits: 2 })} ${currency}`;
+  }
 }

@@ -60,6 +60,9 @@ export async function exportTenantData(tenantId: string) {
       contractAssets,
       auditLogs,
       ssoSettings,
+      organizations,
+      directoryContacts,
+      contractPayments,
     ] = await Promise.all([
       tx.tenant.findUniqueOrThrow({ where: { id: tenantId } }),
       tx.role.findMany(),
@@ -158,6 +161,10 @@ export async function exportTenantData(tenantId: string) {
           updatedAt: true,
         },
       }),
+      // docs/adr/0076-directory-payments-inventory.md
+      tx.organization.findMany(),
+      tx.directoryContact.findMany(),
+      tx.contractPayment.findMany(),
     ]);
 
     return {
@@ -203,6 +210,9 @@ export async function exportTenantData(tenantId: string) {
       contractAssets,
       auditLogs,
       ssoSettings,
+      organizations,
+      directoryContacts,
+      contractPayments,
     };
   });
 }

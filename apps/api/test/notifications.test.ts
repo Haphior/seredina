@@ -33,7 +33,7 @@ describe.skipIf(!hasDb)('Notifications', () => {
 
   it('a user with no preference row gets the default: inApp on, email off', async () => {
     const prefs = await getPreferences(tenantId, userAId);
-    expect(prefs).toHaveLength(8);
+    expect(prefs).toHaveLength(9);
     expect(prefs[0]).toEqual({ eventType: 'TICKET_ASSIGNED', label: expect.any(String), inApp: true, email: false, source: 'builtin' });
     expect(prefs.every((p) => p.inApp && !p.email && p.source === 'builtin')).toBe(true);
   });

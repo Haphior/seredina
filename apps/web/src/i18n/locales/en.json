@@ -130,7 +130,8 @@
       "teams": "Teams",
       "settings": "Settings",
       "notificationSettings": "Notifications",
-      "setup": "Initial setup"
+      "setup": "Initial setup",
+      "directory": "Directory"
     }
   },
   "layout": {
@@ -229,7 +230,8 @@
     "unassigned": "Unassigned",
     "copied": "Copied",
     "copy": "Copy",
-    "someone": "Someone"
+    "someone": "Someone",
+    "typeToSearch": "Type to search…"
   },
   "tickets": {
     "title": "Tickets",
@@ -592,7 +594,13 @@
       "portal.settings_updated": "Customer portal turned on/off",
       "email_settings.updated": "Customer email settings changed",
       "email_template.updated": "Email template changed",
-      "email_template.reset": "Email template restored"
+      "email_template.reset": "Email template restored",
+      "organization.created": "Directory company added",
+      "organization.updated": "Directory company changed",
+      "organization.deleted": "Directory company deleted",
+      "directory_contact.created": "Directory person added",
+      "directory_contact.updated": "Directory person changed",
+      "directory_contact.deleted": "Directory person deleted"
     }
   },
   "mfa": {
@@ -796,14 +804,18 @@
     "summary": {
       "expiring": "Ending soon",
       "expired": "Expired",
-      "yearlyCost": "Recurring cost per year"
+      "yearlyCost": "Recurring cost per year",
+      "paymentsDueSoon": "Payments due soon",
+      "paymentsOverdue": "Overdue payments"
     },
     "filter": {
       "all": "All",
       "expiring": "Ending soon",
       "expired": "Expired",
       "active": "Active",
-      "no_end_date": "No end date"
+      "no_end_date": "No end date",
+      "payments_due_soon": "Payments due soon",
+      "payments_overdue": "Overdue payments"
     },
     "status": {
       "expired": "Expired",
@@ -838,7 +850,51 @@
       "billing": "Billing",
       "seats": "Seats / installs",
       "assets": "Assets",
-      "notes": "Notes"
+      "notes": "Notes",
+      "nextPayment": "Next payment",
+      "supplierContact": "Contact at the supplier",
+      "supplierText": "Supplier (text)"
+    },
+    "noOrganization": "Not linked to the directory",
+    "supplierTextHint": "Or pick a company from the directory above",
+    "payment": {
+      "section": "Payments",
+      "sectionHint": "Seredina emails a reminder before each due date and again if it passes without a payment recorded.",
+      "frequency": "Frequency",
+      "none": "No scheduled payments",
+      "nextDate": "Next due date",
+      "amount": "Amount",
+      "reminderDays": "Remind days before",
+      "reminderEmails": "Send reminders to",
+      "reminderHint": "Separate addresses with commas. People who manage assets also get a notification in Seredina.",
+      "freq": {
+        "monthly": "Monthly",
+        "bimonthly": "Every two months",
+        "quarterly": "Quarterly",
+        "semiannual": "Every six months",
+        "yearly": "Yearly",
+        "one_time": "One-time"
+      },
+      "record": "Record payment",
+      "history": "View payments",
+      "title": "Payments for {{name}}",
+      "nextDue": "Next due date: {{date}}",
+      "noneDue": "No payment is pending.",
+      "paidOn": "Paid on",
+      "reference": "Reference",
+      "referenceHint": "Invoice or transfer number",
+      "recordHint": "Recording it moves the due date to the next period.",
+      "historyTitle": "History",
+      "noHistory": "No payments recorded yet.",
+      "forDue": "for {{date}}",
+      "extra": "extra payment",
+      "undo": "undo",
+      "confirmUndo": "Delete this payment from the history? The next due date doesn't change; edit it on the contract if needed.",
+      "dueToday": "Due today",
+      "dueIn_one": "Due in {{count}} day",
+      "dueIn_other": "Due in {{count}} days",
+      "overdueBy_one": "Overdue by {{count}} day",
+      "overdueBy_other": "Overdue by {{count}} days"
     }
   },
   "portal": {
@@ -902,7 +958,8 @@
       "TICKET_REOPENED": "A customer reopens a ticket of mine or my team's",
       "MENTIONED": "Someone mentions me in an internal note",
       "SLA_WARNING": "An SLA target on my ticket is about to be missed (80% of the time used)",
-      "SLA_BREACHED": "An SLA target on my ticket was missed"
+      "SLA_BREACHED": "An SLA target on my ticket was missed",
+      "CONTRACT_PAYMENT_DUE": "A contract payment is coming due or overdue (users who manage assets)"
     },
     "useDefault": "Use the workspace default",
     "fromWorkspace": "Workspace default",
@@ -1132,7 +1189,22 @@
     "NETWORK_DEVICE": "Network device",
     "PRINTER": "Printer",
     "MOBILE_DEVICE": "Mobile device",
-    "OTHER": "Other"
+    "OTHER": "Other",
+    "LAPTOP": "Laptop",
+    "TABLET": "Tablet",
+    "SWITCH": "Switch",
+    "ROUTER": "Router",
+    "FIREWALL": "Firewall",
+    "ACCESS_POINT": "Wi-Fi access point",
+    "STORAGE": "Storage (NAS/SAN)",
+    "UPS": "UPS",
+    "MONITOR": "Monitor",
+    "PERIPHERAL": "Peripheral (keyboard, mouse, headset)",
+    "DOCKING_STATION": "Docking station",
+    "SCANNER": "Scanner",
+    "PROJECTOR": "Projector",
+    "IP_PHONE": "IP phone",
+    "CAMERA": "IP camera"
   },
   "priority": {
     "LOW": "Low",
@@ -1191,7 +1263,21 @@
     "manufacturer": "Manufacturer",
     "model": "Model",
     "serial": "Serial number",
-    "os": "Operating system"
+    "os": "Operating system",
+    "assetTag": "Asset tag",
+    "inventorySection": "Assignment",
+    "assignedTo": "Assigned to",
+    "location": "Location",
+    "locationPlaceholder": "Floor 2, accounting",
+    "connectedTo": "Connected to",
+    "connectedToPlaceholder": "Search for the equipment it plugs into",
+    "purchaseSection": "Purchase and warranty",
+    "supplier": "Supplier",
+    "purchaseDate": "Purchase date",
+    "purchaseCost": "Purchase cost",
+    "currency": "Currency",
+    "warrantyEnd": "Warranty ends",
+    "notes": "Notes"
   },
   "monitoring": {
     "title": "Monitoring Integrations",
@@ -1741,14 +1827,16 @@
       "status": "Status",
       "hostname": "Hostname",
       "source": "Source",
-      "lastSeen": "Last seen"
+      "lastSeen": "Last seen",
+      "assignedLocation": "Assigned to / location"
     },
     "jobStatus": {
       "PENDING": "Pending",
       "RUNNING": "Running",
       "COMPLETED": "Completed",
       "FAILED": "Failed"
-    }
+    },
+    "allGroups": "All"
   },
   "onCall": {
     "loadFailed": "Failed to load on-call configuration",
@@ -1852,7 +1940,13 @@
     "linkedTickets": "Linked tickets ({{count}})",
     "noTickets": "No tickets reference this asset yet.",
     "services": "Services underpinned ({{count}})",
-    "noServices": "Not linked to any business service yet — manage this from the Services page."
+    "noServices": "Not linked to any business service yet — manage this from the Services page.",
+    "connected_one": "{{count}} connected device",
+    "connected_other": "{{count}} connected devices",
+    "addConnected": "+ Add",
+    "connectedToLabel": "Connected to",
+    "noConnected": "Monitors, docks or peripherals plugged into this device.",
+    "warrantyExpired": "expired"
   },
   "inventory": {
     "collectedAt": "Collected {{date}}",
@@ -2062,7 +2156,9 @@
       "savedOn": "Saved. Contacts inactive for {{days}} days will be anonymized.",
       "savedOff": "Automatic retention is off.",
       "failed": "Failed to save the retention policy"
-    }
+    },
+    "equipmentHeading_one": "{{count}} assigned device",
+    "equipmentHeading_other": "{{count}} assigned devices"
   },
   "customerEmails": {
     "title": "Customer emails",
@@ -2366,6 +2462,80 @@
       "body": "Connect your email, pick your kind of support and invite your team in a few minutes.",
       "continue": "Continue",
       "dismiss": "It's already set up"
+    }
+  },
+  "assetGroup": {
+    "computers": "Computers",
+    "network": "Network",
+    "peripherals": "Peripherals",
+    "infrastructure": "Infrastructure",
+    "other": "Other"
+  },
+  "directory": {
+    "title": "Directory",
+    "intro": "The companies you work with (suppliers, customers, partners, internal areas) and their people: account executives, technical support, billing. Used in contracts and the inventory.",
+    "tabs": {
+      "organizations": "Companies",
+      "people": "People"
+    },
+    "searchOrgs": "Search by name, tax ID or email",
+    "searchPeople": "Search by name, title, company or email",
+    "anyType": "All types",
+    "anyRole": "All areas",
+    "anyOrg": "All companies",
+    "newOrg": "New company",
+    "editOrg": "Edit company",
+    "newPerson": "New person",
+    "editPerson": "Edit person",
+    "edit": "edit",
+    "delete": "delete",
+    "noOrgs": "No companies in the directory yet.",
+    "noPeople": "No people in the directory yet.",
+    "loadFailed": "Could not load the directory",
+    "saveFailed": "Could not save",
+    "confirmDeleteOrg": "Delete {{name}}? Its people stay in the directory without a company, and its contracts and equipment are kept.",
+    "confirmDeletePerson": "Remove {{name}} from the directory?",
+    "counts": "{{people}} people · {{contracts}} contracts · {{assets}} devices",
+    "peopleAt_one": "{{count}} person",
+    "peopleAt_other": "{{count}} people",
+    "contractsWith_one": "{{count}} contract",
+    "contractsWith_other": "{{count}} contracts",
+    "assetsFrom_one": "{{count}} device bought here",
+    "assetsFrom_other": "{{count}} devices bought here",
+    "nextPayment": "next payment {{date}}",
+    "jobTitlePlaceholder": "Account executive",
+    "fields": {
+      "name": "Name",
+      "type": "Type",
+      "taxId": "Tax ID",
+      "website": "Website",
+      "email": "Email",
+      "phone": "Phone",
+      "mobile": "Mobile",
+      "phones": "Phones",
+      "address": "Address",
+      "notes": "Notes",
+      "contactInfo": "Contact",
+      "linked": "Linked",
+      "organization": "Company",
+      "role": "Area",
+      "jobTitle": "Job title"
+    },
+    "orgType": {
+      "SUPPLIER": "Supplier",
+      "CUSTOMER": "Customer",
+      "PARTNER": "Partner",
+      "INTERNAL": "Internal area",
+      "OTHER": "Other"
+    },
+    "role": {
+      "EXECUTIVE": "Account executive",
+      "MANAGEMENT": "Management",
+      "SALES": "Sales",
+      "TECHNICAL": "Technical",
+      "SUPPORT": "Support",
+      "BILLING": "Billing and collections",
+      "OTHER": "Other"
     }
   }
 }

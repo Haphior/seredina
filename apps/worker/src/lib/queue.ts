@@ -1,10 +1,12 @@
 import IORedis from 'ioredis';
 import { Queue } from 'bullmq';
 import {
+  CONTACT_EMAIL_QUEUE_NAME,
   ESCALATION_ADVANCE_QUEUE_NAME,
   NOTIFICATION_EMAIL_QUEUE_NAME,
   TICKET_FOLLOWUP_QUEUE_NAME,
   WEBHOOK_DELIVERY_QUEUE_NAME,
+  type ContactEmailJobPayload,
   type EscalationAdvanceJobPayload,
   type NotificationEmailJobPayload,
   type TicketFollowupJobPayload,
@@ -44,3 +46,6 @@ export const notificationEmailQueue = new Queue<NotificationEmailJobPayload>(NOT
 
 // Consumed by apps/api, not here -- see apps/api/src/lib/ticketFollowup.ts.
 export const ticketFollowupQueue = new Queue<TicketFollowupJobPayload>(TICKET_FOLLOWUP_QUEUE_NAME, { connection });
+
+/** One-off branded emails the worker composes itself -- contract payment reminders. */
+export const contactEmailQueue = new Queue<ContactEmailJobPayload>(CONTACT_EMAIL_QUEUE_NAME, { connection });

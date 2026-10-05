@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { apiGet, apiPatch, apiPost, downloadFile, ApiError } from '../lib/api';
-import type { ContactDetail as ContactDetailType } from '../lib/types';
+import type { Asset, ContactDetail as ContactDetailType } from '../lib/types';
 import { useAuth } from '../auth/AuthContext';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
@@ -103,6 +103,7 @@ export function ContactDetail() {
               ))}
             </div>
           )}
+          {contact.id && <AssignedEquipment contactId={contact.id} />}
         </Card>
 
         {canManage && (
@@ -247,5 +248,37 @@ function AnonymizeModal({ contact, onClose, onDone }: { contact: ContactDetailTy
         </div>
       </form>
     </Modal>
+  );
+}
+
+/** Equipment handed to this person -- docs/adr/0076-directory-payments-inventory.md. */
+function AssignedEquipment({ contactId }: { contactId: string }) {
+  const { t } = useTranslation();
+  const [assets, setAssets] = useState<Asset[] | null>(null);
+  useEffect(() => {
+    apiGet<{ assets: Asset[] }>(`/assets?assignedContactId=${contactId}&limit=100`)
+      .then((r) => setAssets(r.assets))
+      .catch(() => setAssets([]));
+  }, [contactId]);
+  if (!assets || assets.length === 0) return null;
+  return (
+    <div className="mt-5 border-t border-slate-100 pt-4">
+      <h2 className="mb-2.5 text-[13px] font-bold uppercase tracking-wide text-slate-400">{t('contacts.equipmentHeading', { count: assets.length })}</h2>
+      <div className="flex flex-col gap-1.5">
+        {assets.map((a) => (
+          <Link
+            key={a.id}
+            to={`/assets/${a.id}`}
+            className="flex items-center justify-between gap-3 rounded-md bg-slate-50 px-2.5 py-1.5 text-[13px] hover:bg-slate-100"
+          >
+            <span className="min-w-0 truncate font-medium text-indigo-700">{a.name}</span>
+            <span className="flex-shrink-0 text-xs text-slate-400">
+              {t(`assetType.${a.assetType}`)}
+              {a.assetTag ? ` · ${a.assetTag}` : ''}
+            </span>
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }

@@ -440,3 +440,12 @@ export function GearIcon(props: SVGProps<SVGSVGElement>) {
     </Icon>
   );
 }
+
+export function BuildingIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <rect x="3.5" y="3" width="8.5" height="14" rx="1" />
+      <path d="M12 8h3.5a1 1 0 0 1 1 1v8H12M6 6h1M8.8 6h1M6 9h1M8.8 9h1M6 12h1M8.8 12h1M7 17v-2.2h1.5V17" />
+    </Icon>
+  );
+}

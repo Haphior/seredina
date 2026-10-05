@@ -7,12 +7,40 @@ modelos de hardware que puedes asignarle a un activo).
 
 ## Activos
 
-Cada fila es un servidor, estación de trabajo, dispositivo de red,
-impresora o dispositivo móvil — con tipo, estado, IP, hostname, número de
-serie, fabricante/modelo y sistema operativo. Un activo se puede vincular
-a los tickets que lo afectan (desde el propio ticket, ver
-[Tickets](/es/guia/tickets#el-panel-de-propiedades)), así queda un historial
-de qué problemas tuvo cada equipo.
+Cada fila es un equipo de TI, con su tipo, estado, IP, hostname, número de
+serie, fabricante/modelo y sistema operativo. Las pestañas sobre la lista
+agrupan los tipos:
+
+| Grupo | Tipos |
+| --- | --- |
+| Computadores | Estación de trabajo, notebook, servidor, tablet, dispositivo móvil |
+| Red | Switch, router, firewall, punto de acceso Wi-Fi, otro dispositivo de red |
+| Periféricos | Monitor, periférico (teclado, mouse, audífonos), docking station, impresora, escáner, proyector, teléfono IP, cámara IP |
+| Infraestructura | Almacenamiento (NAS/SAN), UPS |
+
+Un activo se puede vincular a los tickets que lo afectan (desde el propio
+ticket, ver [Tickets](/es/guia/tickets#el-panel-de-propiedades)). Así queda un
+historial de qué problemas tuvo cada equipo.
+
+### Datos de inventario
+
+Además de los datos técnicos, cada activo puede registrar:
+- **N.º de inventario**: tu propio número, como *TI-00042*. Se puede buscar.
+- **Asignado a**: la persona que lo usa, uno de tus
+  [contactos](/es/guia/contactos-y-datos-personales). Su página lista los
+  equipos que tiene.
+- **Ubicación**: piso, oficina o rack.
+- **Conectado a**: el equipo al que se conecta, como un monitor o dock a su
+  computador, o un switch a su router. La página de un computador lista lo
+  que tiene conectado, y **+ Agregar** registra un periférico nuevo ya
+  conectado.
+- **Compra**: proveedor (del [directorio](/es/guia/directorio)), fecha,
+  costo y moneda, y fin de la garantía. Una garantía vencida se muestra en
+  rojo.
+- **Notas**.
+
+Los monitores, periféricos y docks no muestran los campos de red ni de
+sistema operativo.
 
 ### Cómo llega un activo al inventario
 
@@ -25,6 +53,13 @@ de qué problemas tuvo cada equipo.
 - **Agente** — ver [Dispositivos](#dispositivos) abajo. Trae más detalle
   que el descubrimiento agentless porque corre *dentro* del equipo, no
   desde afuera.
+
+El escaneo de red reconoce switches, routers, firewalls, puntos de acceso,
+almacenamiento, UPS, impresoras, teléfonos IP y cámaras por lo que cada
+equipo informa por SNMP. El agente clasifica los notebooks y tablets como
+tales. También registra los monitores que ve en un computador, por número de
+serie, como activos de tipo Monitor conectados a él. Si un monitor se cambia
+a otro computador, lo sigue; nadie tiene que tipear números de serie.
 
 ## Dispositivos
 
@@ -125,10 +160,44 @@ historial ya guardado.
 ## Contratos, garantías y licencias
 
 **CMDB → Contratos** registra contratos de soporte, garantías, licencias de
-software, arriendos y suscripciones: proveedor, número de contrato u orden,
-fechas de inicio y término, costo (pago único, mensual o anual, en
-cualquier moneda), puestos para licencias, y los activos que cubre cada uno.
+software, arriendos y suscripciones. Cada uno tiene:
+- el proveedor, elegido desde el [directorio](/es/guia/directorio) junto con
+  la persona a la que llamar ahí, o escrito a mano;
+- el número de contrato u orden;
+- fechas de inicio y término;
+- el costo (pago único, mensual o anual, en cualquier moneda);
+- los puestos, para licencias;
+- los activos que cubre.
+
 La página de cada activo muestra los contratos que lo cubren.
+
+### Pagos y recordatorios
+
+Para recibir recordatorios de los pagos de un contrato, completa su sección
+**Pagos**:
+- la **frecuencia**: mensual, bimestral, trimestral, semestral, anual o
+  pago único;
+- el **próximo vencimiento**;
+- el **monto**, si no es el costo del contrato;
+- **cuántos días antes** avisar (5 por defecto);
+- **a qué correos** enviar los recordatorios, como finanzas o TI.
+
+Seredina les envía un correo a esas direcciones cuando un pago entra en ese
+plazo. Si el vencimiento pasa sin un pago registrado, les escribe una vez
+más. Cada recordatorio sale en el idioma y con el diseño de tu empresa,
+configurados en [Correos al cliente](/es/guia/canales#correos-a-tus-clientes).
+Además, quienes tienen un rol que gestiona activos reciben la notificación
+*Pago de contrato por vencer*, en la aplicación y por correo si la
+activaron.
+
+Cuando hagas un pago, haz clic en **Registrar pago**. Ingresa la fecha, el
+monto y el número de factura o transferencia. El contrato pasa al
+siguiente vencimiento y conserva el día del mes: un contrato que se paga
+el 31 vence el 28 de febrero y luego el 31 de marzo. Cada contrato guarda
+su historial de pagos, y un registro equivocado se puede deshacer.
+
+El encabezado de la página cuenta los pagos por vencer y los vencidos. Los
+filtros *Pagos por vencer* y *Pagos vencidos* los listan.
 
 Cada contrato indica si está vigente, por vencer o vencido. El encabezado
 de la página suma lo que está por vencer, lo vencido y el costo recurrente

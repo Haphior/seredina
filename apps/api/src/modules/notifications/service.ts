@@ -11,6 +11,7 @@ const EVENT_LABELS: Record<NotificationEventType, string> = {
   SLA_WARNING: 'An SLA target on my ticket is about to be missed',
   SLA_BREACHED: 'An SLA target on my ticket was missed',
   CONTRACT_EXPIRING: 'A contract, warranty or license is about to expire (users who manage assets)',
+  CONTRACT_PAYMENT_DUE: 'A contract payment is coming due or overdue (users who manage assets)',
 };
 
 /** Display order: ticket events first, then SLA, then contracts. EVENT_LABELS' type keeps the set complete. */
@@ -23,6 +24,7 @@ export const EVENT_TYPES: NotificationEventType[] = [
   'SLA_WARNING',
   'SLA_BREACHED',
   'CONTRACT_EXPIRING',
+  'CONTRACT_PAYMENT_DUE',
 ];
 
 export async function listNotifications(tenantId: string, userId: string, unreadOnly = false) {

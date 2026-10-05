@@ -16,3 +16,4 @@ export * from './emailOAuth';
 export * from './attachments';
 export * from './totp';
 export * from './emailTemplates';
+export * from './assetTypes';

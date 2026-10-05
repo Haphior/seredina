@@ -1,9 +1,12 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { requirePermission } from '../rbac/permissions';
-import { createAsset, deleteAsset, getAsset, listAssets, updateAsset } from './service';
+import { ASSET_TYPES, ASSET_TYPE_GROUPS, type AssetTypeGroup, type AssetTypeName } from '@seredina/shared';
+import { AssetError, createAsset, deleteAsset, getAsset, listAssets, updateAsset } from './service';
 
-const ASSET_TYPE = z.enum(['SERVER', 'WORKSTATION', 'NETWORK_DEVICE', 'PRINTER', 'MOBILE_DEVICE', 'OTHER']);
+const ASSET_TYPE = z.enum(ASSET_TYPES as [AssetTypeName, ...AssetTypeName[]]);
+const ASSET_GROUP = z.enum(Object.keys(ASSET_TYPE_GROUPS) as [AssetTypeGroup, ...AssetTypeGroup[]]);
+const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'use YYYY-MM-DD');
 const ASSET_STATUS = z.enum(['ACTIVE', 'INACTIVE', 'RETIRED']);
 
 // .nullish() (null or undefined) on the optional string fields -- undefined means
@@ -18,6 +21,17 @@ const assetFieldsSchema = {
   model: z.string().nullish(),
   operatingSystem: z.string().nullish(),
   modelId: z.string().uuid().nullish(),
+  // Inventory details -- docs/adr/0076-directory-payments-inventory.md.
+  assetTag: z.string().max(100).nullish(),
+  location: z.string().max(200).nullish(),
+  assignedContactId: z.string().uuid().nullish(),
+  parentAssetId: z.string().uuid().nullish(),
+  purchaseDate: date.nullish(),
+  purchaseCost: z.number().min(0).max(1e12).nullish(),
+  purchaseCurrency: z.string().regex(/^[A-Za-z]{3}$/, 'use a 3-letter currency code').nullish(),
+  supplierId: z.string().uuid().nullish(),
+  warrantyEndDate: date.nullish(),
+  notes: z.string().max(5000).nullish(),
 };
 
 const createAssetSchema = z.object({
@@ -36,7 +50,11 @@ const updateAssetSchema = z.object({
 
 const listAssetsQuerySchema = z.object({
   assetType: ASSET_TYPE.optional(),
+  group: ASSET_GROUP.optional(),
   status: ASSET_STATUS.optional(),
+  assignedContactId: z.string().uuid().optional(),
+  supplierId: z.string().uuid().optional(),
+  parentAssetId: z.string().uuid().optional(),
   q: z.string().max(200).optional(),
   limit: z.coerce.number().int().min(1).max(200).optional(),
   offset: z.coerce.number().int().min(0).optional(),
@@ -72,8 +90,12 @@ export default async function assetRoutes(app: FastifyInstance) {
       if (!parsed.success) {
         return reply.code(400).send({ error: parsed.error.flatten() });
       }
-      const asset = await createAsset(request.user.tenantId, parsed.data);
-      return reply.code(201).send(asset);
+      try {
+        return reply.code(201).send(await createAsset(request.user.tenantId, parsed.data));
+      } catch (err) {
+        if (err instanceof AssetError) return reply.code(err.status).send({ error: err.message });
+        throw err;
+      }
     },
   );
 
@@ -87,9 +109,9 @@ export default async function assetRoutes(app: FastifyInstance) {
         return reply.code(400).send({ error: parsed.error.flatten() });
       }
       try {
-        const asset = await updateAsset(request.user.tenantId, id, parsed.data);
-        return reply.send(asset);
-      } catch {
+        return reply.send(await updateAsset(request.user.tenantId, id, parsed.data));
+      } catch (err) {
+        if (err instanceof AssetError) return reply.code(err.status).send({ error: err.message });
         return reply.code(404).send({ error: 'asset not found' });
       }
     },

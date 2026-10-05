@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { apiDelete, apiGet, apiPatch, ApiError } from '../lib/api';
+import { apiDelete, apiGet, apiPatch, apiPost, ApiError } from '../lib/api';
 import type { AssetDetail as AssetDetailType, Contract } from '../lib/types';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
@@ -21,6 +21,7 @@ export function AssetDetail() {
   const [asset, setAsset] = useState<AssetDetailType | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
+  const [addingConnected, setAddingConnected] = useState(false);
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -100,6 +101,7 @@ export function AssetDetail() {
               <Spec label={t('assetDetail.os')} value={asset.operatingSystem} />
               <Spec label={t('assetDetail.lastSeen')} value={asset.lastSeenAt ? formatDateTime(asset.lastSeenAt) : null} />
             </dl>
+            <InventoryDetails asset={asset} />
             {asset.snmpSysDescr && (
               <div className="mt-3 border-t border-slate-100 pt-3">
                 <div className="mb-1 text-[11.5px] font-semibold uppercase tracking-wide text-slate-400">SNMP sysDescr</div>
@@ -171,6 +173,41 @@ export function AssetDetail() {
         </div>
 
         <div className="flex flex-col gap-4">
+        <Card>
+          <div className="mb-2.5 flex items-center justify-between">
+            <h2 className="text-[13px] font-bold uppercase tracking-wide text-slate-400">
+              {t('assetDetail.connected', { count: asset.connectedAssets.length })}
+            </h2>
+            <button onClick={() => setAddingConnected(true)} className="shrink-0 whitespace-nowrap text-[12px] font-semibold text-indigo-600 hover:underline">
+              {t('assetDetail.addConnected')}
+            </button>
+          </div>
+          {asset.parentAsset && (
+            <p className="mb-2 text-[12.5px] text-slate-500">
+              {t('assetDetail.connectedToLabel')}{' '}
+              <Link to={`/assets/${asset.parentAsset.id}`} className="font-medium text-indigo-700 hover:underline">
+                {asset.parentAsset.name}
+              </Link>
+            </p>
+          )}
+          {asset.connectedAssets.length === 0 ? (
+            <p className="text-[13px] text-slate-400">{t('assetDetail.noConnected')}</p>
+          ) : (
+            <div className="flex flex-col gap-1.5">
+              {asset.connectedAssets.map((c) => (
+                <Link
+                  key={c.id}
+                  to={`/assets/${c.id}`}
+                  className="flex items-center justify-between gap-2 rounded-md bg-slate-50 px-2.5 py-1.5 text-[13px] hover:bg-slate-100"
+                >
+                  <span className="truncate font-medium text-slate-800">{c.name}</span>
+                  <span className="shrink-0 text-[11.5px] text-slate-400">{t(`assetType.${c.assetType}`)}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </Card>
+
         <AssetContracts assetId={asset.id} />
 
         <Card>
@@ -199,6 +236,69 @@ export function AssetDetail() {
       </div>
 
       {editing && <AssetFormModal asset={asset} onClose={() => setEditing(false)} onSubmit={saveAsset} />}
+      {addingConnected && (
+        <AssetFormModal
+          defaults={{ assetType: 'MONITOR' }}
+          defaultParent={{ id: asset.id, name: asset.name }}
+          onClose={() => setAddingConnected(false)}
+          onSubmit={async (values) => {
+            await apiPost('/assets', values);
+            await load();
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+/** Asset tag, who has it, where it is, how it was bought -- docs/adr/0076-directory-payments-inventory.md. */
+function InventoryDetails({ asset }: { asset: AssetDetailType }) {
+  const { t, i18n } = useTranslation();
+  const hasAny =
+    asset.assetTag || asset.location || asset.assignedContact || asset.supplier || asset.purchaseDate || asset.purchaseCost != null || asset.warrantyEndDate || asset.notes;
+  if (!hasAny) return null;
+  const cost =
+    asset.purchaseCost == null
+      ? null
+      : (() => {
+          try {
+            return asset.purchaseCurrency
+              ? new Intl.NumberFormat(i18n.language, { style: 'currency', currency: asset.purchaseCurrency }).format(asset.purchaseCost)
+              : asset.purchaseCost.toLocaleString(i18n.language);
+          } catch {
+            return `${asset.purchaseCost} ${asset.purchaseCurrency ?? ''}`;
+          }
+        })();
+  const warrantyExpired = asset.warrantyEndDate ? new Date(asset.warrantyEndDate) < new Date() : false;
+  return (
+    <div className="mt-3 border-t border-slate-100 pt-3">
+      <dl className="grid grid-cols-2 gap-3 text-[13px]">
+        <Spec label={t('assetForm.assetTag')} value={asset.assetTag} />
+        <div>
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">{t('assetForm.assignedTo')}</div>
+          <div className="text-slate-700">
+            {asset.assignedContact ? (
+              <Link to={`/contacts/${asset.assignedContact.id}`} className="text-indigo-700 hover:underline">
+                {asset.assignedContact.name}
+              </Link>
+            ) : (
+              '—'
+            )}
+          </div>
+        </div>
+        <Spec label={t('assetForm.location')} value={asset.location} />
+        <Spec label={t('assetForm.supplier')} value={asset.supplier?.name ?? null} />
+        <Spec label={t('assetForm.purchaseDate')} value={asset.purchaseDate?.slice(0, 10) ?? null} />
+        <Spec label={t('assetForm.purchaseCost')} value={cost} />
+        <div>
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">{t('assetForm.warrantyEnd')}</div>
+          <div className={warrantyExpired ? 'text-rose-600' : 'text-slate-700'}>
+            {asset.warrantyEndDate ? asset.warrantyEndDate.slice(0, 10) : '—'}
+            {warrantyExpired && ` · ${t('assetDetail.warrantyExpired')}`}
+          </div>
+        </div>
+      </dl>
+      {asset.notes && <p className="mt-3 whitespace-pre-line text-[12.5px] text-slate-500">{asset.notes}</p>}
     </div>
   );
 }
