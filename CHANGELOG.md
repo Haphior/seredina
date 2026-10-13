@@ -31,6 +31,17 @@ with the same compose command you started the installation with.
 - **Agents.** Installed agents need nothing. From their next check-in,
   laptops are filed as laptops, and their monitors appear as assets.
 
+### Security
+
+- **Dependency updates:**
+  - `@modelcontextprotocol/sdk` 1.32.1: the MCP server's HTTP transport now
+    rejects oversized request bodies (413) and bounds JSON-RPC batches.
+  - `sharp` 0.35.5: bounds checks in image processing.
+  - `source-map-js` 1.2.2: a denial-of-service fix, CVE-2026-93749.
+
+  These replace Dependabot's grouped update (#20), whose lockfile dropped a
+  package the console's build needs.
+
 ### Added
 
 - **Updates from the console** (`docs/adr/0077-in-app-updates.md`).
