@@ -202,6 +202,7 @@ const STRINGS = {
     paymentAgreedAmount: 'el monto acordado',
     mergedInto: 'Esta solicitud se unió a la #{n} («{subject}»).',
     mergedFrom: 'La solicitud #{n} («{subject}») se unió a esta.',
+    contactChanged: '{actor} cambió el contacto de {from} a {to}.',
   },
   en: {
     requestLabel: 'Request #{n}',
@@ -256,6 +257,7 @@ const STRINGS = {
     paymentAgreedAmount: 'the agreed amount',
     mergedInto: 'This ticket was merged into #{n} ("{subject}").',
     mergedFrom: 'Merged ticket #{n} ("{subject}") into this ticket.',
+    contactChanged: '{actor} changed the contact from {from} to {to}.',
   },
 } as const;
 

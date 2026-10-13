@@ -116,7 +116,7 @@ export async function createTicketFromApi(tenantId: string, input: CreateTicketF
     });
 
     await tx.message.create({
-      data: { tenantId, ticketId: ticket.id, authorType: 'CONTACT', body: input.body, isPrivateNote: false },
+      data: { tenantId, ticketId: ticket.id, authorType: 'CONTACT', authorContactId: contact.id, body: input.body, isPrivateNote: false },
     });
 
     return ticket;
@@ -383,6 +383,7 @@ export async function getTicket(tenantId: string, ticketId: string) {
           orderBy: { createdAt: 'asc' },
           include: {
             authorUser: { select: { id: true, name: true } },
+            authorContact: { select: { id: true, name: true, email: true } },
             // Metadata only, never `data` -- the file bytes have no business
             // riding along on every ticket load; GET /attachments/:id fetches
             // the actual blob only when someone clicks to download it.
@@ -484,6 +485,8 @@ export async function addMessage(tenantId: string, ticketId: string, input: AddM
         ticketId,
         authorType,
         authorUserId: input.authorUserId,
+        // The contact writing now; the ticket's contact can change later.
+        authorContactId: authorType === 'CONTACT' ? ticket.contactId : undefined,
         body: input.body,
         isPrivateNote: input.isPrivateNote,
         emailMeta: input.emailMeta ? (input.emailMeta as unknown as Prisma.InputJsonValue) : undefined,
@@ -759,6 +762,83 @@ export async function sendTicketEvent(
     emailMeta: { event, subject: rendered.subject, body: rendered.body, button },
   });
   return true;
+}
+
+export class TicketContactError extends Error {
+  constructor(
+    message: string,
+    public status = 400,
+  ) {
+    super(message);
+  }
+}
+
+/**
+ * Moves a ticket to another contact: an existing one, or one looked up or
+ * created by email. Replies from then on go to the new contact. Leaves an
+ * internal note saying who changed it from whom, so the history explains
+ * why earlier messages came from someone else.
+ */
+export async function changeTicketContact(
+  tenantId: string,
+  ticketId: string,
+  input: { contactId?: string; email?: string; name?: string },
+  actorUserId: string,
+) {
+  const result = await withTenantTx(prisma, tenantId, async (tx) => {
+    const ticket = await tx.ticket.findUnique({ where: { id: ticketId }, include: { contact: true } });
+    if (!ticket) throw new TicketContactError('ticket not found', 404);
+
+    let contact;
+    if (input.contactId) {
+      contact = await tx.contact.findUnique({ where: { id: input.contactId } });
+      if (!contact) throw new TicketContactError('contact not found');
+    } else if (input.email) {
+      const email = input.email.trim().toLowerCase();
+      contact = await tx.contact.upsert({
+        where: { tenantId_email: { tenantId, email } },
+        create: { tenantId, email, name: input.name?.trim() || email },
+        update: {},
+      });
+    } else {
+      throw new TicketContactError('pick a contact or give an email');
+    }
+    if (contact.anonymizedAt) throw new TicketContactError('that contact was anonymized');
+    if (contact.id === ticket.contactId) return { ticket, changed: false as const };
+
+    // Earlier messages keep who wrote them.
+    await tx.message.updateMany({
+      where: { ticketId, authorType: 'CONTACT', authorContactId: null },
+      data: { authorContactId: ticket.contactId },
+    });
+    await tx.ticket.update({ where: { id: ticketId }, data: { contactId: contact.id } });
+    const [actor, { emailSettings }] = await Promise.all([
+      tx.user.findUnique({ where: { id: actorUserId }, select: { name: true } }),
+      tx.tenant.findUniqueOrThrow({ where: { id: tenantId }, select: { emailSettings: true } }),
+    ]);
+    const language = parseEmailSettings(emailSettings).language;
+    const label = (c: { name: string; email: string }) => (c.name && c.name !== c.email ? `${c.name} <${c.email}>` : c.email);
+    await tx.message.create({
+      data: {
+        tenantId,
+        ticketId,
+        authorType: 'SYSTEM',
+        isPrivateNote: true,
+        body: emailString(language, 'contactChanged', {
+          actor: actor?.name ?? '—',
+          from: label(ticket.contact),
+          to: label(contact),
+        }),
+      },
+    });
+    return { ticket, changed: true as const, contactId: contact.id };
+  });
+
+  if (result.changed) {
+    await dispatchWebhookEvent(tenantId, 'ticket.updated', { ticketId, number: result.ticket.number, contactId: result.contactId });
+    await publishLive(tenantId, { type: 'message.created', ticketId });
+  }
+  return getTicket(tenantId, ticketId);
 }
 
 /**

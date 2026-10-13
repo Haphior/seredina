@@ -78,6 +78,8 @@ del despliegue.
 
 | Variable | Requerida | Descripción |
 |---|---|---|
+| `UPDATER_TOKEN` | No | Activa la instalación de actualizaciones desde la consola; es lo que la API le presenta al servicio `updater`. Lo define `scripts/enable-updater.sh`, junto con `SEREDINA_HOST_DIR` (la carpeta de la instalación) y el perfil `updater`. Ver [Actualizaciones](/es/despliegue/actualizaciones-y-backups#desde-la-consola). |
+| `SEREDINA_COMPOSE_FILES` | No | Los archivos de compose con que corre la instalación, separados por `:` (`infra/docker-compose.yml` por defecto). El updater reconstruye con los mismos. |
 | `SENTRY_DSN` | No | Seguimiento de errores (`api`/`worker`). Sin definir, no hace nada — apunta a Sentry.io o a una instancia propia de [GlitchTip](https://glitchtip.com/) (compatible con el protocolo de Sentry). |
 | `VITE_SENTRY_DSN` | No | Lo mismo, para la consola web. Queda fija al construir la imagen `web`. |
 | `EMAIL_POLL_INTERVAL_MS` | No | Cada cuánto el worker revisa el buzón IMAP de cada canal de correo activo (`30000` ms por defecto). |

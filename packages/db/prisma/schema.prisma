@@ -138,6 +138,18 @@ model Role {
   @@map("roles")
 }
 
+// Settings of the whole installation, not of a tenant: where updates come
+// from and what the last check found (docs/adr/0077-in-app-updates.md).
+// Self-hosted only. No tenant_id and no RLS, like `permissions`; the API
+// only lets an administrator of a self-hosted install touch it.
+model InstanceSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("instance_settings")
+}
+
 model Permission {
   id  String @id @default(uuid()) @db.Uuid
   key String @unique // e.g. 'users:manage' — see packages/shared/src/permissions.ts
@@ -286,6 +298,7 @@ model Contact {
   tickets Ticket[]
   // Equipment handed to this person (docs/adr/0076-directory-payments-inventory.md).
   assignedAssets Asset[] @relation("AssetAssignee")
+  authoredMessages Message[] @relation("MessageAuthorContact")
 
   @@unique([tenantId, email])
   @@map("contacts")
@@ -512,11 +525,17 @@ model Message {
   // the branded email. Null on people's messages. See
   // docs/adr/0070-customer-email-templates.md.
   emailMeta     Json?             @map("email_meta")
+  // Which contact wrote a CONTACT message: the ticket's contact can change
+  // later, and a reply can come from a colleague in copy. Null on messages
+  // from before this existed, which read as the ticket's contact.
+  authorContactId String?  @map("author_contact_id") @db.Uuid
+  authorContact   Contact? @relation("MessageAuthorContact", fields: [authorContactId], references: [id], onDelete: SetNull)
   createdAt     DateTime          @default(now()) @map("created_at")
 
   attachments Attachment[]
 
   @@index([tenantId, externalId])
+  @@index([authorContactId])
   @@map("messages")
 }
 

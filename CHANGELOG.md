@@ -9,6 +9,33 @@ contain breaking changes).
 
 ### Added
 
+- **Updates from the console** (`docs/adr/0077-in-app-updates.md`).
+  - Settings → Updates shows the running version and the newer releases
+    with their notes.
+  - It installs one with a single click, once the optional `updater`
+    service is on (`bash scripts/enable-updater.sh`, Linux): database backup
+    first, then fetch, rebuild and restart, with a live log.
+  - Release sources: GitHub `Haphior/seredina` by default, or your own fork
+    or any git repository (internal mirror), with a token for private ones.
+- **Change a ticket's contact** from the ticket: an existing contact or a
+  new one by email.
+  - An internal note records the change.
+  - Earlier messages keep who wrote them; replies from colleagues in copy are
+    now attributed to them too.
+
+### Fixed
+
+- **Forwarded emails with no body.**
+  - Emails forwarded *as an attachment* (Outlook and Gmail) now show the
+    forwarded message's sender, date, subject and text.
+  - Emails whose text part is blank show their HTML content as text.
+- **The notifications panel** no longer hides behind the page with the
+  Frutiger Aero theme, and is opaque and wider.
+- The author of system messages shows as "Sistema"/"System" instead of
+  `SYSTEM`.
+
+### Added
+
 - **Directory of companies and people**
   (`docs/adr/0076-directory-payments-inventory.md`).
   - Suppliers, customers, partners and internal areas, with tax ID and

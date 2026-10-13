@@ -20,3 +20,8 @@ apps/api/prisma/generated/
 .claude/agents/impeccable-*
 .claude/settings.local.json
 .impeccable/
+
+# In-app updates (docs/adr/0077-in-app-updates.md): the updater's state, and
+# the database backups it takes before each update.
+.seredina-update/
+backups/

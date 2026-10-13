@@ -21,6 +21,9 @@ GRANT USAGE ON SCHEMA public TO app_tenant;
 
 -- Global, non-tenant-owned catalog: runtime only ever reads it.
 GRANT SELECT ON permissions TO app_tenant;
+-- Installation-wide settings (docs/adr/0077-in-app-updates.md): no tenant_id,
+-- so no RLS policy; the API restricts it to a self-hosted install's admins.
+GRANT SELECT, INSERT, UPDATE, DELETE ON instance_settings TO app_tenant;
 
 -- Tenant-owned tables: full CRUD for the app, but every row is gated by RLS below.
 GRANT SELECT, INSERT, UPDATE, DELETE ON

@@ -36,6 +36,7 @@ const Contracts = lazy(() => import('./pages/Contracts').then((m) => ({ default:
 const Contacts = lazy(() => import('./pages/Contacts').then((m) => ({ default: m.Contacts })));
 const ContactDetail = lazy(() => import('./pages/ContactDetail').then((m) => ({ default: m.ContactDetail })));
 const Directory = lazy(() => import('./pages/Directory').then((m) => ({ default: m.Directory })));
+const Updates = lazy(() => import('./pages/Updates').then((m) => ({ default: m.Updates })));
 const SsoComplete = lazy(() => import('./pages/SsoComplete').then((m) => ({ default: m.SsoComplete })));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword').then((m) => ({ default: m.ForgotPassword })));
 const SetPassword = lazy(() => import('./pages/SetPassword').then((m) => ({ default: m.SetPassword })));
@@ -114,6 +115,7 @@ export function App() {
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/contacts/:id" element={<ContactDetail />} />
               <Route path="/directory" element={<Directory />} />
+              <Route path="/updates" element={<Updates />} />
               <Route path="/api-keys" element={<ApiKeys />} />
               <Route path="/users" element={<Users />} />
               <Route path="/teams" element={<Teams />} />

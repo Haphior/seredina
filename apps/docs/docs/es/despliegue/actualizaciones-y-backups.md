@@ -17,6 +17,48 @@ git -C /opt/seredina describe --tags            # v0.2.0
 
 ### Actualizar a una versión nueva
 
+#### Desde la consola
+
+**Ajustes → Actualizaciones** (para administradores de una instalación
+propia) muestra:
+- la versión que está corriendo;
+- las versiones más nuevas, con sus notas;
+- un botón **Instalar**.
+
+Al instalar, se hacen solos los pasos de más abajo:
+1. Respalda la base de datos en `backups/`, dentro de la carpeta de la
+   instalación.
+2. Descarga la versión.
+3. Reconstruye y reinicia Seredina.
+
+La página sigue el avance, incluso mientras Seredina se reinicia.
+
+Para instalar desde ahí, activa una vez el **servicio de actualización**, en
+un servidor Linux, desde la carpeta de la instalación:
+
+```bash
+bash scripts/enable-updater.sh
+```
+
+Genera un token, registra dónde está la instalación y arranca un contenedor
+`updater`. Ese contenedor tiene el socket de Docker, que en esa máquina
+equivale a root. No publica ningún puerto y solo le responde a la API, con
+el token. Para desactivarlo: `bash scripts/enable-updater.sh --disable`.
+Sin él, la página igual busca versiones nuevas y muestra los comandos para
+actualizar a mano. En Windows (Docker Desktop), actualiza a mano.
+
+**Fuentes.** Por defecto, las versiones vienen de GitHub
+(`Haphior/seredina`). En **Fuentes** puedes agregar:
+- tu propia copia (fork) en GitHub;
+- cualquier repositorio git, como un espejo interno en GitLab o Gitea, cuyas
+  etiquetas `vX.Y.Z` son las versiones.
+
+Un repositorio privado lleva un token de acceso, que se guarda cifrado. La
+fuente elegida es de donde salen tanto la revisión como la instalación.
+
+#### A mano
+
+
 1. **Lee las notas de la versión.** Dicen qué cambió y si hay algo que
    hacer a mano. Lee también las de cada versión que te saltes.
 2. **Haz un backup** de la base de datos, y ten a mano tu copia del

@@ -131,7 +131,8 @@
       "settings": "Ajustes",
       "notificationSettings": "Notificaciones",
       "setup": "Configuración inicial",
-      "directory": "Directorio"
+      "directory": "Directorio",
+      "updates": "Actualizaciones"
     }
   },
   "layout": {
@@ -404,7 +405,20 @@
     "collisionCustomer": "{{name}} volvió a escribir mientras redactabas: léelo antes de enviar.",
     "collisionDismiss": "Entendido",
     "mentionHint": "Escribe @ para mencionar a un colega",
-    "mentionNobody": "Nadie coincide"
+    "mentionNobody": "Nadie coincide",
+    "changeContact": "Cambiar",
+    "changeContactTitle": "Cambiar el contacto",
+    "existingContact": "Contacto existente",
+    "orNewContact": "O ingresa uno nuevo:",
+    "newContactEmail": "Correo",
+    "newContactName": "Nombre",
+    "changeContactHint": "Las respuestas desde ahora van al nuevo contacto. Queda una nota interna con el cambio.",
+    "author": {
+      "SYSTEM": "Sistema",
+      "AI": "Agente de IA",
+      "AGENT": "Agente",
+      "CONTACT": "Contacto"
+    }
   },
   "tour": {
     "stepCount": "Paso {{current}} de {{total}}",
@@ -600,7 +614,10 @@
       "organization.deleted": "Empresa del directorio eliminada",
       "directory_contact.created": "Persona agregada al directorio",
       "directory_contact.updated": "Persona del directorio modificada",
-      "directory_contact.deleted": "Persona del directorio eliminada"
+      "directory_contact.deleted": "Persona del directorio eliminada",
+      "system.update_started": "Actualización de Seredina iniciada",
+      "system.update_source_saved": "Fuente de actualizaciones guardada",
+      "system.update_source_deleted": "Fuente de actualizaciones eliminada"
     }
   },
   "mfa": {
@@ -2299,7 +2316,8 @@
       "appearance": "El aspecto de la consola.",
       "branding": "Tu nombre, logo y colores en las páginas públicas.",
       "dataExport": "Descarga los datos de tu organización.",
-      "setup": "El asistente de cinco pasos: organización, correo, tipo de soporte y equipo."
+      "setup": "El asistente de cinco pasos: organización, correo, tipo de soporte y equipo.",
+      "updates": "Ver si hay una versión nueva de Seredina e instalarla."
     }
   },
   "setup": {
@@ -2537,5 +2555,81 @@
       "BILLING": "Facturación y cobranza",
       "OTHER": "Otro"
     }
+  },
+  "updates": {
+    "title": "Actualizaciones",
+    "intro": "Revisa si hay una versión nueva de Seredina, lee qué trae e instálala desde aquí. Antes de cada actualización se respalda la base de datos.",
+    "cloudOnly": "Este servicio lo actualiza quien lo opera; no hay nada que hacer aquí.",
+    "loadFailed": "No se pudo cargar el estado de las actualizaciones",
+    "checkFailed": "No se pudo buscar actualizaciones",
+    "applyFailed": "No se pudo iniciar la actualización",
+    "saveFailed": "No se pudo guardar",
+    "running": "Versión instalada",
+    "available": "Disponible: {{version}}",
+    "upToDate": "Al día",
+    "checkedAt": "Revisado el {{date}}",
+    "check": "Buscar actualizaciones",
+    "progressTitle": "Actualización a {{version}}",
+    "state": {
+      "running": "En curso",
+      "succeeded": "Terminada",
+      "failed": "Falló",
+      "idle": "—"
+    },
+    "runningHint": "Esto toma unos minutos. Puedes dejar esta página abierta.",
+    "restarting": "Seredina se está reiniciando con la versión nueva… esta página se actualiza sola.",
+    "succeededHint": "Listo. Recarga la página para usar la versión nueva.",
+    "failedHint": "La actualización no terminó. El respaldo de la base de datos quedó guardado; revisa el detalle abajo.",
+    "newReleases_one": "{{count}} versión nueva",
+    "newReleases_other": "{{count}} versiones nuevas",
+    "noNewReleases": "No hay versiones más nuevas que la instalada.",
+    "latest": "Más reciente",
+    "prerelease": "Prueba",
+    "viewNotes": "Ver en la fuente",
+    "install": "Instalar",
+    "showMore": "Ver más",
+    "showLess": "Ver menos",
+    "confirmTitle": "Instalar {{version}}",
+    "confirmIntro": "Seredina pasará de {{from}} a {{to}}. Se hará en este orden:",
+    "step1": "Respaldo de la base de datos (queda en la carpeta backups/ del servidor).",
+    "step2": "Descarga de la versión desde la fuente elegida.",
+    "step3": "Reconstrucción y reinicio de Seredina; los cambios de base de datos se aplican solos.",
+    "confirmWarning": "Durante uno o dos minutos Seredina no estará disponible. Mejor fuera del horario de trabajo.",
+    "installNow": "Instalar ahora",
+    "updaterTitle": "Instalación desde la consola",
+    "updaterOn": "Activada",
+    "updaterDown": "Sin respuesta",
+    "updaterOff": "Desactivada",
+    "updaterOnHint": "El servicio de actualización está listo para instalar versiones.",
+    "checkout": "Código en el servidor: {{ref}}.",
+    "updaterDownHint": "El servicio de actualización está activado pero no responde. Revisa sus registros en el servidor:",
+    "updaterOffHint": "Para instalar versiones desde aquí, activa el servicio de actualización una vez en el servidor (Linux). Mientras tanto, puedes actualizar a mano:",
+    "enableComment": "En la carpeta de Seredina, una sola vez:",
+    "manualComment": "O a mano, cada vez:",
+    "sourcesTitle": "Fuentes",
+    "sourcesHint": "De dónde se obtienen las versiones. La predeterminada es el repositorio oficial en GitHub; agrega tu propia copia (fork) o un espejo interno.",
+    "addSource": "Agregar fuente",
+    "editSource": "Editar fuente",
+    "edit": "editar",
+    "remove": "quitar",
+    "default": "Predeterminada",
+    "withToken": "con token",
+    "confirmRemoveSource": "¿Quitar la fuente {{name}}?",
+    "type": {
+      "github": "GitHub",
+      "git": "Repositorio git"
+    },
+    "sourceName": "Nombre",
+    "sourceNamePlaceholder": "Copia de la empresa",
+    "sourceType": "Tipo",
+    "githubRepo": "Repositorio (dueño/nombre)",
+    "gitUrl": "URL del repositorio",
+    "token": "Token de acceso",
+    "tokenOptional": "Opcional, para repositorios privados",
+    "tokenKept": "Se mantiene el actual; escribe otro para cambiarlo",
+    "removeToken": "Quitar el token guardado",
+    "includePrereleases": "Incluir versiones de prueba",
+    "githubHint": "Las versiones son los \"releases\" publicados en el repositorio.",
+    "gitHint": "Las versiones son las etiquetas vX.Y.Z del repositorio. Revisarlas requiere el servicio de actualización activado."
   }
 }

@@ -52,6 +52,8 @@ services:
         condition: service_healthy
     environment:
       PORT: 4000
+      # In-app updates (docs/adr/0077-in-app-updates.md); empty = the updater isn't enabled.
+      UPDATER_TOKEN: ${UPDATER_TOKEN:-}
       DATABASE_URL: postgresql://app_tenant:${APP_TENANT_DB_PASSWORD}@postgres:5432/${POSTGRES_DB:-seredina}
       REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
@@ -176,6 +178,28 @@ services:
       # Let's Encrypt rate limits and re-trusting a new CA become a problem.
       - caddy_data:/data
       - caddy_config:/config
+    restart: unless-stopped
+
+  # Optional, profile-gated: updates from the console
+  # (docs/adr/0077-in-app-updates.md). `COMPOSE_PROFILES=updater` in .env, set
+  # up by scripts/enable-updater.sh. It has the Docker socket, so it can do
+  # anything on this host: it publishes no port, listens only on this compose
+  # network, and answers only the API, with UPDATER_TOKEN. The installation
+  # folder is mounted at its own path so compose resolves it the same way
+  # inside as on the host.
+  updater:
+    profiles: ['updater']
+    build:
+      context: ..
+      dockerfile: infra/docker/Dockerfile.updater
+    environment:
+      UPDATER_TOKEN: ${UPDATER_TOKEN:-}
+      SEREDINA_HOST_DIR: ${SEREDINA_HOST_DIR:-}
+      SEREDINA_COMPOSE_FILES: ${SEREDINA_COMPOSE_FILES:-infra/docker-compose.yml}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${SEREDINA_HOST_DIR:-/opt/seredina}:${SEREDINA_HOST_DIR:-/opt/seredina}
+    working_dir: ${SEREDINA_HOST_DIR:-/opt/seredina}
     restart: unless-stopped
 
   # Optional, profile-gated: the MCP server's Streamable HTTP transport (see
