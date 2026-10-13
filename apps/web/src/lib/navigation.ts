@@ -127,6 +127,7 @@ export const SETTINGS_GROUPS: NavGroup[] = [
       { to: '/appearance', itemKey: 'appearance', icon: PaletteIcon, permission: 'tickets:manage_all' },
       { to: '/branding', itemKey: 'branding', icon: BrandIcon, permission: 'tickets:manage_all' },
       { to: '/data-export', itemKey: 'dataExport', icon: DownloadIcon, permission: 'tickets:manage_all' },
+      { to: '/updates', itemKey: 'updates', icon: DownloadIcon, permission: 'roles:manage' },
     ],
   },
 ];

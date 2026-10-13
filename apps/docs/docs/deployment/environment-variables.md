@@ -76,6 +76,8 @@ used *exclusively*, never falling back to the deployment's global config.
 
 | Variable | Required | Description |
 |---|---|---|
+| `UPDATER_TOKEN` | No | Turns on installing updates from the console, and is what the API presents to the `updater` service. Set by `scripts/enable-updater.sh`, with `SEREDINA_HOST_DIR` (the installation folder) and the `updater` profile. See [Updates](/deployment/updates-and-backups#from-the-console). |
+| `SEREDINA_COMPOSE_FILES` | No | The compose files the installation runs with, `:`-separated (`infra/docker-compose.yml` by default). The updater rebuilds with the same ones. |
 | `SENTRY_DSN` | No | Error tracking (`api`/`worker`). Unset, it no-ops — points at Sentry.io or a self-hosted [GlitchTip](https://glitchtip.com/) instance (protocol-compatible with the Sentry SDK). |
 | `VITE_SENTRY_DSN` | No | The same, for the web console. Baked in when the `web` image is built. |
 | `EMAIL_POLL_INTERVAL_MS` | No | How often the worker checks each active email channel's IMAP inbox (`30000` ms by default). |

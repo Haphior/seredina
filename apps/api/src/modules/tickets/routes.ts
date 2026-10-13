@@ -11,6 +11,8 @@ import {
   listTickets,
   listTicketStatuses,
   mergeTicket,
+  changeTicketContact,
+  TicketContactError,
   updateTicket,
   updateTicketStatus,
 } from './service';
@@ -306,6 +308,31 @@ export default async function ticketRoutes(app: FastifyInstance) {
         return reply.send(ticket);
       } catch (err) {
         return reply.code(400).send({ error: (err as Error).message });
+      }
+    },
+  );
+
+  // Who the ticket is for: an existing contact, or one found or created by
+  // email. Same tier as editing the rest of the ticket.
+  app.put(
+    '/tickets/:id/contact',
+    { preHandler: [app.authenticate, requirePermission('tickets:write')] },
+    async (request, reply) => {
+      const { id } = request.params as { id: string };
+      const parsed = z
+        .object({
+          contactId: z.string().uuid().optional(),
+          email: z.string().trim().email().max(320).optional(),
+          name: z.string().trim().max(200).optional(),
+        })
+        .refine((v) => v.contactId || v.email, 'pick a contact or give an email')
+        .safeParse(request.body);
+      if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
+      try {
+        return reply.send(await changeTicketContact(request.user.tenantId, id, parsed.data, request.user.sub));
+      } catch (err) {
+        if (err instanceof TicketContactError) return reply.code(err.status).send({ error: err.message });
+        throw err;
       }
     },
   );

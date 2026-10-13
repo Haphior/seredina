@@ -131,7 +131,8 @@
       "settings": "Settings",
       "notificationSettings": "Notifications",
       "setup": "Initial setup",
-      "directory": "Directory"
+      "directory": "Directory",
+      "updates": "Updates"
     }
   },
   "layout": {
@@ -404,7 +405,20 @@
     "collisionCustomer": "{{name}} wrote back while you were writing — read it before sending.",
     "collisionDismiss": "Got it",
     "mentionHint": "Type @ to mention a colleague",
-    "mentionNobody": "Nobody matches"
+    "mentionNobody": "Nobody matches",
+    "changeContact": "Change",
+    "changeContactTitle": "Change the contact",
+    "existingContact": "Existing contact",
+    "orNewContact": "Or enter a new one:",
+    "newContactEmail": "Email",
+    "newContactName": "Name",
+    "changeContactHint": "Replies from now on go to the new contact. An internal note records the change.",
+    "author": {
+      "SYSTEM": "System",
+      "AI": "AI agent",
+      "AGENT": "Agent",
+      "CONTACT": "Contact"
+    }
   },
   "tour": {
     "stepCount": "Step {{current}} of {{total}}",
@@ -600,7 +614,10 @@
       "organization.deleted": "Directory company deleted",
       "directory_contact.created": "Directory person added",
       "directory_contact.updated": "Directory person changed",
-      "directory_contact.deleted": "Directory person deleted"
+      "directory_contact.deleted": "Directory person deleted",
+      "system.update_started": "Seredina update started",
+      "system.update_source_saved": "Update source saved",
+      "system.update_source_deleted": "Update source removed"
     }
   },
   "mfa": {
@@ -2299,7 +2316,8 @@
       "appearance": "The console's look.",
       "branding": "Your name, logo and colors on public pages.",
       "dataExport": "Download your workspace's data.",
-      "setup": "The five-step wizard: organization, email, kind of support, team."
+      "setup": "The five-step wizard: organization, email, kind of support, team.",
+      "updates": "See whether a new Seredina version is out and install it."
     }
   },
   "setup": {
@@ -2537,5 +2555,81 @@
       "BILLING": "Billing and collections",
       "OTHER": "Other"
     }
+  },
+  "updates": {
+    "title": "Updates",
+    "intro": "See whether a new Seredina version is out, read what it brings, and install it from here. The database is backed up before every update.",
+    "cloudOnly": "This service is updated by whoever operates it; there is nothing to do here.",
+    "loadFailed": "Could not load the update status",
+    "checkFailed": "Could not check for updates",
+    "applyFailed": "Could not start the update",
+    "saveFailed": "Could not save",
+    "running": "Installed version",
+    "available": "Available: {{version}}",
+    "upToDate": "Up to date",
+    "checkedAt": "Checked {{date}}",
+    "check": "Check for updates",
+    "progressTitle": "Updating to {{version}}",
+    "state": {
+      "running": "Running",
+      "succeeded": "Done",
+      "failed": "Failed",
+      "idle": "—"
+    },
+    "runningHint": "This takes a few minutes. You can keep this page open.",
+    "restarting": "Seredina is restarting on the new version… this page refreshes itself.",
+    "succeededHint": "Done. Reload the page to use the new version.",
+    "failedHint": "The update didn't finish. The database backup was kept; see the details below.",
+    "newReleases_one": "{{count}} new version",
+    "newReleases_other": "{{count}} new versions",
+    "noNewReleases": "There is nothing newer than the installed version.",
+    "latest": "Latest",
+    "prerelease": "Pre-release",
+    "viewNotes": "View at the source",
+    "install": "Install",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "confirmTitle": "Install {{version}}",
+    "confirmIntro": "Seredina will go from {{from}} to {{to}}, in this order:",
+    "step1": "A database backup (kept in the server's backups/ folder).",
+    "step2": "Download of the version from the chosen source.",
+    "step3": "Rebuild and restart of Seredina; database changes apply by themselves.",
+    "confirmWarning": "Seredina is unavailable for a minute or two. Best done outside working hours.",
+    "installNow": "Install now",
+    "updaterTitle": "Installing from the console",
+    "updaterOn": "On",
+    "updaterDown": "Not responding",
+    "updaterOff": "Off",
+    "updaterOnHint": "The update service is ready to install versions.",
+    "checkout": "Code on the server: {{ref}}.",
+    "updaterDownHint": "The update service is on but isn't responding. Check its logs on the server:",
+    "updaterOffHint": "To install versions from here, turn the update service on once on the server (Linux). Meanwhile, update by hand:",
+    "enableComment": "In the Seredina folder, once:",
+    "manualComment": "Or by hand, each time:",
+    "sourcesTitle": "Sources",
+    "sourcesHint": "Where versions come from. The default is the official repository on GitHub; add your own fork or an internal mirror.",
+    "addSource": "Add source",
+    "editSource": "Edit source",
+    "edit": "edit",
+    "remove": "remove",
+    "default": "Default",
+    "withToken": "with token",
+    "confirmRemoveSource": "Remove the source {{name}}?",
+    "type": {
+      "github": "GitHub",
+      "git": "Git repository"
+    },
+    "sourceName": "Name",
+    "sourceNamePlaceholder": "Company fork",
+    "sourceType": "Type",
+    "githubRepo": "Repository (owner/name)",
+    "gitUrl": "Repository URL",
+    "token": "Access token",
+    "tokenOptional": "Optional, for private repositories",
+    "tokenKept": "The current one is kept; type another to change it",
+    "removeToken": "Remove the saved token",
+    "includePrereleases": "Include pre-releases",
+    "githubHint": "Versions are the repository's published releases.",
+    "gitHint": "Versions are the repository's vX.Y.Z tags. Checking them needs the update service turned on."
   }
 }

@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { apiDelete, apiGet, apiPatch, apiPost, apiUpload, downloadFile, ApiError } from '../lib/api';
+import { apiDelete, apiGet, apiPatch, apiPost, apiPut, apiUpload, downloadFile, ApiError } from '../lib/api';
+import { SearchPicker, type PickerOption } from '../components/SearchPicker';
+import { Input } from '../components/Input';
+import { Button } from '../components/Button';
 import { useLiveEvents } from '../lib/live';
 import type {
   AssetSummary,
@@ -51,6 +54,7 @@ export function TicketDetail() {
   const [error, setError] = useState<string | null>(null);
   const [presenceUserIds, setPresenceUserIds] = useState<string[]>([]);
   const [showMerge, setShowMerge] = useState(false);
+  const [changingContact, setChangingContact] = useState(false);
 
   const [reply, setReply] = useState('');
   const [isPrivateNote, setIsPrivateNote] = useState(false);
@@ -571,7 +575,10 @@ export function TicketDetail() {
 
         <div className="flex flex-col gap-3" data-testid="message-list">
           {ticket.messages.map((message) => {
-            const authorName = message.authorType === 'CONTACT' ? ticket.contact.name : message.authorUser?.name ?? message.authorType;
+            const authorName =
+              message.authorType === 'CONTACT'
+                ? message.authorContact?.name ?? ticket.contact.name
+                : message.authorUser?.name ?? t(`ticketDetail.author.${message.authorType}`);
             return (
               <div
                 key={message.id}
@@ -823,6 +830,16 @@ export function TicketDetail() {
         <div className="my-[18px] h-px bg-slate-100" />
 
         <FieldGroup label={t('ticketDetail.contact')}>
+          {changingContact && (
+            <ChangeContactModal
+              ticketId={ticket.id}
+              onClose={() => setChangingContact(false)}
+              onChanged={async () => {
+                setChangingContact(false);
+                await loadTicket();
+              }}
+            />
+          )}
           <div className="flex items-center gap-2.5">
             <Avatar name={ticket.contact.name} size={30} />
             <div className="min-w-0">
@@ -831,6 +848,12 @@ export function TicketDetail() {
               </Link>
               <p className="truncate text-xs text-slate-400">{ticket.contact.email}</p>
             </div>
+            <button
+              onClick={() => setChangingContact(true)}
+              className="ml-auto shrink-0 text-[12px] font-semibold text-indigo-600 hover:underline"
+            >
+              {t('ticketDetail.changeContact')}
+            </button>
           </div>
         </FieldGroup>
 
@@ -960,6 +983,64 @@ function MergeModal({
           >
             {submitting ? t('ticketDetail.mergeModal.merging') : t('ticketDetail.mergeModal.merge')}
           </button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+/** Who the ticket is for: another existing contact, or a new one by email. */
+function ChangeContactModal({ ticketId, onClose, onChanged }: { ticketId: string; onClose: () => void; onChanged: () => void }) {
+  const { t } = useTranslation();
+  const [picked, setPicked] = useState<PickerOption | null>(null);
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const search = useCallback(
+    (q: string) =>
+      apiGet<{ contacts: { id: string; name: string; email: string; anonymizedAt: string | null }[] }>(`/contacts?search=${encodeURIComponent(q)}`).then((r) =>
+        r.contacts.filter((c) => !c.anonymizedAt).slice(0, 8).map((c) => ({ id: c.id, name: c.name, hint: c.email })),
+      ),
+    [],
+  );
+
+  async function save() {
+    setSaving(true);
+    setError(null);
+    try {
+      await apiPut(`/tickets/${ticketId}/contact`, picked ? { contactId: picked.id } : { email: email.trim(), name: name.trim() || undefined });
+      onChanged();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : t('ticketDetail.errors.updateFailed'));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Modal title={t('ticketDetail.changeContactTitle')} onClose={onClose}>
+      <div className="space-y-3">
+        <SearchPicker label={t('ticketDetail.existingContact')} value={picked} onChange={setPicked} search={search} />
+        {!picked && (
+          <>
+            <p className="text-[12px] text-slate-400">{t('ticketDetail.orNewContact')}</p>
+            <div className="grid grid-cols-2 gap-2">
+              <Input label={t('ticketDetail.newContactEmail')} type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input label={t('ticketDetail.newContactName')} value={name} onChange={(e) => setName(e.target.value)} />
+            </div>
+          </>
+        )}
+        <p className="text-[12px] text-slate-500">{t('ticketDetail.changeContactHint')}</p>
+        {error && <p className="text-sm text-rose-600">{error}</p>}
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" onClick={onClose}>
+            {t('common.cancel')}
+          </Button>
+          <Button onClick={save} isLoading={saving} disabled={!picked && !email.trim()}>
+            {t('common.save')}
+          </Button>
         </div>
       </div>
     </Modal>

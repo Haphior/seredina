@@ -148,6 +148,7 @@ export async function ingestInboundEmail(email: InboundEmail): Promise<IngestRes
         tenantId: email.tenantId,
         ticketId,
         authorType: 'CONTACT',
+        authorContactId: contact.id,
         body: skippedNote ? `${email.text}\n\n${skippedNote}` : email.text,
         isPrivateNote: false,
         externalId: email.messageId,

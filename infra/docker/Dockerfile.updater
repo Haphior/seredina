@@ -1,0 +1,8 @@
+# The updater service (docs/adr/0077-in-app-updates.md): git and the Docker
+# CLI with the compose plugin, plus Node for its small HTTP server. The
+# server and update script are read from the mounted installation, so the
+# image only changes when these tools do.
+FROM node:22-alpine
+RUN apk add --no-cache bash git docker-cli docker-cli-compose \
+ && git config --system --add safe.directory '*'
+CMD ["sh", "-c", "exec node \"$SEREDINA_HOST_DIR/infra/updater/server.mjs\""]

@@ -3,6 +3,7 @@ import { simpleParser } from 'mailparser';
 import { prisma, withTenantTx, type EmailChannel } from '@seredina/db';
 import { emailString } from '@seredina/shared';
 import { ingestInboundEmail, isAutomaticEmail } from './ingest';
+import { extractInboundBody } from './body';
 import { tenantLanguage } from '../lib/language';
 import { EmailChannelNeedsReconnectError, resolveMailAuth } from './credentials';
 import { notifyUsers } from '../notifications/notify';
@@ -48,7 +49,8 @@ async function pollEmailChannel(channel: EmailChannel): Promise<void> {
           fromAddress,
           fromName: from?.name || fromAddress,
           subject: parsed.subject ?? '',
-          text: parsed.text ?? '',
+          // Falls back to the HTML, and reads emails forwarded as attachments.
+          text: await extractInboundBody(parsed, await tenantLanguage(channel.tenantId)),
           messageId: parsed.messageId ?? `<generated-${channel.id}-${message.uid}@seredina.local>`,
           inReplyTo: parsed.inReplyTo ?? null,
           references,

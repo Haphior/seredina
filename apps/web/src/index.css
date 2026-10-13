@@ -164,6 +164,11 @@
   -webkit-backdrop-filter: blur(16px) saturate(1.5);
   backdrop-filter: blur(16px) saturate(1.5);
 }
+/* Popovers float over busy content (tables, other glass): nearly opaque,
+   or the text behind shows through what's being read. */
+[data-theme='aero'] .popover-panel.bg-white {
+  background-color: rgba(255, 255, 255, 0.97);
+}
 /* A frosted field is its own stacking context, so icons laid over it
    (search magnifiers) need to sit above it explicitly. */
 [data-theme='aero'] .pointer-events-none.absolute {

@@ -88,6 +88,8 @@ export interface Message {
   ticketId: string;
   authorType: MessageAuthorType;
   authorUser: { id: string; name: string } | null;
+  // Who wrote a CONTACT message; null on older ones (read as the ticket's contact).
+  authorContact?: { id: string; name: string; email: string } | null;
   body: string;
   isPrivateNote: boolean;
   createdAt: string;

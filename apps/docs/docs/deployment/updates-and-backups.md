@@ -16,6 +16,46 @@ git -C /opt/seredina describe --tags            # v0.2.0
 
 ### Updating to a new release
 
+#### From the console
+
+**Settings → Updates** (administrators of a self-hosted install) shows:
+- the version running;
+- the newer releases, with their notes;
+- an **Install** button.
+
+Installing does the steps below by itself:
+1. Backs up the database to `backups/` in the installation folder.
+2. Fetches the release.
+3. Rebuilds and restarts Seredina.
+
+The page follows the progress, including while Seredina restarts.
+
+To install from there, turn on the **update service** once, on a Linux host,
+from the installation folder:
+
+```bash
+bash scripts/enable-updater.sh
+```
+
+It generates a token, records where the installation lives, and starts an
+`updater` container. That container has the Docker socket, which on that
+machine is as good as root. It publishes no port and answers only the API,
+with the token. To turn it off: `bash scripts/enable-updater.sh --disable`.
+Without it, the page still checks for releases and shows the commands to
+update by hand. On Windows (Docker Desktop), update by hand.
+
+**Sources.** By default, releases come from GitHub (`Haphior/seredina`). Under
+**Sources** you can add:
+- your own fork on GitHub;
+- any git repository, such as an internal mirror on GitLab or Gitea, whose
+  `vX.Y.Z` tags are the releases.
+
+A private repository takes an access token, kept encrypted. The selected
+source is where both the check and the install come from.
+
+#### By hand
+
+
 1. **Read the release notes.** They list what changed and anything to do
    by hand. Check them for every release you skip over, too.
 2. **Back up** the database, and have your `.env` copy at hand (see
