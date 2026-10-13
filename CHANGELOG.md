@@ -7,6 +7,30 @@ contain breaking changes).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-13
+
+### Upgrading from 0.3.x
+
+Follow [Updating to a new release](https://github.com/Haphior/seredina/blob/main/apps/docs/docs/deployment/updates-and-backups.md):
+back up the database **and `.env`**, `git checkout v0.4.0`, then rebuild
+with the same compose command you started the installation with.
+
+- **Migrations.** Four database migrations run automatically:
+  - the directory, contract payments and inventory fields;
+  - the logo and banner images for emails;
+  - installation settings;
+  - message authors.
+
+  They only add tables, columns and types; the upgrade from 0.3.1 was
+  checked with data (`docs/adr/0074-upgrade-check.md`).
+- **Updates from the console** are optional. To use them, run
+  `bash scripts/enable-updater.sh` once afterwards (Linux hosts). Without
+  it, Settings → Updates still checks for new versions.
+- **Worker.** The worker now gets `WEB_ORIGIN` too; `infra/docker-compose.yml`
+  passes it.
+- **Agents.** Installed agents need nothing. From their next check-in,
+  laptops are filed as laptops, and their monitors appear as assets.
+
 ### Added
 
 - **Updates from the console** (`docs/adr/0077-in-app-updates.md`).
