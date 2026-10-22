@@ -33,6 +33,24 @@ function loginPageWithError(message: string): string {
   return `${webOrigin()}/login?sso_error=${encodeURIComponent(message.slice(0, 300))}`;
 }
 
+// Binds a sign-in to the browser that started it (see startSso). Lax, so it
+// still comes along on the IdP's top-level redirect back to the callback.
+// Set by hand: it's the API's only cookie, not worth a plugin.
+const BINDING_COOKIE = 'seredina_sso';
+
+function bindingCookie(value: string, maxAgeS: number): string {
+  const secure = webOrigin().startsWith('https://') ? '; Secure' : '';
+  return `${BINDING_COOKIE}=${value}; Path=/; Max-Age=${maxAgeS}; HttpOnly; SameSite=Lax${secure}`;
+}
+
+function readBindingCookie(header: string | undefined): string | undefined {
+  for (const part of (header ?? '').split(';')) {
+    const [name, ...rest] = part.trim().split('=');
+    if (name === BINDING_COOKIE) return rest.join('=');
+  }
+  return undefined;
+}
+
 export default async function ssoRoutes(app: FastifyInstance) {
   app.get('/sso-settings', { preHandler: [app.authenticate, requirePermission('users:manage')] }, async (request, reply) => {
     return reply.send(await getSsoSettings(request.user.tenantId));
@@ -64,7 +82,9 @@ export default async function ssoRoutes(app: FastifyInstance) {
     const q = request.query as { tenantSlug?: string; email?: string };
     if (!q.tenantSlug) return reply.redirect(loginPageWithError('Enter your organization first.'));
     try {
-      return reply.redirect(await startSso(q.tenantSlug, q.email || undefined));
+      const { url, browserBinding } = await startSso(q.tenantSlug, q.email || undefined);
+      reply.header('set-cookie', bindingCookie(browserBinding, 10 * 60));
+      return reply.redirect(url);
     } catch (err) {
       request.log.warn({ err }, 'SSO start failed');
       const message = err instanceof SsoError || err instanceof OidcError ? err.message : 'Single sign-on is unavailable right now.';
@@ -76,9 +96,12 @@ export default async function ssoRoutes(app: FastifyInstance) {
     const q = request.query as { code?: string; state?: string; error?: string; error_description?: string };
     if (q.error) return reply.redirect(loginPageWithError(q.error_description || q.error));
     if (!q.code || !q.state) return reply.redirect(loginPageWithError('The sign-in was interrupted. Try again.'));
+    const browserBinding = readBindingCookie(request.headers.cookie);
+    // One sign-in per cookie, whatever the outcome.
+    reply.header('set-cookie', bindingCookie('', 0));
 
     try {
-      const result = await completeSso(q.state, q.code);
+      const result = await completeSso(q.state, q.code, browserBinding);
       await recordAudit(result.tenantId, {
         action: 'auth.login_succeeded',
         actorType: 'user',

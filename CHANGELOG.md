@@ -7,6 +7,25 @@ contain breaking changes).
 
 ## [Unreleased]
 
+### Security
+
+- **Single sign-on.**
+  - Automatic accounts with Google or a generic OpenID Connect provider now
+    need a list of allowed email domains. Without one, anyone with an account
+    at the provider (any Gmail address, say) could join the workspace.
+    Microsoft is unaffected: it is pinned to one directory.
+  - A generic provider must say the email is verified (`email_verified`).
+    Accounts are matched by email, so an unverified address could have
+    signed in as whoever already has it here.
+  - A sign-in is bound to the browser that started it, with a short-lived
+    cookie, so a callback link from someone else's sign-in no longer logs
+    you in as them.
+
+  **Upgrading:** if SSO auto-provisions with Google or a generic provider
+  and lists no domains, existing users still sign in, but new ones are no
+  longer created until an admin adds the domains. With a generic provider
+  that doesn't send `email_verified`, turn that claim on at the provider.
+
 ## [0.4.0] - 2026-10-22
 
 ### Upgrading from 0.3.x
