@@ -188,7 +188,7 @@ Visitors get a chat bubble on your site; each conversation is a ticket
 
 ## Development
 
-Requires Docker (Postgres and Redis) and Node.js 20 or later.
+Requires Docker (Postgres and Redis) and Node.js 22 or later.
 
 ```bash
 npm install
