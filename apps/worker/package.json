@@ -22,7 +22,7 @@
     "imapflow": "^2.0.3",
     "ioredis": "^6.0.0",
     "mailparser": "^3.9.26",
-    "net-snmp": "^3.29.1",
+    "net-snmp": "^3.29.2",
     "nodemailer": "^10.0.10"
   },
   "devDependencies": {
