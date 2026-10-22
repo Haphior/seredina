@@ -25,7 +25,7 @@
     "@seredina/shared": "*",
     "bcryptjs": "^2.4.3",
     "bullmq": "^6.3.6",
-    "fastify": "^5.12.4",
+    "fastify": "^5.12.6",
     "fastify-plugin": "^5.0.1",
     "ioredis": "^6.0.0",
     "qrcode": "^1.5.4",
