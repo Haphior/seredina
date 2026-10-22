@@ -176,7 +176,7 @@ Before going live, **restore a backup on a test machine** and sign in to it.
 
 Install and update by release tag, never from `main`: each release lists
 its changes on the
-[releases page](https://github.com/Haphior/helpdesk-seredina/releases).
+[releases page](https://github.com/Haphior/seredina/releases).
 Follow [Updating your instance](/deployment/updates-and-backups#updating-your-instance):
 
 1. Read the notes.

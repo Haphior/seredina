@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress';
 
 // GitHub Pages serves a project site under /<repository name>/. The Docs
 // workflow passes it, so renaming the repository doesn't break the site.
-const base = process.env.DOCS_BASE || '/helpdesk-seredina/';
+const base = process.env.DOCS_BASE || '/seredina/';
 
 export default defineConfig({
   title: 'Seredina',
@@ -21,7 +21,7 @@ export default defineConfig({
           { text: 'User Guide', link: '/guide/' },
           { text: 'Deployment', link: '/deployment/' },
           { text: 'API & Integrations', link: '/api/' },
-          { text: 'GitHub', link: 'https://github.com/Haphior/helpdesk-seredina' },
+          { text: 'GitHub', link: 'https://github.com/Haphior/seredina' },
         ],
         sidebar: {
           '/guide/': [
@@ -92,7 +92,7 @@ export default defineConfig({
           { text: 'Guía de usuario', link: '/es/guia/' },
           { text: 'Despliegue', link: '/es/despliegue/' },
           { text: 'API e integraciones', link: '/es/api/' },
-          { text: 'GitHub', link: 'https://github.com/Haphior/helpdesk-seredina' },
+          { text: 'GitHub', link: 'https://github.com/Haphior/seredina' },
         ],
         sidebar: {
           '/es/guia/': [
@@ -159,7 +159,7 @@ export default defineConfig({
   themeConfig: {
     logo: '/favicon.svg',
     siteTitle: 'Seredina',
-    socialLinks: [{ icon: 'github', link: 'https://github.com/Haphior/helpdesk-seredina' }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/Haphior/seredina' }],
     search: { provider: 'local' },
   },
 });

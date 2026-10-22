@@ -180,7 +180,7 @@ e inicia sesión en ella.
 
 Instala y actualiza por versión (tag), nunca desde `main`: cada versión
 lista sus cambios en la
-[página de versiones](https://github.com/Haphior/helpdesk-seredina/releases).
+[página de versiones](https://github.com/Haphior/seredina/releases).
 Sigue [Actualizar tu instancia](/es/despliegue/actualizaciones-y-backups#actualizar-tu-instancia):
 
 1. Lee las notas.

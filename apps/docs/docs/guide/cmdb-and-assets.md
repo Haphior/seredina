@@ -145,7 +145,7 @@ execution needs an audited, signed delivery path this unfunded
 open-source project has no way to responsibly maintain. Agent releases
 aren't code-signed yet, either: SmartScreen or Gatekeeper may warn if you
 open the binary by hand, but the install commands aren't affected. See the
-[MVP tour](https://github.com/Haphior/helpdesk-seredina) for the full
+[MVP tour](https://github.com/Haphior/seredina) for the full
 reasoning.
 :::
 

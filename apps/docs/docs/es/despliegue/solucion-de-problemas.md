@@ -137,6 +137,6 @@ Docker Desktop ya viene incluido.
 ## Nada de esto resuelve tu caso
 
 Abre un
-[issue en GitHub](https://github.com/Haphior/helpdesk-seredina/issues) con
+[issue en GitHub](https://github.com/Haphior/seredina/issues) con
 la salida de `docker compose logs` del servicio que falla y tu `.env` **sin
 los valores de los secretos** (nombres de variable sí, valores no).

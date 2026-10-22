@@ -147,7 +147,7 @@ de código abierto sin financiamiento no puede mantener con
 responsabilidad. Las versiones del agente tampoco están firmadas todavía:
 SmartScreen o Gatekeeper pueden advertir si abres el ejecutable a mano,
 pero los comandos de instalación no se ven afectados.
-Ver el [tour del MVP](https://github.com/Haphior/helpdesk-seredina) para
+Ver el [tour del MVP](https://github.com/Haphior/seredina) para
 el razonamiento completo.
 :::
 
