@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "description": "MCP server exposing the shared AI tool catalog (apps/api/src/modules/ai-tools) over stdio -- see docs/adr/0033-ai-tool-catalog-and-autonomy.md.",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "main": "dist/mcp-server/src/index.js",
   "scripts": {

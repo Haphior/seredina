@@ -147,7 +147,7 @@ npm run dev --workspace=apps/web   # http://localhost:5173
 npm run dev --workspace=apps/worker
 ```
 
-Requiere Node.js 20+ (Fastify 5 y `@fastify/jwt` 10 lo exigen). El esquema,
+Requiere Node.js 22+ (el SDK de OpenAI, v7, lo exige). El esquema,
 las migraciones y el seed viven en `packages/db`, no en `apps/api` — correr
 `npm run prisma:generate|prisma:migrate|prisma:deploy|prisma:seed
 --workspace=@seredina/db`.

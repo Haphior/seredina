@@ -7,25 +7,6 @@ contain breaking changes).
 
 ## [Unreleased]
 
-### Security
-
-- **Single sign-on.**
-  - Automatic accounts with Google or a generic OpenID Connect provider now
-    need a list of allowed email domains. Without one, anyone with an account
-    at the provider (any Gmail address, say) could join the workspace.
-    Microsoft is unaffected: it is pinned to one directory.
-  - A generic provider must say the email is verified (`email_verified`).
-    Accounts are matched by email, so an unverified address could have
-    signed in as whoever already has it here.
-  - A sign-in is bound to the browser that started it, with a short-lived
-    cookie, so a callback link from someone else's sign-in no longer logs
-    you in as them.
-
-  **Upgrading:** if SSO auto-provisions with Google or a generic provider
-  and lists no domains, existing users still sign in, but new ones are no
-  longer created until an admin adds the domains. With a generic provider
-  that doesn't send `email_verified`, turn that claim on at the provider.
-
 ## [0.4.0] - 2026-10-22
 
 ### Upgrading from 0.3.x
@@ -49,10 +30,37 @@ with the same compose command you started the installation with.
   passes it.
 - **Agents.** Installed agents need nothing. From their next check-in,
   laptops are filed as laptops, and their monitors appear as assets.
+- **Node.js 22.** The images now build on Node 22; the rebuild takes care of
+  it. Running from source (development) needs Node 22 or later.
+- **Single sign-on.** If SSO creates accounts automatically with Google or a
+  generic provider and lists no allowed domains, existing users still sign
+  in, but new accounts wait until an admin adds the domains. With a generic
+  provider that doesn't send `email_verified`, turn that claim on at the
+  provider.
 
 ### Security
 
+- **Single sign-on.**
+  - Automatic accounts with Google or a generic OpenID Connect provider now
+    need a list of allowed email domains. Without one, anyone with an account
+    at the provider (any Gmail address, say) could join the workspace.
+    Microsoft is unaffected: it is pinned to one directory.
+  - A generic provider must say the email is verified (`email_verified`).
+    Accounts are matched by email, so an unverified address could have
+    signed in as whoever already has it here.
+  - A sign-in is bound to the browser that started it, with a short-lived
+    cookie, so a callback link from someone else's sign-in no longer logs
+    you in as them.
 - **Dependency updates:**
+  - `vite` 6.4.4: command handling of the editor launcher on Windows, a
+    `server.fs.allow` bypass, cross-origin script execution through custom
+    middleware.
+  - `fast-jwt` 6.3.5: its verifier cache accepted expired tokens without
+    `iat`. Seredina's own tokens always carry `exp`.
+  - `hono` 4.13.11 (used by the MCP SDK): `serveStatic` decoded paths twice.
+  - `postcss-selector-parser` 6.1.5: CPU exhaustion on long flat selectors
+    (GHSA-rj75-hqrm-r3gf), backported to the 6.x line Tailwind 3 uses.
+  - `vitest` 5.0.3 (tests only): two `@vitest/mocker` advisories.
   - `@modelcontextprotocol/sdk` 1.32.1: the MCP server's HTTP transport now
     rejects oversized request bodies (413) and bounds JSON-RPC batches.
   - `sharp` 0.35.5: bounds checks in image processing.
@@ -78,6 +86,13 @@ with the same compose command you started the installation with.
   - An internal note records the change.
   - Earlier messages keep who wrote them; replies from colleagues in copy are
     now attributed to them too.
+
+### Changed
+
+- **Node.js 22** in every image and in CI, instead of Node 20, which reached
+  end of life in April 2026. The OpenAI SDK's version 7 requires it.
+- Dependencies: `openai` 7, `@fastify/cors` 11, `@sentry/node` 11,
+  `net-snmp` 3.29.2, `@huggingface/transformers` 4.3.1.
 
 ### Fixed
 
