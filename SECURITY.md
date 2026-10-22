@@ -5,7 +5,7 @@
 Please **do not** open a public GitHub issue for a security vulnerability.
 
 Use GitHub's private vulnerability reporting instead: go to the
-[Security tab](https://github.com/Haphior/helpdesk-seredina/security/advisories/new)
+[Security tab](https://github.com/Haphior/seredina/security/advisories/new)
 and open a new draft security advisory. This reaches the maintainer directly and
 keeps the report private until there's a fix.
 

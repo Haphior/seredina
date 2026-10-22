@@ -130,7 +130,7 @@ installs it; Docker Desktop already includes it.
 ## None of this fixes your issue
 
 Open an
-[issue on GitHub](https://github.com/Haphior/helpdesk-seredina/issues)
+[issue on GitHub](https://github.com/Haphior/seredina/issues)
 with the output of `docker compose logs` for the failing service and your
 `.env` **with the secret values stripped out** (variable names, not
 values).

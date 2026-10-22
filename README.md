@@ -5,231 +5,221 @@
 <h1 align="center">Seredina</h1>
 <p align="center"><b>Open-source ITSM that meets you in the middle.</b></p>
 <p align="center">
-  <a href="https://github.com/Haphior/helpdesk-seredina/actions/workflows/ci.yml"><img src="https://github.com/Haphior/helpdesk-seredina/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
-  <a href="https://github.com/Haphior/helpdesk-seredina/releases"><img src="https://img.shields.io/github/v/release/Haphior/helpdesk-seredina?include_prereleases&label=release" alt="Latest release"></a>
+  <a href="https://github.com/Haphior/seredina/actions/workflows/ci.yml"><img src="https://github.com/Haphior/seredina/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
+  <a href="https://github.com/Haphior/seredina/releases"><img src="https://img.shields.io/github/v/release/Haphior/seredina?include_prereleases&label=release" alt="Latest release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue.svg" alt="License: AGPL-3.0"></a>
+  <a href="https://haphior.github.io/seredina/"><img src="https://img.shields.io/badge/docs-haphior.github.io%2Fseredina-informational" alt="Documentation"></a>
 </p>
 
-Ticketing, asset management/CMDB, and NOC/SOC alert ingestion — with an AI copilot
-that drafts, and a human who approves — in one open-source helpdesk. "Seredina"
-(середина) is Slavic for "the middle": email, API calls, and monitoring alerts all
-arrive from different places and land in the same ticket.
+Ticketing, asset management/CMDB and NOC/SOC alert intake in one helpdesk,
+with an AI copilot that drafts and a human who approves. "Seredina"
+(середина) is Slavic for "the middle": email, the portal, API calls and
+monitoring alerts arrive from different places and land in the same ticket.
 
-Run it as a self-hosted Docker deployment or as a multi-tenant cloud service — same
-codebase, same containers, your choice. Full source, AGPL-3.0, no separate
-"enterprise" fork holding features back.
+Self-host it with Docker or run it as a multi-tenant cloud service: same
+codebase, same containers. Full source under AGPL-3.0, with no separate
+"enterprise" edition holding features back.
 
-**Full documentation**: **[haphior.github.io/helpdesk-seredina](https://haphior.github.io/helpdesk-seredina/)**
-— user guide (every feature, from the console's point of view), deployment/
-hosting reference, and the API/webhooks/MCP-server integration reference.
-Source lives in `apps/docs/`, built with [VitePress](https://vitepress.dev)
-and deployed via `.github/workflows/docs.yml`.
+**Documentation: [haphior.github.io/seredina](https://haphior.github.io/seredina/)**
+(English and Spanish) covers every feature from the console, deployment, and
+the API, webhooks and MCP server.
 
-Status: Phases 0-5 done (multi-tenant ticketing core, SLA + macros + service
-catalog + change/problem/release management, AI copilot with autonomous mode and
-an MCP server, cloud hardening, Slack/Teams/Telegram/Zabbix integrations, and a
-real endpoint agent for hardware/software inventory). On top of that:
+## Features
 
-- **Email**: IMAP/SMTP or **Gmail / Microsoft 365 over OAuth**, attachments kept
-  on the ticket, replies sent from the mailbox the customer wrote to.
-- **Sign-in security**: two-factor sign-in (TOTP + recovery codes), single
-  sign-on over OpenID Connect (Microsoft Entra ID, Google Workspace, any OIDC
-  provider), and an append-only **audit log**. Invitations by email,
-  self-service password change and reset; a password change signs out every
-  other session.
-- **Personal data**: a Contacts page to correct, export or anonymize a
-  contact's data, and optional automatic retention, for data protection laws
-  such as Chile's Ley 21.719 or GDPR.
+**Service desk**
+- Tickets from email (IMAP/SMTP, or Gmail and Microsoft 365 over OAuth),
+  the customer portal, an embeddable chat widget, Slack, Teams, Telegram,
+  the API and monitoring alerts (Grafana, Zabbix, any webhook).
+- Tenant-defined statuses, custom fields, macros, saved views, SLA policies
+  with business hours and escalation, on-call schedules, CSAT surveys.
+- Service catalog, change, problem and release management, IT processes and
+  templates, a knowledge base with semantic search, a public status page.
 - **Customer portal**: customers sign in with an emailed link to follow and
-  reply to their own tickets and request catalog items.
-- **Contracts, warranties and licenses** linked to assets, with renewal
-  reminders; **AI triage** of new tickets (suggest or auto-set priority/team).
+  answer their own tickets and request catalog items.
+
+**Assets and inventory**
+- CMDB of IT equipment with an equipment catalog of hardware models, and a
+  directory of the companies you work with and their people.
+- Contracts, warranties and licenses linked to assets, with payment and
+  renewal reminders.
+- Agentless network discovery (TCP and SNMP).
 - **Endpoint agent** for Windows, macOS and Linux
   ([Haphior/seredina-agent](https://github.com/Haphior/seredina-agent)): one
-  binary that runs as a service, installed with a command copied from the
-  Devices page. It reports a full inventory to the CMDB, on workstations and
-  servers alike: hardware down to serial numbers and memory modules,
+  binary that runs as a service and reports hardware down to serial numbers,
   software, updates, security posture (antivirus/EDR, encryption, firewall),
-  and a server's services, ports, roles and VMs.
-- The console in **English and Spanish**.
+  and a server's services, ports, roles and VMs. Inventory only: it never
+  runs commands sent from the server.
 
-See [docs/ROADMAP.md](docs/ROADMAP.md) for the full breakdown of what's shipped,
-what's disclosed-but-deferred, and what's still backlog, and
-[CHANGELOG.md](CHANGELOG.md) for what changed in each release.
+**AI, opt-in**
+- Bring your own key: Anthropic, OpenAI or a local Ollama. With none set,
+  the AI features stay off.
+- Reply suggestions and summaries grounded in the knowledge base, triage of
+  new tickets (priority and team).
+- An autonomous mode and an MCP server for your own agents, both gated by a
+  per-tenant Autonomy Policy: actions that change data wait for a human
+  unless explicitly allowed, and every call is audited.
 
-## Stack
+**Security and administration**
+- Tenant isolation with PostgreSQL Row-Level Security.
+- Two-factor sign-in (TOTP and recovery codes), single sign-on over OpenID
+  Connect (Microsoft Entra ID, Google Workspace, any OIDC provider), custom
+  roles, an append-only audit log.
+- Personal data tools: correct, export or anonymize a contact, and optional
+  automatic retention (Chile's Ley 21.719, GDPR).
+- Updates from the console (Linux hosts), dashboards and reports, data
+  export, console in English and Spanish.
 
-- **API**: Node.js/TypeScript, Fastify, Prisma, PostgreSQL (with Row-Level Security for
-  tenant isolation)
-- **Web**: React, Vite, Tailwind
-- **Worker**: BullMQ (Redis) for agentless network discovery, outbound email/
-  webhook/notification delivery, and SLA escalation timers; a plain interval
-  loop for inbound email polling (see docs/adr/0004-email-channel.md for why
-  that one isn't BullMQ too), with a per-mailbox Redis lock so several worker
-  replicas never poll the same mailbox twice (docs/adr/0059-email-poll-lock.md)
-- **AI**: pluggable provider adapters (`packages/ai-adapters`; Anthropic and
-  OpenAI implemented, plus a local Ollama option — bring your own key, or unset
-  it entirely and the feature 503s cleanly) power a copilot (suggest-reply/
-  summarize on a ticket), a full autonomous tool-use loop gated by a per-tenant
-  Autonomy Policy (mutating actions need human approval unless explicitly
-  allow-listed), and `apps/mcp-server` (stdio + Streamable HTTP) so an external
-  agent can operate on tickets/knowledge base under the same guardrails — see
-  docs/adr/0005-ai-copilot.md and docs/adr/0033-ai-tool-catalog-and-autonomy.md
-- **License**: AGPL-3.0-only — see [LICENSE](LICENSE)
+See [CHANGELOG.md](CHANGELOG.md) for what each release changed and
+[docs/ROADMAP.md](docs/ROADMAP.md) for what's planned and deliberately left out.
 
-## Repo layout
+## Install
 
-```
-apps/
-  api/          Fastify + Prisma HTTP/WS API — all domain logic lives in src/modules/*/service.ts
-  web/          Agent/admin console
-  worker/       Discovery + email (IMAP poll, SMTP send) background processing — src/email/, src/discovery/
-  mcp-server/   MCP server exposing the same tool catalog as the AI copilot/autonomous modes
-  docs/         User guide + deployment + API reference (VitePress), deployed to GitHub Pages
-packages/
-  db/           Prisma schema/migrations/RLS policies + the guarded-client/withTenantTx
-                tenant-isolation mechanism -- shared by apps/api and apps/worker,
-                not duplicated (see docs/adr/0001-multi-tenancy-rls.md)
-  shared/       Cross-app types, zod DTOs, permission constants, CIDR/crypto/queue-contract utils
-  ui/           Shared React components
-  ai-adapters/  LLM provider adapter interface + implementations
-  config/       Shared tsconfig/eslint
-infra/          Dockerfiles, docker-compose.yml
-docs/           Roadmap, architecture decision records
-```
-
-## Self-hosted deployment
-
-Requires Docker.
+Requires Docker. On Linux:
 
 ```bash
-./scripts/setup.sh                              # generates .env with fresh secrets
+git clone https://github.com/Haphior/seredina.git
+cd seredina
+git checkout "$(git tag --sort=-v:refname | head -1)"   # the latest release
+./scripts/setup.sh                                       # writes .env with fresh secrets
 docker compose -f infra/docker-compose.yml up -d
 ```
 
-That's the whole install — `migrate` applies the schema/RLS policies and exits,
-then `api`/`worker`/`web` start. Visit the web app (`http://localhost:8080` by
-default, `WEB_PORT` in `.env`) and register your organization at `/register` —
-there's no separate CLI bootstrap step, the same registration flow works
-identically in self-hosted and cloud mode.
+`migrate` applies the schema and exits, then `api`, `worker` and `web`
+start. Open `http://localhost:8080` (`WEB_PORT` in `.env`) and register your
+organization at `/register`.
 
-`./scripts/setup.sh` won't touch an existing `.env` — delete it first if you
-want to regenerate secrets from scratch. **Never do that on an instance in use**:
-`ENCRYPTION_KEY` encrypts every stored secret (mailbox passwords and OAuth
-tokens, SSO settings, users' MFA secrets, AI keys), and a new key makes all of
-them unreadable. Back it up separately from your database backups — see
-[Updates and Backups](https://haphior.github.io/helpdesk-seredina/deployment/updates-and-backups).
-See `.env.example` for what every variable does and which ones are optional
-(`ANTHROPIC_API_KEY` for the AI copilot, `SENTRY_DSN` for error tracking).
+- **Windows Server with Docker Desktop**: see
+  [Windows Server](https://haphior.github.io/seredina/deployment/windows-server).
+- **HTTPS, a company server, a domain**: see
+  [Production on a company server](https://haphior.github.io/seredina/deployment/internal-server).
+- **Every variable**: [`.env.example`](.env.example) and
+  [Environment variables](https://haphior.github.io/seredina/deployment/environment-variables).
 
-If a container fails to become healthy, `docker compose -f
-infra/docker-compose.yml logs api` (or `worker`) is the first place to look —
-`apps/api`/`apps/worker` both validate every required env var at startup and
-report everything missing/malformed in one message, rather than crashing on
-the first one and forcing a fix-restart-discover-the-next-one loop.
+> [!WARNING]
+> Back up `.env` separately from the database. `ENCRYPTION_KEY` encrypts every
+> stored secret (mailbox passwords and OAuth tokens, SSO settings, MFA secrets,
+> AI keys); without it they can't be read. `setup.sh` never overwrites an
+> existing `.env`.
 
-## MCP server (connect your own AI agent)
+If a container doesn't become healthy, start with
+`docker compose -f infra/docker-compose.yml logs api` (or `worker`): both
+check every required variable at startup and list everything missing at once.
 
-`apps/mcp-server` exposes the same tool catalog the AI copilot uses (get/reply/
-status/assign/macro/escalate on tickets) to *your own* MCP-compatible agent
-(Claude Desktop, an n8n workflow, a custom script). Two transports, picked
-with `MCP_TRANSPORT` (default `stdio`):
+## Updating
 
-**stdio** — a separate process from `api`/`worker`, not part of a plain
-`docker compose up`. A client spawns it per-session and owns its
-stdin/stdout directly, the same way Claude Desktop spawns any other local
-MCP server. The tenant is resolved once at startup from `SEREDINA_API_KEY`.
+Back up, check out the new tag, rebuild:
 
-1. Create an API key from Settings → API Keys in the web app.
-2. Build the image: `docker build -f infra/docker/Dockerfile.mcp-server -t seredina-mcp-server .`
-3. Point your MCP client at `docker run -i --rm -e SEREDINA_API_KEY=<your key> -e DATABASE_URL=... -e ENCRYPTION_KEY=... seredina-mcp-server` (or run `apps/mcp-server` directly with `tsx`/`node` in development — see `apps/mcp-server/package.json`'s `dev` script).
-
-**http** — a genuine always-on network service (Streamable HTTP,
-deliberately stateless — see `docs/adr/0035-mcp-http-transport.md`), for a
-remote or long-running agent instead of a locally-spawned one. Each request
-carries its own `Authorization: Bearer <ApiKey>` header; the tenant is
-resolved fresh per request, never cached server-side. Run it with
-`docker compose --profile mcp up mcp-server-http` (profile-gated — a plain
-`docker compose up` never starts it), or set `MCP_TRANSPORT=http` when
-running `apps/mcp-server` directly.
-
-Every mutating tool call is gated by that tenant's Autonomy Policy (Operations
-→ AI Agent Activity in the web app): tools not on the auto-execute allow-list
-wait there for a human to approve or reject, and every call — auto-executed
-or not — is logged to the same audit trail. See
-`docs/adr/0033-ai-tool-catalog-and-autonomy.md`.
-
-## Embeddable chat widget
-
-Drop this on any page of your own website — no login, no API key, works
-from any domain:
-
-```html
-<script src="https://<your-seredina-instance>/api/widget.js" data-tenant="<your-tenant-slug>"></script>
+```bash
+docker compose -f infra/docker-compose.yml exec -T postgres \
+  pg_dump -U app_migrator -Fc seredina > before-update.dump
+git fetch --tags
+git checkout v0.4.0            # the new release
+docker compose -f infra/docker-compose.yml up -d --build
 ```
 
-A visitor gets a floating chat bubble; the conversation lands in Seredina
-as a normal ticket (`channel: "widget"`) that agents reply to like any
-other. Continuity across page loads/visits is via a random token the
-visitor's browser holds in `localStorage`, not a login — see
-`docs/adr/0040-embeddable-widget.md` for how that's scoped safely and how
-its cross-origin CORS is handled without weakening this API's normal CORS
-lockdown.
+Migrations run on their own before the API takes traffic. Read the release
+notes of every version you skip. On Linux you can also update from
+Settings → Updates after `bash scripts/enable-updater.sh`. Details, rollback
+and backups: [Updates and backups](https://haphior.github.io/seredina/deployment/updates-and-backups).
+
+## Stack
+
+| Part | Technology |
+|---|---|
+| API | Node.js, TypeScript, Fastify, Prisma, PostgreSQL with Row-Level Security |
+| Console | React, Vite, Tailwind |
+| Worker | BullMQ on Redis: discovery, outbound email, webhooks, notifications, SLA timers; inbound email polling with a per-mailbox lock |
+| AI | `packages/ai-adapters` (Anthropic, OpenAI, Ollama), local embeddings with pgvector |
+| MCP | `apps/mcp-server`, stdio and Streamable HTTP |
+| Docs | VitePress in `apps/docs`, published to GitHub Pages |
+
+The reasoning behind the main decisions is in [docs/adr/](docs/adr/).
+
+## Repository layout
+
+```
+apps/
+  api/          Fastify API; domain logic in src/modules/*/service.ts
+  web/          Agent and admin console
+  worker/       Background jobs: discovery, email in and out, deliveries, timers
+  mcp-server/   MCP server with the AI copilot's tool catalog
+  docs/         User guide, deployment and API reference (VitePress)
+packages/
+  db/           Prisma schema, migrations, RLS policies, withTenantTx
+  shared/       Types, zod DTOs, permissions, crypto, SSRF guard, queue contracts
+  ui/           Shared React components
+  ai-adapters/  LLM provider interface and implementations
+  config/       Shared tsconfig and eslint
+infra/          Dockerfiles, docker-compose files, Caddy, the updater
+scripts/        setup, compose smoke test, upgrade check, updater setup
+docs/           Roadmap, ADRs, product and design notes
+```
+
+## Integrations
+
+### MCP server
+
+`apps/mcp-server` exposes the copilot's ticket tools (get, reply, status,
+assign, macro, escalate) to your own MCP client: Claude Desktop, an n8n
+workflow, a script. Create an API key in Settings → API Keys, then pick a
+transport with `MCP_TRANSPORT`:
+
+- **stdio** (default): the client starts it per session.
+  ```bash
+  docker build -f infra/docker/Dockerfile.mcp-server -t seredina-mcp-server .
+  docker run -i --rm -e SEREDINA_API_KEY=<key> -e DATABASE_URL=... -e ENCRYPTION_KEY=... seredina-mcp-server
+  ```
+- **http**: an always-on service, authenticated per request with
+  `Authorization: Bearer <key>`:
+  `docker compose -f infra/docker-compose.yml --profile mcp up -d mcp-server-http`.
+
+Changes go through the tenant's Autonomy Policy (Operations → AI Agent
+Activity) like the copilot's. See `docs/adr/0033-ai-tool-catalog-and-autonomy.md`
+and `docs/adr/0035-mcp-http-transport.md`.
+
+### Chat widget
+
+```html
+<script src="https://<your-instance>/api/widget.js" data-tenant="<tenant-slug>"></script>
+```
+
+Visitors get a chat bubble on your site; each conversation is a ticket
+(`channel: "widget"`). See `docs/adr/0040-embeddable-widget.md`.
 
 ## Development
 
-Requires Docker (for Postgres + Redis) and Node.js 20+ (Fastify 5 / `@fastify/jwt` 10
-require it — this repo was bumped off Node 18 during Phase 0 specifically to avoid
-shipping known-critical CVEs in the older `fastify`/`fast-jwt` majors).
+Requires Docker (Postgres and Redis) and Node.js 20 or later.
 
 ```bash
 npm install
 docker compose -f infra/docker-compose.yml up -d postgres redis
-npm run dev:api
-
-# in a second terminal
-npm run dev --workspace=apps/web   # http://localhost:5173, expects the API on :4000
-
-# in a third terminal, only if you want discovery/email working locally
-npm run dev --workspace=apps/worker   # needs REDIS_URL + DATABASE_URL + ENCRYPTION_KEY set
+npm run dev:api                               # API on :4000
+npm run dev --workspace=apps/web              # console on :5173
+npm run dev --workspace=apps/worker           # only for discovery/email; needs REDIS_URL, DATABASE_URL, ENCRYPTION_KEY
 ```
 
-The web app reads its API base URL from `VITE_API_URL` (`apps/web/.env.example`,
-default `http://localhost:4000`). The API allows cross-origin requests via
-`@fastify/cors`, configurable with `CORS_ORIGIN` (unset = allow-all, fine for local
-dev since auth is a Bearer token, never a cookie).
+- The console reads the API address from `VITE_API_URL`
+  (`apps/web/.env.example`, default `http://localhost:4000`).
+- Database: `npm run prisma:generate|prisma:migrate|prisma:deploy|prisma:seed --workspace=@seredina/db`.
+- `./scripts/compose-smoke.sh` builds every image and boots the whole stack
+  in its own compose project, as CI's `compose-smoke` job does.
+- Error tracking uses the Sentry SDK and stays off until `SENTRY_DSN` /
+  `VITE_SENTRY_DSN` is set (Sentry or a self-hosted GlitchTip).
 
-Database schema/migrations/seed now live in `packages/db`, not `apps/api` — run
-`npm run prisma:generate|prisma:migrate|prisma:deploy|prisma:seed --workspace=@seredina/db`.
-
-To check that the Docker images still build and the whole stack comes up (what
-CI's `compose-smoke` job runs), use `./scripts/compose-smoke.sh`. It uses its
-own compose project and ports, and removes everything when it finishes.
-
-See [docs/PRD.md](docs/PRD.md) for the consolidated product requirements
-(problem/ICP/scope/risks in one place), [docs/adr/](docs/adr/) for the reasoning
-behind the multi-tenancy, AI, and agentless-discovery architecture,
-[docs/PRODUCT.md](docs/PRODUCT.md) for the full ICP/pain/value detail,
-[docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) for the UI's typography/color/
-component conventions, and [docs/BRAND.md](docs/BRAND.md) for the name/logo/voice.
-
-Error tracking (`apps/api`, `apps/worker`, `apps/web`) is wired via the Sentry SDK
-but no-ops until `SENTRY_DSN`/`VITE_SENTRY_DSN` is set — point it at Sentry.io or a
-self-hosted [GlitchTip](https://glitchtip.com/) instance (protocol-compatible),
-whichever fits your deployment.
+More background: [docs/PRD.md](docs/PRD.md) (product requirements),
+[docs/PRODUCT.md](docs/PRODUCT.md), [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)
+and [docs/BRAND.md](docs/BRAND.md).
 
 ## Contributing
 
-Commit small and often: one focused change per commit (a schema migration, a
-route, a UI pass on one screen) rather than batching a whole feature into one
-commit. Easier to review, `git bisect`, and revert. This wasn't followed
-consistently early on (Phase 0/1 commits are large, feature-sized) — new work
-should do better, not match that precedent.
+- Keep commits small and focused: one migration, one route, one screen.
+- Sign off every commit (`git commit -s`): the
+  [Developer Certificate of Origin](DCO.md), checked by CI on every pull
+  request.
+- Read the [Code of Conduct](CODE_OF_CONDUCT.md). Report security issues
+  privately as described in [SECURITY.md](SECURITY.md), never in a public
+  issue.
 
-Every commit needs a `Signed-off-by` trailer (the
-[Developer Certificate of Origin](DCO.md), not a copyright transfer) — commit
-with `git commit -s` and CI checks it automatically on every pull request. See
-[DCO.md](DCO.md) for the full text and how to fix a commit that's missing one.
-Please also read [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md); security issues go
-through [SECURITY.md](SECURITY.md)'s private reporting flow, never a public
-issue.
+## License
+
+[AGPL-3.0-only](LICENSE).

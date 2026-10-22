@@ -4,7 +4,7 @@
 
 Seredina doesn't update itself: you choose when. Each release is a git tag
 (`v0.2.0`, `v0.3.0`...) with its notes on the
-[releases page](https://github.com/Haphior/helpdesk-seredina/releases). A
+[releases page](https://github.com/Haphior/seredina/releases). A
 production server should run a release, not whatever `main` holds today.
 
 ### Which version is running

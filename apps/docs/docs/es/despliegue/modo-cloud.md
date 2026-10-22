@@ -20,7 +20,7 @@ segundo intento de `/register` es el que se bloquea.
 `SEREDINA_MODE=cloud` quita ese límite — cualquiera puede registrar su
 propia organización en `/register`, cada una aislada de las demás por
 Row-Level Security de Postgres (ver la
-[arquitectura de multi-tenancy](https://github.com/Haphior/helpdesk-seredina/blob/main/docs/adr/0001-multi-tenancy-rls.md)
+[arquitectura de multi-tenancy](https://github.com/Haphior/seredina/blob/main/docs/adr/0001-multi-tenancy-rls.md)
 si te interesa el detalle técnico). Esto es lo que necesitas si vas a
 operar Seredina como tu propio servicio para múltiples clientes.
 

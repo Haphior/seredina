@@ -24,7 +24,7 @@ variable de entorno, no un fork ni una imagen distinta. Ver
 
 ```bash
 git clone --branch v0.3.1 https://github.com/Haphior/seredina.git   # la última versión
-cd helpdesk-seredina
+cd seredina
 ./scripts/setup.sh                                # genera .env con secretos aleatorios
 docker compose -f infra/docker-compose.yml up -d
 ```

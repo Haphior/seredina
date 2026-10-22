@@ -275,8 +275,8 @@ back up, `git checkout v0.3.0`, `docker compose -f infra/docker-compose.yml up -
 ## [0.2.0] - 2026-09-27
 
 The first release meant for production use on a company server. See
-[Production on a company server](https://github.com/Haphior/helpdesk-seredina/blob/main/apps/docs/docs/deployment/internal-server.md)
-and [Updates and backups](https://github.com/Haphior/helpdesk-seredina/blob/main/apps/docs/docs/deployment/updates-and-backups.md).
+[Production on a company server](https://github.com/Haphior/seredina/blob/main/apps/docs/docs/deployment/internal-server.md)
+and [Updates and backups](https://github.com/Haphior/seredina/blob/main/apps/docs/docs/deployment/updates-and-backups.md).
 
 ### Added
 
@@ -581,5 +581,5 @@ production by anyone outside this project, hence alpha.
 [Unreleased]: https://github.com/Haphior/seredina/compare/v0.3.1...HEAD
 [0.3.1]: https://github.com/Haphior/seredina/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Haphior/seredina/compare/v0.2.0...v0.3.0
-[0.2.0]: https://github.com/Haphior/helpdesk-seredina/compare/v0.1.0-alpha.1...v0.2.0
-[0.1.0-alpha.1]: https://github.com/Haphior/helpdesk-seredina/releases/tag/v0.1.0-alpha.1
+[0.2.0]: https://github.com/Haphior/seredina/compare/v0.1.0-alpha.1...v0.2.0
+[0.1.0-alpha.1]: https://github.com/Haphior/seredina/releases/tag/v0.1.0-alpha.1
