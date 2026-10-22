@@ -99,6 +99,8 @@ describe('SSO identity rules', () => {
     expect(() => identityFromClaims('oidc', baseClaims('n') as never, ['other.test'])).toThrow(/can't sign in/);
     expect(() => identityFromClaims('oidc', baseClaims('n', { email_verified: false }) as never, [])).toThrow(/not verified/);
     expect(() => identityFromClaims('google', baseClaims('n', { email_verified: undefined }) as never, [])).toThrow(/not verified/);
+    // A generic IdP that doesn't say is treated as unverified too.
+    expect(() => identityFromClaims('oidc', baseClaims('n', { email_verified: undefined }) as never, [])).toThrow(/not verified/);
     // Microsoft: pinned directory, UPN as the email.
     expect(identityFromClaims('microsoft', baseClaims('n', { email: undefined, preferred_username: 'Ana@Acme.test' }) as never, []).email).toBe(
       'ana@acme.test',
@@ -156,9 +158,20 @@ describe.skipIf(!hasDb)('SSO sign-in', () => {
   async function signInAs(email: string) {
     clearOidcCaches();
     const idp = fakeIdp((nonce) => baseClaims(nonce, { email }));
-    const { code, state } = idp.authorize(await startSso(slug, undefined, idp.fetchImpl));
-    return completeSso(state, code, idp.fetchImpl);
+    const { url, browserBinding } = await startSso(slug, undefined, idp.fetchImpl);
+    const { code, state } = idp.authorize(url);
+    return completeSso(state, code, browserBinding, idp.fetchImpl);
   }
+
+  it('refuses a callback from a browser that did not start the sign-in', async () => {
+    clearOidcCaches();
+    const idp = fakeIdp((nonce) => baseClaims(nonce, { email: 'ana@acme.test' }));
+    const { url } = await startSso(slug, undefined, idp.fetchImpl);
+    const { code, state } = idp.authorize(url);
+    await expect(completeSso(state, code, undefined, idp.fetchImpl)).rejects.toThrow(/another browser/);
+    const other = await startSso(slug, undefined, idp.fetchImpl);
+    await expect(completeSso(state, code, other.browserBinding, idp.fetchImpl)).rejects.toThrow(/another browser/);
+  });
 
   it('signs in an existing user, and the exchange token works exactly once', async () => {
     const result = await signInAs('Ana@acme.test');
@@ -232,5 +245,15 @@ describe.skipIf(!hasDb)('SSO sign-in', () => {
         ['tickets:read', 'users:manage'],
       ),
     ).rejects.toThrow(/permissions you don't have/);
+  });
+
+  it('won\'t auto-provision from Google or a generic IdP without a domain allowlist', async () => {
+    await expect(
+      saveSsoSettings(
+        tenantId,
+        { enabled: true, provider: 'google', issuer: '', clientId: 'c', clientSecret: 's', allowedDomains: [], autoProvision: true, defaultRoleKey: 'agent', enforced: false },
+        ['tickets:read', 'users:manage'],
+      ),
+    ).rejects.toThrow(/allowed email domains/);
   });
 });

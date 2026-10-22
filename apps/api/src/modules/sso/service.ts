@@ -125,6 +125,12 @@ export async function saveSsoSettings(tenantId: string, input: SsoSettingsInput,
   }
   if (input.enforced && !input.enabled) throw new SsoError('Turn single sign-on on before requiring it.');
   const allowedDomains = [...new Set(input.allowedDomains.map((d) => d.trim().toLowerCase().replace(/^@/, '')).filter(Boolean))];
+  // Google and a generic IdP vouch for accounts far outside the organization
+  // (any Gmail address, anyone who can register at the IdP). Microsoft is
+  // pinned to one directory (issuerFor), which is the boundary by itself.
+  if (input.autoProvision && input.provider !== 'microsoft' && allowedDomains.length === 0) {
+    throw new SsoError('List the allowed email domains before turning on automatic accounts, or anyone with an account at the provider could join.');
+  }
 
   await withTenantTx(prisma, tenantId, async (tx) => {
     const role = await tx.role.findUnique({
@@ -185,6 +191,13 @@ const EXCHANGE_TTL_MS = 60 * 1000;
 interface StatePayload {
   t: string; // tenant
   n: string; // nonce -- also seeds the PKCE verifier
+  b: string; // hash of the browser binding (the SSO cookie)
+}
+
+export interface SsoStart {
+  url: string;
+  /** Set as a cookie on the browser that started the sign-in; completeSso() wants it back. */
+  browserBinding: string;
 }
 
 /**
@@ -207,8 +220,13 @@ async function loadConfig(tenantId: string, fetchOverride?: FetchLike) {
   return { row, provider, fetchImpl, metadata };
 }
 
-/** Step 1: where to send the browser. */
-export async function startSso(tenantSlug: string, loginHint?: string, fetchOverride?: FetchLike): Promise<string> {
+/**
+ * Step 1: where to send the browser. The state is also bound to the browser
+ * that asked: without that, someone could start a sign-in with their own
+ * account and hand the callback link to someone else, who would land in the
+ * console signed in as them (login CSRF).
+ */
+export async function startSso(tenantSlug: string, loginHint?: string, fetchOverride?: FetchLike): Promise<SsoStart> {
   const tenantId = await resolveTenantIdBySlug(tenantSlug);
   if (!tenantId) throw new SsoError('Single sign-on is not set up for this workspace.');
   const redirectUri = ssoRedirectUri();
@@ -216,11 +234,12 @@ export async function startSso(tenantSlug: string, loginHint?: string, fetchOver
 
   const { row, provider, metadata } = await loadConfig(tenantId, fetchOverride);
   const nonce = randomBytes(16).toString('base64url');
-  const state = signPurposeToken<StatePayload>(STATE_PURPOSE, { t: tenantId, n: nonce }, STATE_TTL_MS);
+  const browserBinding = randomBytes(16).toString('base64url');
+  const state = signPurposeToken<StatePayload>(STATE_PURPOSE, { t: tenantId, n: nonce, b: sha256Hex(browserBinding) }, STATE_TTL_MS);
   const extra: Record<string, string> = {};
   // Google: restrict the account chooser to the workspace domain when there's exactly one.
   if (provider === 'google' && row.allowedDomains.length === 1) extra.hd = row.allowedDomains[0];
-  return buildAuthorizeUrl(metadata, {
+  const url = buildAuthorizeUrl(metadata, {
     clientId: row.clientId,
     redirectUri,
     state,
@@ -229,6 +248,7 @@ export async function startSso(tenantSlug: string, loginHint?: string, fetchOver
     loginHint,
     extra,
   });
+  return { url, browserBinding };
 }
 
 export interface SsoIdentity {
@@ -244,10 +264,10 @@ export function identityFromClaims(provider: SsoProvider, claims: IdTokenClaims,
     // The directory is pinned (issuerFor), so its own accounts' UPN is trustworthy.
     email = claims.email ?? claims.preferred_username;
   } else {
-    if (claims.email_verified === false || claims.email_verified === 'false') {
-      throw new SsoError('Your identity provider has not verified your email address.');
-    }
-    if (provider === 'google' && claims.email_verified !== true && claims.email_verified !== 'true') {
+    // Accounts are matched by email, so an unverified one could take over
+    // whoever already has that address here -- an admin included. Absent
+    // counts as unverified.
+    if (claims.email_verified !== true && claims.email_verified !== 'true') {
       throw new SsoError('Your identity provider has not verified your email address.');
     }
     email = claims.email;
@@ -273,9 +293,12 @@ export interface SsoResult {
 }
 
 /** Step 2: the IdP sent the browser back. Returns who signed in (or throws with a reason to show). */
-export async function completeSso(state: string, code: string, fetchOverride?: FetchLike): Promise<SsoResult> {
+export async function completeSso(state: string, code: string, browserBinding: string | undefined, fetchOverride?: FetchLike): Promise<SsoResult> {
   const payload = verifyPurposeToken<StatePayload>(STATE_PURPOSE, state);
   if (!payload) throw new SsoError('The sign-in link expired. Try again.');
+  if (!browserBinding || sha256Hex(browserBinding) !== payload.b) {
+    throw new SsoError('This sign-in was started in another browser. Start it again from this one.');
+  }
   const tenantId = payload.t;
   const redirectUri = ssoRedirectUri();
   if (!redirectUri) throw new SsoError('The server has no public address configured (WEB_ORIGIN).');
@@ -302,7 +325,8 @@ export async function completeSso(state: string, code: string, fetchOverride?: F
       if (existing.lockedUntil && existing.lockedUntil > new Date()) throw new SsoError('Your account is temporarily locked.');
       return { tenantId, userId: existing.id, email: existing.email, provisioned: false };
     }
-    if (!row.autoProvision) {
+    // Settings saved before saveSsoSettings required domains may still have none.
+    if (!row.autoProvision || (provider !== 'microsoft' && row.allowedDomains.length === 0)) {
       throw new SsoError(`There's no account for ${identity.email} in this workspace. Ask an admin to add you.`);
     }
     const role = await tx.role.findUnique({ where: { tenantId_key: { tenantId, key: row.defaultRoleKey } } });
