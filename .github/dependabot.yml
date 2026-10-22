@@ -11,6 +11,10 @@ updates:
     ignore:
       - dependency-name: tailwindcss
         update-types: ['version-update:semver-major']
+      # Tailwind 3 needs 6.x. GHSA-rj75-hqrm-r3gf lists only 7.1.6 as fixed,
+      # so Dependabot moves Tailwind to 4 to reach it; 6.1.5 has the backport.
+      - dependency-name: postcss-selector-parser
+        update-types: ['version-update:semver-major']
       - dependency-name: vite
         update-types: ['version-update:semver-major']
       - dependency-name: '@vitejs/plugin-react'
