@@ -7,7 +7,7 @@ contain breaking changes).
 
 ## [Unreleased]
 
-## [0.4.0] - 2026-10-13
+## [0.4.0] - 2026-10-22
 
 ### Upgrading from 0.3.x
 
@@ -39,8 +39,10 @@ with the same compose command you started the installation with.
   - `sharp` 0.35.5: bounds checks in image processing.
   - `source-map-js` 1.2.2: a denial-of-service fix, CVE-2026-93749.
 
-  These replace Dependabot's grouped update (#20), whose lockfile dropped a
-  package the console's build needs.
+  These undo Dependabot's grouped update (#20), merged after 0.3.x: it moved
+  the console to Tailwind 4 and its lockfile dropped a package the console's
+  build needs, so the console's Docker image did not build. The console stays
+  on Tailwind 3.
 
 ### Added
 
