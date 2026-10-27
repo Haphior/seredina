@@ -29,7 +29,7 @@
     "@seredina/config": "*",
     "@types/mailparser": "^3.4.6",
     "@types/net-snmp": "^3.23.0",
-    "@types/node": "^20.16.10",
+    "@types/node": "^26.6.5",
     "tsx": "^4.19.1",
     "typescript": "^5.6.3"
   }
