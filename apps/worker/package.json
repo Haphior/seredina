@@ -17,7 +17,7 @@
     "@seredina/ai-adapters": "*",
     "@seredina/db": "*",
     "@seredina/shared": "*",
-    "bullmq": "^6.3.6",
+    "bullmq": "^6.4.2",
     "html-to-text": "^10.0.1",
     "imapflow": "^2.0.3",
     "ioredis": "^6.0.0",
