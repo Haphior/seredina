@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+import { createHmac, randomUUID } from 'node:crypto';
 import Fastify, { type FastifyInstance } from 'fastify';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { prisma, withTenantTx } from '@seredina/db';
@@ -8,6 +8,15 @@ import { requirePermission } from '../src/modules/rbac/permissions';
 import { createRole, createUser, updateRole, updateUser } from '../src/modules/auth/service';
 
 const hasDb = Boolean(process.env.DATABASE_URL);
+
+// A token as issued before sessions expired: HS256 with the session secret,
+// no `exp`. Signed by hand because @fastify/jwt (10.2.5+) keeps the
+// plugin's expiresIn even when a call passes `expiresIn: undefined`.
+function signWithoutExpiry(payload: object): string {
+  const part = (value: object) => Buffer.from(JSON.stringify(value)).toString('base64url');
+  const unsigned = `${part({ alg: 'HS256', typ: 'JWT' })}.${part({ ...payload, iat: Math.floor(Date.now() / 1000) })}`;
+  return `${unsigned}.${createHmac('sha256', process.env.JWT_SECRET!).update(unsigned).digest('base64url')}`;
+}
 
 /**
  * The JWT plugin's authenticate() must not trust a token's baked-in
@@ -95,7 +104,7 @@ describe.skipIf(!hasDb)('JWT sessions', () => {
 
   it('rejects a legacy token issued without an expiry', async () => {
     const { userId } = await tokenFor('manager');
-    const legacy = app.jwt.sign({ sub: userId, tenantId, permissions: [] }, { expiresIn: undefined });
+    const legacy = signWithoutExpiry({ sub: userId, tenantId, permissions: [] });
     const decoded = app.jwt.decode<{ exp?: number }>(legacy);
     // Guard: make sure this test really exercises a token WITHOUT exp.
     if (decoded?.exp !== undefined) throw new Error('test setup: token unexpectedly has exp');
