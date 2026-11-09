@@ -29,6 +29,12 @@ updates:
         update-types: ['version-update:semver-major']
       - dependency-name: fastify
         update-types: ['version-update:semver-major']
+      # TypeScript 7 is the native compiler: a migration of its own.
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
+      # Types for the Node version the images run (22), not the newest one.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: github-actions
     directory: /

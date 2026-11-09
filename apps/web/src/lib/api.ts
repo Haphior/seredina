@@ -33,7 +33,7 @@ export function endSession() {
 
 // zod's .flatten() shape, returned as `{ error: ... }` by every route that does
 // `reply.code(400).send({ error: parsed.error.flatten() })`. Recognized here so a
-// validation failure reads as "title: String must contain at least 1 character(s)"
+// validation failure reads as "title: Too small: expected string to have >=1 characters"
 // instead of the raw JSON blob a user has no way to parse themselves.
 interface ZodFlattenedError {
   formErrors?: string[];

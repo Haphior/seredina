@@ -7,6 +7,43 @@ contain breaking changes).
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-11-09
+
+A security release: dependency updates only, no new features and no
+database migrations.
+
+### Upgrading from 0.4.0
+
+Back up the database and `.env`, `git checkout v0.4.1`, rebuild with the
+same compose command. Nothing in `.env` changes.
+
+Validation messages read differently: Zod 4 words them its own way, for
+example "Too small: expected string to have >=1 characters" instead of
+"String must contain at least 1 character(s)".
+
+### Security
+
+- **Zod 4** (`zod` 4.6.7, high): Zod 3 and Zod 4 up to 4.6.5 can exhaust
+  memory validating a large array (GHSA-mrhx-c7xc-m3w5). Zod 3 has no fixed
+  release, so the API and the MCP server move to Zod 4.
+- `body-parser` 2.4.0 (high): denial of service via trailing bytes.
+- `fast-uri` 3.1.9 and 4.2.3: host confusion, scheme spoofing and
+  injection, path equivalence.
+- `nodemailer` 10.3/10.4: three address-parser advisories. `mailparser`
+  moves to 3.14, which no longer pins the old `nodemailer`.
+- `@hono/node-server` 2.1.6 (used by the MCP SDK): `serveStatic` decoded
+  paths twice.
+- `fastify` 5.12.6: header validation bypass via case-sensitive
+  `propertyNames`. `ip-address` 10.7.4: quadratic-time zone identifiers.
+- `vite` 6.4.6 (development): `server.fs.deny` bypassed with queries.
+
+### Changed
+
+- `@fastify/jwt` 10.2.7, `bullmq` 6.7, `@types/node` 22 (the Node version
+  the images run).
+- The autonomous AI mode builds its tools' JSON Schema with Zod 4's own
+  `z.toJSONSchema`; `zod-to-json-schema` is gone.
+
 ## [0.4.0] - 2026-10-22
 
 ### Upgrading from 0.3.x
@@ -593,7 +630,9 @@ production by anyone outside this project, hence alpha.
   `[tenantId, createdAt]`) after a real Lighthouse-against-production-build
   performance pass.
 
-[Unreleased]: https://github.com/Haphior/seredina/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/Haphior/seredina/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/Haphior/seredina/compare/v0.4.0...v0.4.1
+[0.4.0]: https://github.com/Haphior/seredina/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/Haphior/seredina/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Haphior/seredina/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Haphior/seredina/compare/v0.1.0-alpha.1...v0.2.0
