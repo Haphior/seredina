@@ -24,7 +24,7 @@ export interface ToolDefinition<TArgs = unknown> {
   name: string;
   description: string;
   mutating: boolean;
-  argsSchema: z.ZodObject<z.ZodRawShape, z.UnknownKeysParam, z.ZodTypeAny, TArgs>;
+  argsSchema: z.ZodObject & z.ZodType<TArgs>;
   execute: (tenantId: string, args: TArgs) => Promise<unknown>;
 }
 

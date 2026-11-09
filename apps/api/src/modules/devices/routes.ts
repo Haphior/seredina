@@ -29,7 +29,7 @@ const checkInSchema = z.object({
   macAddress: macSchema.optional(),
   // IPv4 only: an agent's ARP table. Capped well above any real LAN segment's
   // neighbor count, so one device can't flood the CMDB.
-  neighbors: z.array(z.object({ ip: z.string().ip({ version: 'v4' }), mac: macSchema })).max(512).optional(),
+  neighbors: z.array(z.object({ ip: z.ipv4(), mac: macSchema })).max(512).optional(),
   // Validated separately below: a bad detailed inventory shouldn't cost the
   // device its whole check-in.
   inventory: z.unknown().optional(),

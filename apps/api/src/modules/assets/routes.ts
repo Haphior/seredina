@@ -13,7 +13,7 @@ const ASSET_STATUS = z.enum(['ACTIVE', 'INACTIVE', 'RETIRED']);
 // "don't touch this field" on PATCH, null means "clear it" (e.g. remove a
 // mis-entered serial number). Plain .optional() can't express the second case.
 const assetFieldsSchema = {
-  ipAddress: z.string().ip().nullish(),
+  ipAddress: z.union([z.ipv4(), z.ipv6()]).nullish(),
   macAddress: z.string().nullish(),
   hostname: z.string().nullish(),
   serialNumber: z.string().nullish(),

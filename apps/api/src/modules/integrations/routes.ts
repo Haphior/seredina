@@ -7,9 +7,17 @@ const grafanaAlertSchema = z.object({
   title: z.string().optional(),
   message: z.string().optional(),
   groupKey: z.string().optional(),
-  commonLabels: z.record(z.string()).optional(),
-  commonAnnotations: z.record(z.string()).optional(),
-  alerts: z.array(z.object({ status: z.string().optional(), labels: z.record(z.string()).optional(), annotations: z.record(z.string()).optional() })).optional(),
+  commonLabels: z.record(z.string(), z.string()).optional(),
+  commonAnnotations: z.record(z.string(), z.string()).optional(),
+  alerts: z
+    .array(
+      z.object({
+        status: z.string().optional(),
+        labels: z.record(z.string(), z.string()).optional(),
+        annotations: z.record(z.string(), z.string()).optional(),
+      }),
+    )
+    .optional(),
 });
 
 export default async function integrationsRoutes(app: FastifyInstance) {

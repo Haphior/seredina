@@ -1,17 +1,12 @@
-import { zodToJsonSchema } from 'zod-to-json-schema';
+import { z } from 'zod';
 import type { LlmMessage, LlmProviderAdapter, ToolResult, ToolSpec } from '@seredina/ai-adapters';
 import { logAiUsage } from '../ai/service';
 import { TOOL_CATALOG } from './catalog';
 import { runTool } from './executor';
 
-// zod-to-json-schema's own declared signature is generic enough (combined
-// with zod 3.25's own recursive types) that passing ANY real zod schema into
-// it directly makes TS blow up with "type instantiation is excessively deep"
-// -- confirmed as a genuine zod-to-json-schema/zod version friction, not a
-// bug in this file's own types (reproduced with a trivial `z.object({...})`
-// in isolation). Re-declaring the function's shape as non-generic here is a
-// type-level-only workaround; the actual runtime call is unaffected.
-const toJsonSchema = zodToJsonSchema as (schema: unknown) => Record<string, unknown>;
+// The tool's arguments as the JSON Schema an LLM provider's tool definition
+// takes. Zod 4 does this itself (zod-to-json-schema was for Zod 3).
+const toJsonSchema = (schema: z.ZodType) => z.toJSONSchema(schema) as Record<string, unknown>;
 
 // A hard cap on tool calls per invocation -- the roadmap's "action caps" for
 // autonomous mode. Not per-tenant-per-day (that's AutonomyPolicy.maxActionsPerDay,
