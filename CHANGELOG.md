@@ -36,11 +36,20 @@ example "Too small: expected string to have >=1 characters" instead of
 - `fastify` 5.12.6: header validation bypass via case-sensitive
   `propertyNames`. `ip-address` 10.7.4: quadratic-time zone identifiers.
 - `vite` 6.4.6 (development): `server.fs.deny` bypassed with queries.
+- `glob` 14.0.4 and `minimatch` 11.0.5, through `@sentry/node` 11.11: two
+  advisories in the build plugins Sentry brought in.
 
 ### Changed
 
+- **Anthropic SDK 1.6** (`@anthropic-ai/sdk`). It sends API version
+  `2026-10-21` and the API key as `Authorization: Bearer`. Seredina's
+  requests needed no change: they send no `temperature`, `top_p` or
+  `top_k`, and no documents or citations in the turns the new version
+  checks. The SDK is now under the Apache License 2.0, which the AGPL
+  allows.
+- Sentry 11 in the console (`@sentry/react`), `@sentry/node` 11.11.
 - `@fastify/jwt` 10.2.7, `bullmq` 6.7, `@types/node` 22 (the Node version
-  the images run).
+  the images run), `i18next` 26.7, `react-i18next` 17.1.
 - The autonomous AI mode builds its tools' JSON Schema with Zod 4's own
   `z.toJSONSchema`; `zod-to-json-schema` is gone.
 
