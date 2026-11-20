@@ -22,6 +22,8 @@ const ApiKeys = lazy(() => import('./pages/ApiKeys').then((m) => ({ default: m.A
 const Assets = lazy(() => import('./pages/Assets').then((m) => ({ default: m.Assets })));
 const Devices = lazy(() => import('./pages/Devices').then((m) => ({ default: m.Devices })));
 const AssetDetail = lazy(() => import('./pages/AssetDetail').then((m) => ({ default: m.AssetDetail })));
+const MobileLines = lazy(() => import('./pages/MobileLines').then((m) => ({ default: m.MobileLines })));
+const HandoverPrint = lazy(() => import('./pages/HandoverPrint').then((m) => ({ default: m.HandoverPrint })));
 const Users = lazy(() => import('./pages/Users').then((m) => ({ default: m.Users })));
 const Teams = lazy(() => import('./pages/Teams').then((m) => ({ default: m.Teams })));
 const Settings = lazy(() => import('./pages/Settings').then((m) => ({ default: m.Settings })));
@@ -103,6 +105,8 @@ export function App() {
           <Route path="/csat/:tenantSlug/:token" element={<PublicCsat />} />
 
           <Route element={<RequireAuth />}>
+            {/* A page to print: no console chrome around it. */}
+            <Route path="/handovers/:id/print" element={<HandoverPrint />} />
             <Route element={<Layout />}>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
@@ -110,6 +114,7 @@ export function App() {
               <Route path="/tickets/:id" element={<TicketDetail />} />
               <Route path="/assets" element={<Assets />} />
               <Route path="/devices" element={<Devices />} />
+              <Route path="/mobile-lines" element={<MobileLines />} />
               <Route path="/assets/:id" element={<AssetDetail />} />
               <Route path="/contracts" element={<Contracts />} />
               <Route path="/contacts" element={<Contacts />} />

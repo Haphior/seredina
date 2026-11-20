@@ -84,6 +84,8 @@ const TENANT_SCOPE_FIELD: Record<string, string> = {
   Organization: 'tenantId',
   DirectoryContact: 'tenantId',
   ContractPayment: 'tenantId',
+  MobileLine: 'tenantId',
+  AssetHandover: 'tenantId',
 };
 
 const WRITE_OPERATIONS = new Set(['create']);

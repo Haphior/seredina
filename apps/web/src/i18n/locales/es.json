@@ -132,7 +132,8 @@
       "notificationSettings": "Notificaciones",
       "setup": "Configuración inicial",
       "directory": "Directorio",
-      "updates": "Actualizaciones"
+      "updates": "Actualizaciones",
+      "mobileLines": "Líneas móviles"
     }
   },
   "layout": {
@@ -617,7 +618,13 @@
       "directory_contact.deleted": "Persona del directorio eliminada",
       "system.update_started": "Actualización de Seredina iniciada",
       "system.update_source_saved": "Fuente de actualizaciones guardada",
-      "system.update_source_deleted": "Fuente de actualizaciones eliminada"
+      "system.update_source_deleted": "Fuente de actualizaciones eliminada",
+      "mobile_line.created": "Línea móvil agregada",
+      "mobile_line.updated": "Línea móvil modificada",
+      "mobile_line.deleted": "Línea móvil eliminada",
+      "asset.delivered": "Equipo entregado",
+      "asset.returned": "Equipo devuelto",
+      "asset.handover_deleted": "Acta de entrega eliminada"
     }
   },
   "mfa": {
@@ -1294,7 +1301,9 @@
     "purchaseCost": "Costo de compra",
     "currency": "Moneda",
     "warrantyEnd": "Fin de garantía",
-    "notes": "Notas"
+    "notes": "Notas",
+    "imei": "IMEI",
+    "imeiHint": "Marca *#06# en el teléfono o míralo en la caja. Android no deja que una app lo lea."
   },
   "monitoring": {
     "title": "Integraciones de monitoreo",
@@ -1383,12 +1392,14 @@
     "platforms": {
       "windows": "Windows",
       "unix": "macOS / Linux",
-      "manual": "Ya descargado"
+      "manual": "Ya descargado",
+      "android": "Android"
     },
     "platformHints": {
       "windows": "En PowerShell abierto como administrador. Descarga el agente, verifica su SHA-256, inscribe el equipo y deja el agente corriendo como servicio.",
       "unix": "En una terminal (te pedirá tu contraseña, por sudo). Descarga el agente, verifica su SHA-256, inscribe el equipo y deja el agente corriendo como servicio.",
-      "manual": "Para equipos sin acceso a internet: copia el agente desde <releases>sus versiones</releases> y ejecuta esto como administrador desde su carpeta (./seredina-agent en macOS/Linux, .\\seredina-agent.exe en Windows)."
+      "manual": "Para equipos sin acceso a internet: copia el agente desde <releases>sus versiones</releases> y ejecuta esto como administrador desde su carpeta (./seredina-agent en macOS/Linux, .\\seredina-agent.exe en Windows).",
+      "android": "Celulares y tablets Android: instala la app Seredina Agent y escanea el código desde ella. La app reporta modelo, versión de Android, parche de seguridad, SIM, batería, almacenamiento, aplicaciones instaladas y estado de seguridad."
     },
     "generateHint": "Genera un comando de inscripción para agregar un equipo.",
     "empty": "Todavía no hay equipos inscritos.",
@@ -1400,7 +1411,15 @@
     "never": "Nunca",
     "revoked": "Revocado",
     "active": "Activo",
-    "revoke": "revocar"
+    "revoke": "revocar",
+    "android": {
+      "step1": "1. Instala la app",
+      "step1Hint": "Escanea con la cámara del celular para descargar el APK. Android pedirá permitir la instalación desde el navegador.",
+      "downloadQr": "Código QR para descargar la app",
+      "step2": "2. Inscribe el equipo",
+      "step2Hint": "Abre Seredina Agent, toca «Escanear código» y apunta a este código. Sirve una sola vez y vence en 15 minutos.",
+      "enrollQr": "Código QR de inscripción"
+    }
   },
   "services": {
     "loadFailed": "No se pudieron cargar los servicios",
@@ -1978,7 +1997,8 @@
       "updates": "Actualizaciones",
       "services": "Servicios",
       "ports": "Puertos",
-      "server": "Roles y VMs"
+      "server": "Roles y VMs",
+      "mobile": "Móvil"
     },
     "none": "Ninguno.",
     "noneDetected": "No se detectó ninguno.",
@@ -2112,7 +2132,31 @@
     "process": "Proceso",
     "roles": "Roles y software de servidor",
     "guests": "Máquinas virtuales y contenedores",
-    "image": "Imagen"
+    "image": "Imagen",
+    "mobile": {
+      "device": "Equipo",
+      "deviceName": "Nombre del equipo",
+      "brand": "Marca",
+      "securityPatch": "Parche de seguridad",
+      "apiLevel": "Nivel de API",
+      "storage": "Almacenamiento",
+      "storageFree": "{{free}} libres de {{total}}",
+      "battery": "Batería",
+      "charging": "cargando",
+      "posture": "Seguridad",
+      "screenLock": "Bloqueo de pantalla",
+      "encrypted": "Almacenamiento cifrado",
+      "rooted": "Rooteado",
+      "developerOptions": "Opciones de desarrollador",
+      "usbDebugging": "Depuración USB",
+      "sims": "Tarjetas SIM",
+      "slot": "Ranura",
+      "carrier": "Operador",
+      "country": "País",
+      "number": "Número",
+      "numberHidden": "la SIM no lo informa",
+      "noSims": "Sin SIM o sin permiso para verlas"
+    }
   },
   "contacts": {
     "loadFailed": "No se pudieron cargar los contactos",
@@ -2631,5 +2675,104 @@
     "includePrereleases": "Incluir versiones de prueba",
     "githubHint": "Las versiones son los \"releases\" publicados en el repositorio.",
     "gitHint": "Las versiones son las etiquetas vX.Y.Z del repositorio. Revisarlas requiere el servicio de actualización activado."
+  },
+  "handovers": {
+    "title": "Entregas",
+    "deliver": "Entregar",
+    "return": "Devolución",
+    "empty": "Sin actas de entrega todavía.",
+    "print": "Imprimir",
+    "delete": "Eliminar acta",
+    "confirmDelete": "¿Eliminar esta acta? El responsable del equipo no cambia.",
+    "deleteFailed": "No se pudo eliminar el acta",
+    "kind": {
+      "DELIVERY": "Entrega",
+      "RETURN": "Devolución"
+    },
+    "pickReceiver": "Elige quién recibe el equipo",
+    "pickReturner": "Elige quién devuelve el equipo",
+    "saveFailed": "No se pudo registrar",
+    "loadFailed": "No se pudo cargar el acta",
+    "deliverTitle": "Entregar {{name}}",
+    "returnTitle": "Devolución de {{name}}",
+    "receiver": "Recibe",
+    "returner": "Devuelve",
+    "date": "Fecha",
+    "line": "Línea entregada con el equipo",
+    "noLine": "Ninguna",
+    "condition": "Estado del equipo",
+    "conditionPlaceholder": "Nuevo, sin rayas",
+    "accessories": "Accesorios",
+    "accessoriesPlaceholder": "Cargador, cable USB-C, funda",
+    "notes": "Observaciones",
+    "saveAndPrint": "Guardar e imprimir acta",
+    "printNow": "Imprimir",
+    "form": {
+      "titleDelivery": "Acta de entrega de equipo",
+      "titleReturn": "Acta de devolución de equipo",
+      "introDelivery": "En la fecha {{date}}, {{company}} hace entrega a {{person}} del equipo que se detalla a continuación.",
+      "introReturn": "En la fecha {{date}}, {{person}} devuelve a {{company}} el equipo que se detalla a continuación.",
+      "equipment": "Equipo",
+      "type": "Tipo",
+      "name": "Nombre",
+      "brandModel": "Marca y modelo",
+      "serial": "N.º de serie",
+      "assetTag": "Etiqueta de inventario",
+      "accessories": "Accesorios",
+      "condition": "Estado",
+      "line": "Línea telefónica",
+      "phoneNumber": "Número",
+      "carrier": "Operador",
+      "plan": "Plan",
+      "notes": "Observaciones",
+      "statementDelivery": "El receptor declara recibir el equipo descrito en el estado indicado y se compromete a cuidarlo, a usarlo para fines laborales y a devolverlo cuando la empresa lo solicite o al término de su relación laboral.",
+      "statementReturn": "Se deja constancia de la devolución del equipo descrito, en el estado indicado.",
+      "handedBy": "Entrega",
+      "returnedBy": "Devuelve",
+      "receivedBy": "Recibe",
+      "receivedBackBy": "Recibe",
+      "signName": "Nombre",
+      "signId": "RUT"
+    }
+  },
+  "mobileLines": {
+    "title": "Líneas móviles",
+    "new": "Nueva línea",
+    "edit": "Editar línea",
+    "intro": "Los números de la empresa: operador, plan, costo mensual, en qué teléfono está cada SIM y quién la tiene. Los pagos y recordatorios van en el contrato del operador.",
+    "searchPlaceholder": "Buscar número, ICCID, plan o persona",
+    "status": "Estado",
+    "anyStatus": "Cualquier estado",
+    "statuses": {
+      "ACTIVE": "Activa",
+      "SUSPENDED": "Suspendida",
+      "CANCELLED": "Dada de baja"
+    },
+    "monthlyTotal": "Total mensual: {{total}}",
+    "loadFailed": "No se pudieron cargar las líneas",
+    "empty": "No hay líneas que coincidan.",
+    "number": "Número",
+    "carrier": "Operador",
+    "plan": "Plan",
+    "monthlyCost": "Costo mensual",
+    "phone": "Teléfono",
+    "assignedTo": "Asignada a",
+    "editAction": "Editar",
+    "deleteAction": "Eliminar",
+    "confirmDelete": "¿Eliminar la línea {{number}}?",
+    "deleteFailed": "No se pudo eliminar la línea",
+    "saveFailed": "No se pudo guardar la línea",
+    "iccid": "ICCID (n.º de la SIM)",
+    "planPlaceholder": "Plan empresa 30 GB",
+    "dataAllowance": "Datos",
+    "currency": "Moneda",
+    "contractEnd": "Fin de contrato",
+    "contract": "Contrato del operador",
+    "contractHint": "Para los pagos y sus recordatorios por correo.",
+    "phonePlaceholder": "Busca el celular por nombre",
+    "notes": "Notas",
+    "onAsset_one": "Líneas ({{count}})",
+    "onAsset_other": "Líneas ({{count}})",
+    "noneOnAsset": "Sin líneas en este equipo."
   }
 }

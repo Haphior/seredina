@@ -157,6 +157,84 @@ solo con una columna extra indicando de dónde salió el dato. Revocar un
 dispositivo desde esta pantalla corta sus futuros reportes sin borrar el
 historial ya guardado.
 
+### Celulares y tablets (Android)
+
+Los celulares y tablets Android se inscriben con la app **Seredina
+Agent**, que viene con cada versión de Seredina. En **Dispositivos**:
+
+1. Haz clic en **Generar comando de inscripción** y elige **Android**.
+2. Escanea el primer código QR con la cámara del celular para descargar la
+   app. Android pide permitir la instalación desde el navegador.
+3. Abre Seredina Agent, toca **Escanear código** y apunta al segundo QR.
+   Vale 15 minutos y funciona una sola vez.
+
+La app pide permiso para ver el teléfono: con él informa las SIM y su
+número. Si se lo niegas, funciona igual, sin los números. Cada 6 horas
+(y cuando tocas **Enviar inventario ahora**) informa:
+
+- Fabricante, modelo y nombre del equipo; versión de Android, nivel de API
+  y **parche de seguridad**.
+- Las SIM: operador, país y número, cuando la SIM lo informa.
+- Si hay **bloqueo de pantalla**, si el almacenamiento está cifrado, si
+  tiene las opciones de desarrollador o la depuración USB activas, y si
+  parece rooteado.
+- Batería, memoria y almacenamiento libre.
+- Las aplicaciones instaladas por el usuario, con su versión, si vienen de
+  Google Play y cuándo se instalaron.
+
+Se ve en la pestaña **Móvil** del activo. Un celular queda como
+**Teléfono móvil** y una tablet como **Tablet**.
+
+La app no envía fotos, mensajes, contactos ni ubicación, y no puede
+controlar el equipo: no bloquea, no borra, no instala nada.
+
+::: tip El IMEI se escribe a mano
+Desde Android 10, solo el MDM de un equipo (Intune, Google) puede leer el
+IMEI y el número de serie. Escribe el IMEI en el activo: marca `*#06#` en
+el teléfono o míralo en la caja. El buscador de **Activos** lo encuentra.
+:::
+
+Si tu servidor usa un certificado privado, el código QR lleva la huella
+de su CA. La app descarga la CA, verifica la huella y después confía solo
+en ella. Si tus celulares no llegan a GitHub, copia
+`seredina-agent-android.apk` a la carpeta de `AGENT_DOWNLOAD_URL`.
+
+Los iPhone no tienen app: iOS no deja que una app lea el inventario del
+equipo sin un MDM. Regístralos a mano en **Activos** (con su IMEI), y usa
+las líneas y las actas de entrega igual que con un Android.
+
+## Líneas móviles
+
+**Líneas móviles** guarda los números de la empresa: el número, el
+operador (una empresa del [Directorio](/es/guia/directorio)), el plan, los
+datos, el costo mensual, el ICCID de la SIM y el fin del contrato. Cada
+línea dice en qué teléfono está y quién la tiene. Arriba se ve el total
+mensual de las líneas que muestra el filtro.
+
+Cuando un celular con la app informa el número de su SIM, la línea con
+ese número queda en ese celular sola (aunque antes estuviera en otro). La
+app nunca crea líneas: un número que no está registrado puede ser una SIM
+personal.
+
+Los pagos y sus recordatorios por correo van en el contrato del operador:
+crea un contrato con su calendario de pagos y elígelo en cada línea.
+
+## Actas de entrega
+
+En la página de cualquier activo, **Entregas** registra a quién se le
+entregó un equipo y cuándo lo devolvió:
+
+1. Haz clic en **Entregar** (o **Devolución**, si alguien lo tiene).
+2. Elige la persona, la fecha, el estado del equipo, los accesorios
+   (cargador, funda...) y, si corresponde, la línea que va con él.
+3. **Guardar e imprimir acta** abre el acta lista para imprimir y firmar,
+   con el logo de la empresa (el que subiste en
+   [Correos a clientes](/es/guia/canales)).
+
+Una entrega deja el equipo y la línea asignados a esa persona; una
+devolución los deja sin asignar. El acta se puede volver a imprimir desde
+el historial. Borrar un acta no cambia a quién está asignado el equipo.
+
 ## Contratos, garantías y licencias
 
 **CMDB → Contratos** registra contratos de soporte, garantías, licencias de

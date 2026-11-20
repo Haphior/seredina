@@ -449,3 +449,12 @@ export function BuildingIcon(props: SVGProps<SVGSVGElement>) {
     </Icon>
   );
 }
+
+export function PhoneIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <rect x="5.5" y="2" width="9" height="16" rx="2" />
+      <path d="M8.5 15h3" />
+    </Icon>
+  );
+}

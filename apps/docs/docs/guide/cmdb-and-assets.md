@@ -154,6 +154,83 @@ its discovery source — it's the same inventory, just with an extra column
 showing where the data came from. Revoking a device from this screen cuts
 off its future check-ins without deleting its already-saved history.
 
+### Phones and tablets (Android)
+
+Android phones and tablets enroll with the **Seredina Agent** app, which
+ships with every Seredina release. In **Devices**:
+
+1. Click **Generate enrollment command** and choose **Android**.
+2. Scan the first QR code with the phone's camera to download the app.
+   Android asks to allow installing from the browser.
+3. Open Seredina Agent, tap **Scan code** and point it at the second QR
+   code. It works once and expires in 15 minutes.
+
+The app asks for permission to see the phone: with it, it reports the SIMs
+and their numbers. Without it, it works the same, without the numbers.
+Every 6 hours (and when you tap **Send inventory now**) it reports:
+
+- Manufacturer, model and device name; Android version, API level and
+  **security patch**.
+- The SIMs: carrier, country and number, when the SIM reports it.
+- Whether a **screen lock** is set, storage is encrypted, developer options
+  or USB debugging are on, and whether it looks rooted.
+- Battery, memory and free storage.
+- The apps the user installed, with their version, whether they came from
+  Google Play, and when.
+
+It shows in the asset's **Mobile** tab. A phone becomes a **Mobile
+device** and a tablet a **Tablet**.
+
+The app never sends photos, messages, contacts or location, and it can't
+control the device: it doesn't lock, wipe or install anything.
+
+::: tip The IMEI is typed in
+Since Android 10, only a device's MDM (Intune, Google) can read the IMEI
+and serial number. Type the IMEI into the asset: dial `*#06#` on the phone
+or check the box. The **Assets** search finds it.
+:::
+
+If your server uses a private certificate, the QR code carries its CA's
+fingerprint. The app downloads the CA, checks the fingerprint, and then
+trusts only that CA. If your phones can't reach GitHub, copy
+`seredina-agent-android.apk` into the `AGENT_DOWNLOAD_URL` folder.
+
+iPhones have no app: iOS doesn't let an app read the device's inventory
+without an MDM. Register them by hand in **Assets** (with their IMEI), and
+use lines and handover forms the same as with an Android.
+
+## Mobile lines
+
+**Mobile lines** keeps the company's phone numbers: the number, the
+carrier (a company in the [Directory](/guide/directory)), the plan, the
+data allowance, the monthly cost, the SIM's ICCID and when the contract
+ends. Each line says which phone it's in and who has it. The top shows
+the monthly total of the lines the filter shows.
+
+When a phone with the app reports its SIM's number, the line with that
+number moves into that phone by itself (even from another phone). The app
+never creates lines: a number that isn't registered may be a personal
+SIM.
+
+Payments and their email reminders go on the carrier's contract: create
+a contract with its payment schedule and pick it on each line.
+
+## Handover forms
+
+On any asset's page, **Handovers** records who equipment was handed to and
+when it came back:
+
+1. Click **Hand over** (or **Return**, when someone has it).
+2. Pick the person, the date, the condition, the accessories (charger,
+   case...) and, when there is one, the line that goes with it.
+3. **Save and print the form** opens the form ready to print and sign,
+   with the company logo (the one uploaded under
+   [Customer emails](/guide/channels)).
+
+A handover assigns the equipment and the line to that person; a return
+leaves them unassigned. The form can be printed again from the history.
+Deleting a record doesn't change who the equipment is assigned to.
+
 ## Contracts, warranties and licenses
 
 **CMDB → Contracts** tracks support contracts, warranties, software

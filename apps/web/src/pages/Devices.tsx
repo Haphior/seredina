@@ -8,6 +8,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { CopyableCodeBlock } from '../components/Copyable';
 import { Input } from '../components/Input';
+import { QrCode } from '../components/QrCode';
 import { formatDateTime } from '../lib/format';
 
 interface AgentSetup {
@@ -15,13 +16,27 @@ interface AgentSetup {
   caCertPem: string | null;
   caCertSha256: string | null;
   agentDownloadUrl: string | null;
+  androidApkUrl: string;
 }
 
 /** The agent lives in its own repository; its releases carry the install scripts. */
 const AGENT_RELEASES = 'https://github.com/Haphior/seredina-agent/releases/latest/download';
+/** The Android agent ships with Seredina's own releases (docs/adr/0078-mobile-inventory.md). */
+const ANDROID_APK_RELEASE = 'https://github.com/Haphior/seredina/releases/latest/download/seredina-agent-android.apk';
 
-type AgentPlatform = 'windows' | 'unix' | 'manual';
-const AGENT_PLATFORMS: AgentPlatform[] = ['windows', 'unix', 'manual'];
+type AgentPlatform = 'windows' | 'unix' | 'manual' | 'android';
+const AGENT_PLATFORMS: AgentPlatform[] = ['windows', 'unix', 'manual', 'android'];
+
+/**
+ * What the Android agent's scanner reads (docs/adr/0078-mobile-inventory.md):
+ * the server, the one-time token, and -- for a private CA -- the CA's sha256,
+ * which the app checks the CA it then downloads against before trusting it.
+ */
+export function buildAndroidEnrollLink(serverUrl: string, token: string, caCertSha256: string | null): string {
+  const params = new URLSearchParams({ s: serverUrl.trim().replace(/\/$/, ''), t: token });
+  if (caCertSha256) params.set('p', caCertSha256);
+  return `seredina://enroll?${params.toString()}`;
+}
 
 /**
  * docs/adr/0054-server-address-and-tls.md: the address is whatever the
@@ -34,7 +49,7 @@ const AGENT_PLATFORMS: AgentPlatform[] = ['windows', 'unix', 'manual'];
  * check its SHA-256, enroll, and start the service.
  */
 function buildEnrollCommand(
-  platform: AgentPlatform,
+  platform: Exclude<AgentPlatform, 'android'>,
   serverUrl: string,
   token: string,
   caCertPem: string | null,
@@ -83,10 +98,14 @@ export function Devices() {
   }, []);
 
   const serverUrlValid = /^https?:\/\/[^\s/]+/i.test(serverUrl.trim());
+  const androidLink =
+    enrollToken && serverUrlValid && platform === 'android'
+      ? buildAndroidEnrollLink(serverUrl, enrollToken, agentSetup?.caCertSha256 ?? null)
+      : null;
   const enrollCommand =
-    enrollToken && serverUrlValid
+    enrollToken && serverUrlValid && platform !== 'android'
       ? buildEnrollCommand(
-          platform,
+          platform as Exclude<AgentPlatform, 'android'>,
           serverUrl,
           enrollToken,
           agentSetup?.caCertPem ?? null,
@@ -165,7 +184,7 @@ export function Devices() {
             </p>
           )}
         </div>
-        {enrollCommand ? (
+        {enrollToken && serverUrlValid ? (
           <>
             <h2 className="mb-1 text-[15px] font-bold text-slate-800">{t('devices.runThis')}</h2>
             <p className="mb-3 text-[12.5px] text-slate-500">{t('devices.validity')}</p>
@@ -202,7 +221,8 @@ export function Devices() {
                 }}
               />
             </p>
-            <CopyableCodeBlock label={t('devices.command')} value={enrollCommand} />
+            {enrollCommand && <CopyableCodeBlock label={t('devices.command')} value={enrollCommand} />}
+            {androidLink && <AndroidEnroll link={androidLink} apkUrl={agentSetup?.androidApkUrl ?? ANDROID_APK_RELEASE} />}
           </>
         ) : (
           <p className="text-[12.5px] text-slate-500">{t('devices.generateHint')}</p>
@@ -262,6 +282,28 @@ export function Devices() {
           </table>
         </Card>
       )}
+    </div>
+  );
+}
+
+/** Two QR codes: one to download the app, one for the app to scan. */
+function AndroidEnroll({ link, apkUrl }: { link: string; apkUrl: string }) {
+  const { t } = useTranslation();
+  return (
+    <div className="grid gap-4 sm:grid-cols-2">
+      <div>
+        <h3 className="mb-1 text-[13px] font-bold text-slate-700">{t('devices.android.step1')}</h3>
+        <p className="mb-2 text-[12.5px] text-slate-500">{t('devices.android.step1Hint')}</p>
+        <QrCode value={apkUrl} size={170} label={t('devices.android.downloadQr')} />
+        <a href={apkUrl} className="mt-1.5 block break-all text-[12px] text-indigo-700 hover:underline">
+          {apkUrl}
+        </a>
+      </div>
+      <div>
+        <h3 className="mb-1 text-[13px] font-bold text-slate-700">{t('devices.android.step2')}</h3>
+        <p className="mb-2 text-[12.5px] text-slate-500">{t('devices.android.step2Hint')}</p>
+        <QrCode value={link} size={170} label={t('devices.android.enrollQr')} />
+      </div>
     </div>
   );
 }

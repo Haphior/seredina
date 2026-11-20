@@ -2,7 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { requirePermission } from '../rbac/permissions';
 import { checkIn, createEnrollmentToken, enrollDevice, listDevices, revokeDevice } from './service';
-import { getAgentSetup } from './agentSetup';
+import { getAgentSetup, readAgentCaCert } from './agentSetup';
 import { agentInventorySchema, describeInventoryError } from './inventorySchema';
 import { auditRequest, recordAudit, requestOrigin } from '../audit/service';
 
@@ -12,7 +12,8 @@ const macSchema = z.string().regex(/^[0-9A-Fa-f]{2}([:-]?[0-9A-Fa-f]{2}){5}$/);
 
 const enrollSchema = z.object({
   hostname: z.string().min(1).max(200),
-  platform: z.enum(['linux', 'darwin', 'win32']),
+  // 'android': the mobile agent (docs/adr/0078-mobile-inventory.md).
+  platform: z.enum(['linux', 'darwin', 'win32', 'android']),
   agentVersion: z.string().max(50).optional(),
   machineFingerprint: z.string().regex(/^[0-9a-f]{64}$/, 'machineFingerprint must be a lowercase sha256 hex digest').optional(),
   macAddress: macSchema.optional(),
@@ -58,6 +59,17 @@ export default async function deviceRoutes(app: FastifyInstance) {
     { preHandler: [app.authenticate, requirePermission('assets:manage')] },
     async (_request, reply) => reply.send(await getAgentSetup()),
   );
+
+  // The CA the enrollment QR pins by hash (docs/adr/0078-mobile-inventory.md):
+  // a phone can't carry a whole certificate in a QR code comfortably, so it
+  // fetches it here before trusting anything and keeps it only if its sha256
+  // matches the QR. Public by nature, like the CA in the desktop agent's
+  // enrollment command -- only the private key is secret, never readable here.
+  app.get('/v1/devices/ca.pem', async (_request, reply) => {
+    const pem = await readAgentCaCert();
+    if (!pem) return reply.code(404).send({ error: 'no private CA configured' });
+    return reply.type('application/x-pem-file').send(pem);
+  });
 
   app.get('/devices', { preHandler: [app.authenticate, requirePermission('assets:read')] }, async (request, reply) => {
     const devices = await listDevices(request.user.tenantId);

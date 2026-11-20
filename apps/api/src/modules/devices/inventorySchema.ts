@@ -24,7 +24,7 @@ export const agentInventorySchema = z.object({
       model: text(),
       serialNumber: text(),
       uuid: text(),
-      formFactor: z.enum(['laptop', 'desktop', 'server', 'virtual', 'tablet', 'other']).optional(),
+      formFactor: z.enum(['laptop', 'desktop', 'server', 'virtual', 'tablet', 'phone', 'other']).optional(),
       role: z.enum(['server', 'workstation']).optional(),
       virtual: z.boolean().optional(),
       hypervisor: text(),
@@ -182,6 +182,29 @@ export const agentInventorySchema = z.object({
     500,
   ),
   serverRoles: names(100),
+  // Phones and tablets: what the Android agent reports beyond the shared
+  // sections above (docs/adr/0078-mobile-inventory.md). No IMEI or serial:
+  // Android 10+ keeps both from apps that aren't the device's MDM.
+  mobile: z
+    .object({
+      deviceName: text(),
+      brand: text(),
+      securityPatch: text(20),
+      apiLevel: count,
+      sims: list(
+        z.object({ slot: count, carrier: text(), countryIso: text(10), phoneNumber: text(40) }),
+        4,
+      ),
+      screenLockSecure: z.boolean().optional(),
+      developerOptions: z.boolean().optional(),
+      usbDebugging: z.boolean().optional(),
+      rooted: z.boolean().optional(),
+      batteryPercent: z.number().int().min(0).max(100).optional(),
+      charging: z.boolean().optional(),
+      storageTotalGb: size,
+      storageFreeGb: size,
+    })
+    .optional(),
   virtualMachines: list(z.object({ name: z.string().max(200), type: text(30), state: text(50), image: text() }), 500),
 });
 
