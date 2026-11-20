@@ -1,0 +1,42 @@
+name: Android agent
+
+# Builds and tests the Android agent (apps/agent-android,
+# docs/adr/0078-mobile-inventory.md) whenever it changes. The release APK
+# is built and attached by release.yml.
+on:
+  pull_request:
+    paths:
+      - "apps/agent-android/**"
+      - ".github/workflows/android-agent.yml"
+  push:
+    branches: [main]
+    paths:
+      - "apps/agent-android/**"
+      - ".github/workflows/android-agent.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: "8.14.3"
+
+      - name: Unit tests and a debug APK
+        run: gradle -p apps/agent-android --no-daemon testDebugUnitTest assembleDebug
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: seredina-agent-android-debug
+          path: apps/agent-android/app/build/outputs/apk/debug/*.apk
+          retention-days: 14

@@ -7,6 +7,28 @@ contain breaking changes).
 
 ## [Unreleased]
 
+### Added
+
+- **Android agent.** A Seredina Agent app for Android phones and tablets
+  reports model, Android version, security patch, SIMs (carrier and
+  number), screen lock, encryption, developer options, root, battery,
+  storage and installed apps every 6 hours. Enroll it from **Devices** →
+  **Android** by scanning two QR codes: one downloads the app, the other
+  enrolls it. With a private CA, the QR pins the CA by its hash. The APK
+  is attached to each release (`seredina-agent-android.apk`). It never
+  controls the device. See `docs/adr/0078-mobile-inventory.md`.
+- **IMEI** on phones and tablets, typed into the asset (Android doesn't
+  let an app read it) and found by the assets search.
+- **Mobile lines.** A new page for the company's numbers: carrier, plan,
+  data, monthly cost and total, ICCID, contract end, the carrier's
+  contract (for payment reminders), the phone each SIM is in and who has
+  it. A phone that reports its SIM's number links the matching line by
+  itself.
+- **Handover forms.** Record a delivery or a return on any asset (person,
+  date, condition, accessories, the line that goes with it), and print the
+  handover form with the company logo and signature lines. A delivery
+  assigns the asset and its line to the person; a return clears them.
+
 ## [0.4.1] - 2026-11-09
 
 A security release: dependency updates only, no new features and no

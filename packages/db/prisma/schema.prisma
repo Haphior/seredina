@@ -93,6 +93,8 @@ model Tenant {
   organizations         Organization[]
   directoryContacts     DirectoryContact[]
   contractPayments      ContractPayment[]
+  mobileLines           MobileLine[]
+  assetHandovers        AssetHandover[]
 
   @@map("tenants")
   auditLogs AuditLog[]
@@ -299,6 +301,9 @@ model Contact {
   // Equipment handed to this person (docs/adr/0076-directory-payments-inventory.md).
   assignedAssets Asset[] @relation("AssetAssignee")
   authoredMessages Message[] @relation("MessageAuthorContact")
+  // Phone lines and handover records (docs/adr/0078-mobile-inventory.md).
+  mobileLines MobileLine[]
+  handovers   AssetHandover[]
 
   @@unique([tenantId, email])
   @@map("contacts")
@@ -822,6 +827,12 @@ model Asset {
   supplier          Organization? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
   warrantyEndDate   DateTime?     @map("warranty_end_date") @db.Date
   notes             String?
+  // Phones and tablets: the IMEI, typed in or scanned from the box -- an
+  // app can't read it on Android 10+ (docs/adr/0078-mobile-inventory.md).
+  imei              String?
+
+  mobileLines MobileLine[]
+  handovers   AssetHandover[]
 
   tickets  TicketAsset[]
   services ServiceAsset[]
@@ -871,7 +882,7 @@ model Device {
   assetId          String    @unique @map("asset_id") @db.Uuid
   asset            Asset     @relation(fields: [assetId], references: [id], onDelete: Cascade)
   hashedCredential String    @unique @map("hashed_credential")
-  platform         String // os.platform() at enrollment: 'linux' | 'darwin' | 'win32'
+  platform         String // at enrollment: 'linux' | 'darwin' | 'win32', or 'android' for the mobile agent
   agentVersion     String?   @map("agent_version")
   // sha256 of the OS's own stable machine id (/etc/machine-id, Windows
   // MachineGuid, macOS IOPlatformUUID), hashed on the device so the raw id
@@ -879,8 +890,9 @@ model Device {
   // instead of creating a duplicate (docs/adr/0055-agent-based-discovery.md).
   // Nullable: agents older than this send none.
   machineFingerprint String?   @map("machine_fingerprint")
-  // The role (server/workstation) the agent last reported. The asset's type
-  // follows it only when it changes, so a type an admin set by hand sticks.
+  // The role (server/workstation) the agent last reported -- for the Android
+  // agent, the form factor (phone/tablet). The asset's type follows it only
+  // when it changes, so a type an admin set by hand sticks.
   reportedRole     String?   @map("reported_role")
   enrolledAt       DateTime  @default(now()) @map("enrolled_at")
   revokedAt        DateTime? @map("revoked_at")
@@ -1825,8 +1837,9 @@ model Contract {
   paymentReminderSentFor DateTime? @map("payment_reminder_sent_for") @db.Date
   paymentOverdueSentFor  DateTime? @map("payment_overdue_sent_for") @db.Date
 
-  assets   ContractAsset[]
-  payments ContractPayment[]
+  assets      ContractAsset[]
+  payments    ContractPayment[]
+  mobileLines MobileLine[]
 
   @@index([tenantId, endDate])
   @@map("contracts")
@@ -1878,9 +1891,10 @@ model Organization {
   createdAt DateTime         @default(now()) @map("created_at")
   updatedAt DateTime         @updatedAt @map("updated_at")
 
-  contacts  DirectoryContact[]
-  contracts Contract[]
-  assets    Asset[]
+  contacts    DirectoryContact[]
+  contracts   Contract[]
+  assets      Asset[]
+  mobileLines MobileLine[]
 
   @@unique([tenantId, name])
   @@map("organizations")
@@ -1934,4 +1948,82 @@ model ContractAsset {
   @@id([contractId, assetId])
   @@index([assetId])
   @@map("contract_assets")
+}
+
+// ---------------------------------------------------------------------------
+// Mobile inventory: phone lines and equipment handovers --
+// docs/adr/0078-mobile-inventory.md.
+// ---------------------------------------------------------------------------
+
+enum MobileLineStatus {
+  ACTIVE
+  SUSPENDED
+  CANCELLED
+}
+
+// A phone line (a SIM and its plan): who has it, in which phone, with which
+// carrier and at what cost. Billing and payment reminders stay on the
+// carrier's Contract, which a line can point to.
+model MobileLine {
+  id                String           @id @default(uuid()) @db.Uuid
+  tenantId          String           @map("tenant_id") @db.Uuid
+  tenant            Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  phoneNumber       String           @map("phone_number")
+  status            MobileLineStatus @default(ACTIVE)
+  carrierId         String?          @map("carrier_id") @db.Uuid
+  carrier           Organization?    @relation(fields: [carrierId], references: [id], onDelete: SetNull)
+  plan              String?
+  dataAllowance     String?          @map("data_allowance")
+  monthlyCost       Decimal?         @map("monthly_cost") @db.Decimal(14, 2)
+  currency          String?
+  iccid             String?
+  contractEndDate   DateTime?        @map("contract_end_date") @db.Date
+  contractId        String?          @map("contract_id") @db.Uuid
+  contract          Contract?        @relation(fields: [contractId], references: [id], onDelete: SetNull)
+  // The phone it's in. The Android agent links a line it sees in a phone.
+  assetId           String?          @map("asset_id") @db.Uuid
+  asset             Asset?           @relation(fields: [assetId], references: [id], onDelete: SetNull)
+  assignedContactId String?          @map("assigned_contact_id") @db.Uuid
+  assignedContact   Contact?         @relation(fields: [assignedContactId], references: [id], onDelete: SetNull)
+  notes             String?
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+
+  handovers AssetHandover[]
+
+  @@unique([tenantId, phoneNumber])
+  @@index([tenantId, assetId])
+  @@map("mobile_lines")
+}
+
+enum HandoverKind {
+  DELIVERY
+  RETURN
+}
+
+// A record of handing equipment to a person, or of getting it back -- what
+// the printed handover form (acta de entrega) is made from. Recording one
+// also moves the asset's assignee.
+model AssetHandover {
+  id             String       @id @default(uuid()) @db.Uuid
+  tenantId       String       @map("tenant_id") @db.Uuid
+  tenant         Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  assetId        String       @map("asset_id") @db.Uuid
+  asset          Asset        @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  kind           HandoverKind
+  contactId      String?      @map("contact_id") @db.Uuid
+  contact        Contact?     @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  handedOverOn   DateTime     @map("handed_over_on") @db.Date
+  condition      String?
+  accessories    String?
+  notes          String?
+  // The line handed over with the phone, if any.
+  mobileLineId   String?      @map("mobile_line_id") @db.Uuid
+  mobileLine     MobileLine?  @relation(fields: [mobileLineId], references: [id], onDelete: SetNull)
+  recordedById   String?      @map("recorded_by_id") @db.Uuid
+  recordedByName String?      @map("recorded_by_name")
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  @@index([tenantId, assetId, handedOverOn])
+  @@map("asset_handovers")
 }

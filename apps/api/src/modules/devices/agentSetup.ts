@@ -47,7 +47,16 @@ export interface AgentSetup {
    * can't reach GitHub; null = download from the agent's GitHub releases.
    */
   agentDownloadUrl: string | null;
+  /**
+   * Where phones download the Android agent: the mirror above when there is
+   * one, else this project's latest GitHub release
+   * (docs/adr/0078-mobile-inventory.md).
+   */
+  androidApkUrl: string;
 }
+
+export const ANDROID_APK_NAME = 'seredina-agent-android.apk';
+const ANDROID_APK_RELEASE_URL = `https://github.com/Haphior/seredina/releases/latest/download/${ANDROID_APK_NAME}`;
 
 function agentDownloadUrl(): string | null {
   const value = process.env.AGENT_DOWNLOAD_URL?.trim().replace(/\/+$/, '');
@@ -56,10 +65,12 @@ function agentDownloadUrl(): string | null {
 
 export async function getAgentSetup(): Promise<AgentSetup> {
   const ca = await readAgentCaCert();
+  const mirror = agentDownloadUrl();
   return {
     serverUrl: process.env.API_PUBLIC_URL?.replace(/\/$/, '') || null,
     caCertPem: ca,
     caCertSha256: ca ? sha256Hex(ca) : null,
-    agentDownloadUrl: agentDownloadUrl(),
+    agentDownloadUrl: mirror,
+    androidApkUrl: mirror ? `${mirror}/${ANDROID_APK_NAME}` : ANDROID_APK_RELEASE_URL,
   };
 }

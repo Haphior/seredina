@@ -46,6 +46,7 @@ import uiSettingsRoutes from './modules/uisettings/routes';
 import brandingRoutes from './modules/branding/routes';
 import emailTemplateRoutes from './modules/emailtemplates/routes';
 import directoryRoutes from './modules/directory/routes';
+import mobileRoutes from './modules/mobile/routes';
 import updateRoutes from './modules/updates/routes';
 import telegramRoutes from './modules/telegram/routes';
 import csatRoutes from './modules/csat/routes';
@@ -158,6 +159,7 @@ export function buildApp() {
   app.register(brandingRoutes);
   app.register(emailTemplateRoutes);
   app.register(directoryRoutes);
+  app.register(mobileRoutes);
   app.register(updateRoutes);
   app.register(telegramRoutes);
   app.register(csatRoutes);

@@ -119,7 +119,8 @@ export async function enrollDevice(rawToken: string, input: EnrollDeviceInput): 
 
     const assetData = {
       name: input.hostname,
-      assetType: 'WORKSTATION' as const,
+      // A phone until its first check-in says it's a tablet.
+      assetType: input.platform === 'android' ? ('MOBILE_DEVICE' as const) : ('WORKSTATION' as const),
       hostname: input.hostname,
       discoverySource: 'AGENT' as const,
       lastSeenAt: new Date(),
@@ -241,16 +242,18 @@ export async function checkIn(hashedCredential: string, input: CheckInInput): Pr
     // The asset's type follows the role the agent reports (server or
     // workstation) only when that role changes, so a type an admin set by
     // hand sticks. The first report only moves the enrollment default.
-    const role = input.inventory?.system?.role;
+    // The Android agent reports a form factor (phone or tablet) instead.
+    const formFactor = input.inventory?.system?.formFactor;
+    const role = device.platform === 'android' ? (formFactor === 'tablet' ? 'tablet' : formFactor ? 'phone' : undefined) : input.inventory?.system?.role;
     // A workstation's form factor says which kind it is: a laptop or tablet
     // (docs/adr/0076-directory-payments-inventory.md).
-    const formFactor = input.inventory?.system?.formFactor;
     const workstationType = formFactor === 'laptop' ? 'LAPTOP' : formFactor === 'tablet' ? 'TABLET' : 'WORKSTATION';
-    let assetType: 'SERVER' | 'WORKSTATION' | 'LAPTOP' | 'TABLET' | undefined;
+    let assetType: 'SERVER' | 'WORKSTATION' | 'LAPTOP' | 'TABLET' | 'MOBILE_DEVICE' | undefined;
     if (role && role !== device.reportedRole) {
       const current = await tx.asset.findUnique({ where: { id: device.assetId }, select: { assetType: true } });
-      if (device.reportedRole !== null || current?.assetType === 'WORKSTATION') {
-        assetType = role === 'server' ? 'SERVER' : workstationType;
+      const enrollmentDefault = device.platform === 'android' ? 'MOBILE_DEVICE' : 'WORKSTATION';
+      if (device.reportedRole !== null || current?.assetType === enrollmentDefault) {
+        assetType = role === 'server' ? 'SERVER' : role === 'tablet' ? 'TABLET' : role === 'phone' ? 'MOBILE_DEVICE' : workstationType;
       }
       await tx.device.update({ where: { id: device.id }, data: { reportedRole: role } });
     } else if (role === 'workstation' && workstationType !== 'WORKSTATION') {
@@ -284,6 +287,7 @@ export async function checkIn(hashedCredential: string, input: CheckInInput): Pr
     });
 
     if (input.inventory?.monitors) await syncAgentMonitors(tx, tenantId, device.assetId, input.inventory.monitors);
+    if (input.inventory?.mobile?.sims) await linkReportedLines(tx, device.assetId, input.inventory.mobile.sims);
 
     return ingestNeighbors(tx, tenantId, input.neighbors ?? []);
   });
@@ -336,5 +340,42 @@ async function syncAgentMonitors(
         lastSeenAt: new Date(),
       },
     });
+  }
+}
+
+/** Digits only, for comparing numbers written as +56 9 1234 5678, 912345678 or 56912345678. */
+export function phoneDigits(value: string): string {
+  return value.replace(/\D/g, '');
+}
+
+/**
+ * The same number written with or without the country code: equal, or one
+ * ends with the other and the shorter still has at least 8 digits (a local
+ * number), so 912345678 matches +56 9 1234 5678 but 5678 matches nothing.
+ */
+export function samePhoneNumber(a: string, b: string): boolean {
+  const x = phoneDigits(a);
+  const y = phoneDigits(b);
+  if (!x || !y) return false;
+  if (x === y) return true;
+  const [short, long] = x.length < y.length ? [x, y] : [y, x];
+  return short.length >= 8 && long.endsWith(short);
+}
+
+/**
+ * A phone that reports a SIM's number puts that line in it: a line already
+ * registered with that number is linked to this phone (moved from the phone
+ * it was in before, a SIM changing phones). Never creates lines -- an
+ * unknown number may be a personal SIM -- and never unlinks: a phone whose
+ * SIM can't report its number (common) leaves its lines as they were.
+ */
+async function linkReportedLines(tx: Prisma.TransactionClient, assetId: string, sims: NonNullable<NonNullable<AgentInventory['mobile']>['sims']>) {
+  const numbers = sims.map((s) => s.phoneNumber?.trim()).filter((n): n is string => !!n && phoneDigits(n).length >= 8);
+  if (!numbers.length) return;
+  const lines = await tx.mobileLine.findMany({ select: { id: true, phoneNumber: true, assetId: true } });
+  for (const line of lines) {
+    if (line.assetId !== assetId && numbers.some((n) => samePhoneNumber(n, line.phoneNumber))) {
+      await tx.mobileLine.update({ where: { id: line.id }, data: { assetId } });
+    }
   }
 }

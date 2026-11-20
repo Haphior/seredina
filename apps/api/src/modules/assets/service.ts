@@ -26,6 +26,7 @@ export interface AssetInput {
   supplierId?: string | null;
   warrantyEndDate?: string | null;
   notes?: string | null;
+  imei?: string | null;
 }
 
 export class AssetError extends Error {
@@ -135,6 +136,7 @@ export async function listAssets(tenantId: string, filter: ListAssetsFilter = {}
           { ipAddress: { contains: filter.q, mode: 'insensitive' } },
           { hostname: { contains: filter.q, mode: 'insensitive' } },
           { serialNumber: { contains: filter.q, mode: 'insensitive' } },
+          { imei: { contains: filter.q } },
           { model: { contains: filter.q, mode: 'insensitive' } },
           { assetTag: { contains: filter.q, mode: 'insensitive' } },
           { location: { contains: filter.q, mode: 'insensitive' } },
@@ -181,6 +183,12 @@ export async function getAsset(tenantId: string, id: string) {
         supplier: { select: { id: true, name: true } },
         parentAsset: { select: { id: true, name: true, assetType: true } },
         connectedAssets: { select: { id: true, name: true, assetType: true, assetTag: true }, orderBy: { name: 'asc' } },
+        // docs/adr/0078-mobile-inventory.md
+        mobileLines: {
+          select: { id: true, phoneNumber: true, status: true, plan: true, carrier: { select: { id: true, name: true } } },
+          orderBy: { phoneNumber: 'asc' },
+        },
+        device: { select: { id: true, platform: true, agentVersion: true, revokedAt: true } },
       },
     });
     if (!asset) throw new Error('asset not found');

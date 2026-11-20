@@ -8,6 +8,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { AssetFormModal, type AssetFormValues } from '../components/AssetFormModal';
 import { AgentInventory } from '../components/AgentInventory';
+import { AssetHandovers } from '../components/AssetHandovers';
 import { BackArrowIcon } from '../components/icons';
 import { formatDateTime } from '../lib/format';
 import { ContractStatusBadge } from './Contracts';
@@ -96,6 +97,9 @@ export function AssetDetail() {
               <Spec label={t('assetDetail.mac')} value={asset.macAddress} />
               <Spec label={t('assetDetail.hostname')} value={asset.hostname} />
               <Spec label={t('assetDetail.serial')} value={asset.serialNumber} />
+              {(asset.assetType === 'MOBILE_DEVICE' || asset.assetType === 'TABLET' || asset.imei) && (
+                <Spec label="IMEI" value={asset.imei ?? null} />
+              )}
               <Spec label={t('assetDetail.manufacturer')} value={asset.manufacturer} />
               <Spec label={t('assetDetail.model')} value={asset.model} />
               <Spec label={t('assetDetail.os')} value={asset.operatingSystem} />
@@ -207,6 +211,12 @@ export function AssetDetail() {
             </div>
           )}
         </Card>
+
+        <AssetHandovers asset={asset} onChange={load} />
+
+        {(asset.assetType === 'MOBILE_DEVICE' || asset.assetType === 'TABLET' || (asset.mobileLines?.length ?? 0) > 0) && (
+          <AssetLines lines={asset.mobileLines ?? []} />
+        )}
 
         <AssetContracts assetId={asset.id} />
 
@@ -349,6 +359,37 @@ function AssetContracts({ assetId }: { assetId: string }) {
               </span>
               <ContractStatusBadge contract={c} />
             </div>
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+/** The phone lines in this phone -- docs/adr/0078-mobile-inventory.md. */
+function AssetLines({ lines }: { lines: NonNullable<AssetDetailType['mobileLines']> }) {
+  const { t } = useTranslation();
+  return (
+    <Card>
+      <h2 className="mb-2.5 text-[13px] font-bold uppercase tracking-wide text-slate-400">{t('mobileLines.onAsset', { count: lines.length })}</h2>
+      {lines.length === 0 ? (
+        <p className="text-[13px] text-slate-400">
+          {t('mobileLines.noneOnAsset')}{' '}
+          <Link to="/mobile-lines" className="text-indigo-600 hover:underline">
+            {t('mobileLines.title')}
+          </Link>
+        </p>
+      ) : (
+        <div className="flex flex-col gap-1.5">
+          {lines.map((l) => (
+            <Link
+              key={l.id}
+              to="/mobile-lines"
+              className="flex items-center justify-between gap-2 rounded-md bg-slate-50 px-2.5 py-1.5 text-[13px] hover:bg-slate-100"
+            >
+              <span className="shrink-0 whitespace-nowrap font-medium text-slate-800">{l.phoneNumber}</span>
+              <span className="truncate text-[11.5px] text-slate-400">{[l.carrier?.name, l.plan].filter(Boolean).join(' · ')}</span>
+            </Link>
           ))}
         </div>
       )}
