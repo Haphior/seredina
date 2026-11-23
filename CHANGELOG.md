@@ -7,6 +7,24 @@ contain breaking changes).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-23
+
+Mobile inventory: an Android agent, phone lines and handover forms.
+
+### Upgrading from 0.4.x
+
+Back up the database and `.env`, `git checkout v0.5.0`, rebuild with the
+same compose command. One additive migration (`imei` on assets, and the
+`mobile_lines` and `asset_handovers` tables) runs on start. Nothing in
+`.env` changes. Desktop agents need nothing.
+
+To enroll phones, the release carries `seredina-agent-android.apk`. If
+your devices download from `AGENT_DOWNLOAD_URL` instead of GitHub, copy
+the APK into that folder too.
+
+Passwords set from now on are stored as `$2b$` bcrypt hashes (bcryptjs
+3); existing `$2a$` hashes keep working, so nobody has to reset theirs.
+
 ### Added
 
 - **Android agent.** A Seredina Agent app for Android phones and tablets
@@ -28,6 +46,18 @@ contain breaking changes).
   date, condition, accessories, the line that goes with it), and print the
   handover form with the company logo and signature lines. A delivery
   assigns the asset and its line to the person; a return clears them.
+
+### Security
+
+- `hono` 4.13.18 (used by the MCP SDK's HTTP transport): `validator()`
+  skipped requests with oddly formatted `Content-Type` parameters,
+  `bodyLimit()` could exhaust memory with small chunks, and two path
+  issues in `mount()` and `serveStatic()`.
+
+### Changed
+
+- `bcryptjs` 3.0.3, `fastify-plugin` 6.0.1, `openai` 7.58,
+  `@huggingface/transformers` 4.3.2 and `autoprefixer` 10.6.2.
 
 ## [0.4.1] - 2026-11-09
 
