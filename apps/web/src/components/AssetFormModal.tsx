@@ -16,6 +16,8 @@ const ASSET_STATUSES: AssetStatus[] = ['ACTIVE', 'INACTIVE', 'RETIRED'];
 // those fields instead of showing empty boxes nobody will fill in.
 const NO_NETWORK: AssetType[] = ['MONITOR', 'PERIPHERAL', 'DOCKING_STATION'];
 const HAS_OS: AssetType[] = ['WORKSTATION', 'LAPTOP', 'SERVER', 'TABLET', 'MOBILE_DEVICE', 'OTHER'];
+// Phones and tablets carry an IMEI (docs/adr/0078-mobile-inventory.md).
+const HAS_IMEI: AssetType[] = ['MOBILE_DEVICE', 'TABLET'];
 
 export interface AssetFormValues {
   name: string;
@@ -40,6 +42,7 @@ export interface AssetFormValues {
   supplierId: string | null;
   warrantyEndDate: string | null;
   notes: string | null;
+  imei: string | null;
 }
 
 function toFormValues(asset?: Asset, defaults?: Partial<AssetFormValues>): AssetFormValues {
@@ -65,6 +68,7 @@ function toFormValues(asset?: Asset, defaults?: Partial<AssetFormValues>): Asset
     supplierId: asset?.supplierId ?? null,
     warrantyEndDate: asset?.warrantyEndDate?.slice(0, 10) ?? null,
     notes: asset?.notes ?? null,
+    imei: asset?.imei ?? null,
   };
 }
 
@@ -149,6 +153,8 @@ export function AssetFormModal({
         assignedContactId: assignee?.id ?? null,
         parentAssetId: parent?.id ?? null,
         purchaseCurrency: values.purchaseCurrency ? values.purchaseCurrency.toUpperCase() : null,
+        // Only phones and tablets have one; changing the type away clears it.
+        imei: HAS_IMEI.includes(values.assetType) ? values.imei : null,
       });
       onClose();
     } catch (err) {
@@ -190,6 +196,12 @@ export function AssetFormModal({
           <Input label={t('assetForm.assetTag')} placeholder="TI-00123" {...text('assetTag')} />
           <Input label={t('assetForm.serial')} {...text('serialNumber')} />
         </div>
+        {HAS_IMEI.includes(values.assetType) && (
+          <div>
+            <Input label={t('assetForm.imei')} inputMode="numeric" placeholder="35 123456 789012 3" {...text('imei')} />
+            <p className="mt-1 text-[11.5px] text-slate-400">{t('assetForm.imeiHint')}</p>
+          </div>
+        )}
 
         {catalogModels.length > 0 && (
           <Select label={t('assetForm.catalogModel')} value={values.modelId ?? ''} onChange={(e) => pickCatalogModel(e.target.value)}>

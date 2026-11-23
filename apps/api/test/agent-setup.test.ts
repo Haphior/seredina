@@ -78,7 +78,13 @@ describe.skipIf(!hasDb)('Agent setup: server address and CA pinning', () => {
     delete process.env.TLS_CA_FILE;
     delete process.env.API_PUBLIC_URL;
     delete process.env.AGENT_DOWNLOAD_URL;
-    expect((await setup()).json()).toEqual({ serverUrl: null, caCertPem: null, caCertSha256: null, agentDownloadUrl: null });
+    expect((await setup()).json()).toEqual({
+      serverUrl: null,
+      caCertPem: null,
+      caCertSha256: null,
+      agentDownloadUrl: null,
+      androidApkUrl: 'https://github.com/Haphior/seredina/releases/latest/download/seredina-agent-android.apk',
+    });
   });
 
   it('points agents at an internal download mirror when one is configured', async () => {

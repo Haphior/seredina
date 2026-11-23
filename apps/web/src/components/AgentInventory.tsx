@@ -13,13 +13,13 @@ import { Input } from './Input';
  * it -- a Mac has no Windows updates, a laptop no listening services.
  */
 
-type Tab = 'overview' | 'hardware' | 'storage' | 'network' | 'software' | 'security' | 'updates' | 'services' | 'ports' | 'server';
+type Tab = 'overview' | 'mobile' | 'hardware' | 'storage' | 'network' | 'software' | 'security' | 'updates' | 'services' | 'ports' | 'server';
 
 export function AgentInventory({ inventory, collectedAt, assetName }: { inventory: Inventory; collectedAt: string | null; assetName: string }) {
   const { t } = useTranslation();
   const inv = inventory;
   const tabs = useMemo(() => {
-    const present: Tab[] = ['overview', 'hardware', 'storage', 'network'];
+    const present: Tab[] = inv.mobile ? ['overview', 'mobile', 'hardware', 'storage', 'network'] : ['overview', 'hardware', 'storage', 'network'];
     if (inv.software?.length) present.push('software');
     present.push('security');
     if (inv.updates?.installed?.length || inv.updates?.pending !== undefined) present.push('updates');
@@ -72,6 +72,7 @@ export function AgentInventory({ inventory, collectedAt, assetName }: { inventor
 
       <div role="tabpanel">
         {tab === 'overview' && <Overview inv={inv} />}
+        {tab === 'mobile' && <Mobile inv={inv} />}
         {tab === 'hardware' && <Hardware inv={inv} />}
         {tab === 'storage' && <Storage inv={inv} />}
         {tab === 'network' && <Network inv={inv} />}
@@ -571,6 +572,67 @@ function Server({ inv }: { inv: Inventory }) {
         <Table
           head={[t('inventory.name'), t('inventory.type'), t('inventory.state'), t('inventory.image')]}
           rows={(inv.virtualMachines ?? []).map((g) => [g.name, g.type, g.state, g.image])}
+        />
+      </Section>
+    </>
+  );
+}
+
+/** What the Android agent reports about a phone or tablet -- docs/adr/0078-mobile-inventory.md. */
+function Mobile({ inv }: { inv: Inventory }) {
+  const { t } = useTranslation();
+  const m = inv.mobile ?? {};
+  const storage =
+    m.storageTotalGb === undefined
+      ? null
+      : m.storageFreeGb === undefined
+        ? gb(m.storageTotalGb)
+        : t('inventory.mobile.storageFree', { free: gb(m.storageFreeGb), total: gb(m.storageTotalGb) });
+  return (
+    <>
+      <Section title={t('inventory.mobile.device')}>
+        <Facts>
+          <Fact label={t('inventory.mobile.deviceName')}>{m.deviceName}</Fact>
+          <Fact label={t('inventory.mobile.brand')}>{m.brand}</Fact>
+          <Fact label={t('inventory.mobile.securityPatch')}>{m.securityPatch}</Fact>
+          <Fact label={t('inventory.mobile.apiLevel')}>{m.apiLevel}</Fact>
+          <Fact label={t('inventory.mobile.storage')}>{storage}</Fact>
+          <Fact label={t('inventory.mobile.battery')}>
+            {m.batteryPercent === undefined
+              ? null
+              : `${m.batteryPercent}%${m.charging ? ` · ${t('inventory.mobile.charging')}` : ''}`}
+          </Fact>
+        </Facts>
+      </Section>
+      <Section title={t('inventory.mobile.posture')}>
+        <Facts>
+          <Fact label={t('inventory.mobile.screenLock')}>
+            <YesNo value={m.screenLockSecure} />
+          </Fact>
+          <Fact label={t('inventory.mobile.encrypted')}>
+            <YesNo value={inv.security?.systemDiskEncrypted} />
+          </Fact>
+          <Fact label={t('inventory.mobile.rooted')}>
+            <YesNo value={m.rooted} good={false} />
+          </Fact>
+          <Fact label={t('inventory.mobile.developerOptions')}>
+            <YesNo value={m.developerOptions} good={false} />
+          </Fact>
+          <Fact label={t('inventory.mobile.usbDebugging')}>
+            <YesNo value={m.usbDebugging} good={false} />
+          </Fact>
+        </Facts>
+      </Section>
+      <Section title={t('inventory.mobile.sims')}>
+        <Table
+          head={[t('inventory.mobile.slot'), t('inventory.mobile.carrier'), t('inventory.mobile.country'), t('inventory.mobile.number')]}
+          rows={(m.sims ?? []).map((sim) => [
+            sim.slot === undefined ? null : sim.slot + 1,
+            sim.carrier,
+            sim.countryIso?.toUpperCase(),
+            sim.phoneNumber ?? <span className="text-slate-400">{t('inventory.mobile.numberHidden')}</span>,
+          ])}
+          empty={t('inventory.mobile.noSims')}
         />
       </Section>
     </>

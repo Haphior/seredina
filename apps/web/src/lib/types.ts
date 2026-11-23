@@ -216,7 +216,7 @@ export interface AgentInventory {
     model?: string;
     serialNumber?: string;
     uuid?: string;
-    formFactor?: 'laptop' | 'desktop' | 'server' | 'virtual' | 'tablet' | 'other';
+    formFactor?: 'laptop' | 'desktop' | 'server' | 'virtual' | 'tablet' | 'phone' | 'other';
     role?: 'server' | 'workstation';
     virtual?: boolean;
     hypervisor?: string;
@@ -300,6 +300,22 @@ export interface AgentInventory {
   ports?: { protocol: 'tcp' | 'udp'; address?: string; port: number; process?: string }[];
   serverRoles?: string[];
   virtualMachines?: { name: string; type?: string; state?: string; image?: string }[];
+  // The Android agent (docs/adr/0078-mobile-inventory.md).
+  mobile?: {
+    deviceName?: string;
+    brand?: string;
+    securityPatch?: string;
+    apiLevel?: number;
+    sims?: { slot?: number; carrier?: string; countryIso?: string; phoneNumber?: string }[];
+    screenLockSecure?: boolean;
+    developerOptions?: boolean;
+    usbDebugging?: boolean;
+    rooted?: boolean;
+    batteryPercent?: number;
+    charging?: boolean;
+    storageTotalGb?: number;
+    storageFreeGb?: number;
+  };
 }
 
 export interface Asset {
@@ -346,6 +362,68 @@ export interface Asset {
   supplier?: { id: string; name: string } | null;
   warrantyEndDate: string | null;
   notes: string | null;
+  imei?: string | null;
+  // Only on the asset's own page -- docs/adr/0078-mobile-inventory.md.
+  mobileLines?: { id: string; phoneNumber: string; status: MobileLineStatus; plan: string | null; carrier: { id: string; name: string } | null }[];
+  device?: { id: string; platform: string; agentVersion: string | null; revokedAt: string | null } | null;
+}
+
+// docs/adr/0078-mobile-inventory.md
+export type MobileLineStatus = 'ACTIVE' | 'SUSPENDED' | 'CANCELLED';
+
+export interface MobileLine {
+  id: string;
+  phoneNumber: string;
+  status: MobileLineStatus;
+  carrierId: string | null;
+  carrier: { id: string; name: string } | null;
+  plan: string | null;
+  dataAllowance: string | null;
+  monthlyCost: number | null;
+  currency: string | null;
+  iccid: string | null;
+  contractEndDate: string | null;
+  contractId: string | null;
+  contract: { id: string; name: string; nextPaymentDate: string | null } | null;
+  assetId: string | null;
+  asset: { id: string; name: string; assetType: AssetType; imei: string | null } | null;
+  assignedContactId: string | null;
+  assignedContact: { id: string; name: string; email: string } | null;
+  notes: string | null;
+}
+
+export type HandoverKind = 'DELIVERY' | 'RETURN';
+
+export interface AssetHandover {
+  id: string;
+  assetId: string;
+  kind: HandoverKind;
+  contactId: string | null;
+  contact: { id: string; name: string; email: string } | null;
+  handedOverOn: string;
+  condition: string | null;
+  accessories: string | null;
+  notes: string | null;
+  mobileLineId: string | null;
+  mobileLine: { id: string; phoneNumber: string; iccid: string | null; plan: string | null; carrier: { name: string } | null } | null;
+  recordedByName: string | null;
+  createdAt: string;
+}
+
+export interface AssetHandoverDetail extends AssetHandover {
+  tenantName: string;
+  tenantSlug: string;
+  asset: {
+    id: string;
+    name: string;
+    assetType: AssetType;
+    assetTag: string | null;
+    manufacturer: string | null;
+    model: string | null;
+    serialNumber: string | null;
+    imei: string | null;
+    location: string | null;
+  };
 }
 
 export interface Manufacturer {

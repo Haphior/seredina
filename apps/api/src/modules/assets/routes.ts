@@ -32,6 +32,13 @@ const assetFieldsSchema = {
   supplierId: z.string().uuid().nullish(),
   warrantyEndDate: date.nullish(),
   notes: z.string().max(5000).nullish(),
+  // Phones and tablets: 14-16 digits (an IMEI or IMEISV), spaces and dashes allowed.
+  imei: z
+    .string()
+    .trim()
+    .regex(/^[0-9][0-9 -]{12,20}[0-9]$/, 'use the 15-digit IMEI')
+    .transform((v) => v.replace(/[ -]/g, ''))
+    .nullish(),
 };
 
 const createAssetSchema = z.object({

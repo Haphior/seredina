@@ -132,7 +132,8 @@
       "notificationSettings": "Notifications",
       "setup": "Initial setup",
       "directory": "Directory",
-      "updates": "Updates"
+      "updates": "Updates",
+      "mobileLines": "Mobile lines"
     }
   },
   "layout": {
@@ -617,7 +618,13 @@
       "directory_contact.deleted": "Directory person deleted",
       "system.update_started": "Seredina update started",
       "system.update_source_saved": "Update source saved",
-      "system.update_source_deleted": "Update source removed"
+      "system.update_source_deleted": "Update source removed",
+      "mobile_line.created": "Mobile line added",
+      "mobile_line.updated": "Mobile line changed",
+      "mobile_line.deleted": "Mobile line deleted",
+      "asset.delivered": "Equipment handed over",
+      "asset.returned": "Equipment returned",
+      "asset.handover_deleted": "Handover record deleted"
     }
   },
   "mfa": {
@@ -1294,7 +1301,9 @@
     "purchaseCost": "Purchase cost",
     "currency": "Currency",
     "warrantyEnd": "Warranty ends",
-    "notes": "Notes"
+    "notes": "Notes",
+    "imei": "IMEI",
+    "imeiHint": "Dial *#06# on the phone or check the box. Android doesn't let an app read it."
   },
   "monitoring": {
     "title": "Monitoring Integrations",
@@ -1383,12 +1392,14 @@
     "platforms": {
       "windows": "Windows",
       "unix": "macOS / Linux",
-      "manual": "Already downloaded"
+      "manual": "Already downloaded",
+      "android": "Android"
     },
     "platformHints": {
       "windows": "In PowerShell opened as administrator. It downloads the agent, checks its SHA-256, enrolls this device and starts the agent as a service.",
       "unix": "In a terminal (it asks for your password, for sudo). It downloads the agent, checks its SHA-256, enrolls this device and starts the agent as a service.",
-      "manual": "For devices without internet access: copy the agent from <releases>its releases</releases>, then run this as administrator from its folder (./seredina-agent on macOS/Linux, .\\seredina-agent.exe on Windows)."
+      "manual": "For devices without internet access: copy the agent from <releases>its releases</releases>, then run this as administrator from its folder (./seredina-agent on macOS/Linux, .\\seredina-agent.exe on Windows).",
+      "android": "Android phones and tablets: install the Seredina Agent app and scan the code from it. The app reports model, Android version, security patch, SIMs, battery, storage, installed apps and security posture."
     },
     "generateHint": "Generate an enrollment command to add a device.",
     "empty": "No devices enrolled yet.",
@@ -1400,7 +1411,15 @@
     "never": "Never",
     "revoked": "Revoked",
     "active": "Active",
-    "revoke": "revoke"
+    "revoke": "revoke",
+    "android": {
+      "step1": "1. Install the app",
+      "step1Hint": "Scan with the phone's camera to download the APK. Android will ask to allow installing from the browser.",
+      "downloadQr": "QR code to download the app",
+      "step2": "2. Enroll the device",
+      "step2Hint": "Open Seredina Agent, tap “Scan code” and point it at this code. It works once and expires in 15 minutes.",
+      "enrollQr": "Enrollment QR code"
+    }
   },
   "services": {
     "loadFailed": "Failed to load services",
@@ -1978,7 +1997,8 @@
       "updates": "Updates",
       "services": "Services",
       "ports": "Ports",
-      "server": "Roles and VMs"
+      "server": "Roles and VMs",
+      "mobile": "Mobile"
     },
     "none": "None.",
     "noneDetected": "None detected.",
@@ -2112,7 +2132,31 @@
     "process": "Process",
     "roles": "Roles and server software",
     "guests": "Virtual machines and containers",
-    "image": "Image"
+    "image": "Image",
+    "mobile": {
+      "device": "Device",
+      "deviceName": "Device name",
+      "brand": "Brand",
+      "securityPatch": "Security patch",
+      "apiLevel": "API level",
+      "storage": "Storage",
+      "storageFree": "{{free}} free of {{total}}",
+      "battery": "Battery",
+      "charging": "charging",
+      "posture": "Security",
+      "screenLock": "Screen lock",
+      "encrypted": "Storage encrypted",
+      "rooted": "Rooted",
+      "developerOptions": "Developer options",
+      "usbDebugging": "USB debugging",
+      "sims": "SIM cards",
+      "slot": "Slot",
+      "carrier": "Carrier",
+      "country": "Country",
+      "number": "Number",
+      "numberHidden": "not reported by the SIM",
+      "noSims": "No SIM, or no permission to see them"
+    }
   },
   "contacts": {
     "loadFailed": "Failed to load contacts",
@@ -2631,5 +2675,104 @@
     "includePrereleases": "Include pre-releases",
     "githubHint": "Versions are the repository's published releases.",
     "gitHint": "Versions are the repository's vX.Y.Z tags. Checking them needs the update service turned on."
+  },
+  "handovers": {
+    "title": "Handovers",
+    "deliver": "Hand over",
+    "return": "Return",
+    "empty": "No handover records yet.",
+    "print": "Print",
+    "delete": "Delete record",
+    "confirmDelete": "Delete this record? Who the equipment is assigned to doesn't change.",
+    "deleteFailed": "Couldn't delete the record",
+    "kind": {
+      "DELIVERY": "Handed over",
+      "RETURN": "Returned"
+    },
+    "pickReceiver": "Choose who receives it",
+    "pickReturner": "Choose who returns it",
+    "saveFailed": "Couldn't record it",
+    "loadFailed": "Couldn't load the record",
+    "deliverTitle": "Hand over {{name}}",
+    "returnTitle": "Return of {{name}}",
+    "receiver": "Received by",
+    "returner": "Returned by",
+    "date": "Date",
+    "line": "Line handed over with it",
+    "noLine": "None",
+    "condition": "Condition",
+    "conditionPlaceholder": "New, no scratches",
+    "accessories": "Accessories",
+    "accessoriesPlaceholder": "Charger, USB-C cable, case",
+    "notes": "Notes",
+    "saveAndPrint": "Save and print the form",
+    "printNow": "Print",
+    "form": {
+      "titleDelivery": "Equipment handover form",
+      "titleReturn": "Equipment return form",
+      "introDelivery": "On {{date}}, {{company}} hands over to {{person}} the equipment described below.",
+      "introReturn": "On {{date}}, {{person}} returns to {{company}} the equipment described below.",
+      "equipment": "Equipment",
+      "type": "Type",
+      "name": "Name",
+      "brandModel": "Make and model",
+      "serial": "Serial number",
+      "assetTag": "Asset tag",
+      "accessories": "Accessories",
+      "condition": "Condition",
+      "line": "Phone line",
+      "phoneNumber": "Number",
+      "carrier": "Carrier",
+      "plan": "Plan",
+      "notes": "Notes",
+      "statementDelivery": "The recipient acknowledges receiving the equipment described, in the condition stated, and agrees to look after it, use it for work, and return it when the company asks or when their employment ends.",
+      "statementReturn": "This records the return of the equipment described, in the condition stated.",
+      "handedBy": "Handed over by",
+      "returnedBy": "Returned by",
+      "receivedBy": "Received by",
+      "receivedBackBy": "Received by",
+      "signName": "Name",
+      "signId": "ID number"
+    }
+  },
+  "mobileLines": {
+    "title": "Mobile lines",
+    "new": "New line",
+    "edit": "Edit line",
+    "intro": "The company's phone numbers: carrier, plan, monthly cost, which phone each SIM is in and who has it. Payments and reminders go on the carrier's contract.",
+    "searchPlaceholder": "Search number, ICCID, plan or person",
+    "status": "Status",
+    "anyStatus": "Any status",
+    "statuses": {
+      "ACTIVE": "Active",
+      "SUSPENDED": "Suspended",
+      "CANCELLED": "Cancelled"
+    },
+    "monthlyTotal": "Monthly total: {{total}}",
+    "loadFailed": "Couldn't load the lines",
+    "empty": "No lines match.",
+    "number": "Number",
+    "carrier": "Carrier",
+    "plan": "Plan",
+    "monthlyCost": "Monthly cost",
+    "phone": "Phone",
+    "assignedTo": "Assigned to",
+    "editAction": "Edit",
+    "deleteAction": "Delete",
+    "confirmDelete": "Delete line {{number}}?",
+    "deleteFailed": "Couldn't delete the line",
+    "saveFailed": "Couldn't save the line",
+    "iccid": "ICCID (SIM number)",
+    "planPlaceholder": "Business 30 GB",
+    "dataAllowance": "Data",
+    "currency": "Currency",
+    "contractEnd": "Contract ends",
+    "contract": "Carrier contract",
+    "contractHint": "For payments and their email reminders.",
+    "phonePlaceholder": "Find the phone by name",
+    "notes": "Notes",
+    "onAsset_one": "Lines ({{count}})",
+    "onAsset_other": "Lines ({{count}})",
+    "noneOnAsset": "No lines in this device."
   }
 }
